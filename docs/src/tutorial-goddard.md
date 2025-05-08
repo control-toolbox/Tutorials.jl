@@ -34,9 +34,9 @@ $v(t) \leq v_{\max}$. The initial state is fixed while only the final mass is pr
     as well as constrained arcs due to the path constraint on the velocity (see below).
 
 We import the [OptimalControl.jl](https://control-toolbox.org/OptimalControl.jl) package to define the optimal control problem and
-[NLPModelsIpopt.jl](https://github.com/JuliaSmoothOptimizers/NLPModelsIpopt.jl) to solve it. 
-We import the [Plots.jl](https://github.com/JuliaPlots/Plots.jl) package to plot the solution. 
-The [OrdinaryDiffEq.jl](https://github.com/SciML/OrdinaryDiffEq.jl) package is used to 
+[NLPModelsIpopt.jl](https://jso.dev/NLPModelsIpopt.jl) to solve it. 
+We import the [Plots.jl](https://docs.juliaplots.org) package to plot the solution. 
+The [OrdinaryDiffEq.jl](https://docs.sciml.ai/OrdinaryDiffEq) package is used to 
 define the shooting function for the indirect method and the [MINPACK.jl](https://github.com/sglyon/MINPACK.jl) package permits to solve the shooting equation.
 
 ```@example main
@@ -119,15 +119,11 @@ bang arc with maximal control, followed by a singular arc, then by a boundary ar
 arc is with zero control. Note that the switching function vanishes along the singular and
 boundary arcs.
 
-!!! tip "Interactions with an optimal control solution"
-
-    Please check [`state`](@ref), [`costate`](@ref), [`control`](@ref) and [`variable`](@ref) to get data from the solution. The functions `state`, `costate` and `control` return functions of time and `variable` returns a vector. The function [`time_grid`](@ref) returns the discretized time grid returned by the solver.
-
 ```@example main
-t = time_grid(direct_sol)
-x = state(direct_sol)
-u = control(direct_sol)
-p = costate(direct_sol)
+t = time_grid(direct_sol)   # the time grid as a vector
+x = state(direct_sol)       # the state as a function of time
+u = control(direct_sol)     # the control as a function of time
+p = costate(direct_sol)     # the costate as a function of time
 
 H1 = Lift(F1)           # H1(x, p) = p' * F1(x)
 φ(t) = H1(x(t), p(t))   # switching function
@@ -193,9 +189,7 @@ as well as the associated multiplier for the *order one* state constraint on the
 
     which is the reason why we use the `@Lie` macro to compute Poisson brackets below.
 
-With the help of the [differential geometry primitives](https://control-toolbox.org/CTBase.jl/stable/api-diffgeom.html)
-from [CTBase.jl](https://control-toolbox.org/OptimalControl.jl/stable/api-ctbase.html),
-these expressions are straightforwardly translated into Julia code:
+With the help of differential geometry primitives, these expressions are straightforwardly translated into Julia code:
 
 ```@example main
 # Controls
@@ -284,11 +278,11 @@ We aggregate the data to define the initial guess vector.
 
 ### MINPACK.jl
 
-We can use [NonlinearSolve.jl](https://github.com/SciML/NonlinearSolve.jl) package or, instead, the 
+We can use [NonlinearSolve.jl](https://docs.sciml.ai/NonlinearSolve) package or, instead, the 
 [MINPACK.jl](https://github.com/sglyon/MINPACK.jl) package to solve 
 the shooting equation. To compute the Jacobian of the shooting function we use the 
-[DifferentiationInterface.jl](https://gdalle.github.io/DifferentiationInterface.jl/DifferentiationInterface) package with 
-[ForwardDiff.jl](https://github.com/JuliaDiff/ForwardDiff.jl) backend.
+[DifferentiationInterface.jl](https://juliadiff.org/DifferentiationInterface.jl/DifferentiationInterface) package with 
+[ForwardDiff.jl](https://juliadiff.org/ForwardDiff.jl) backend.
 
 ```@setup main
 using NonlinearSolve  # interface to NLE solvers

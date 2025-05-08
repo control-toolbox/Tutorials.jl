@@ -20,7 +20,7 @@ and the initial condition
 
 We aim to solve this optimal control problem for different values of $t_f$.
 First, we need to import the [OptimalControl.jl](https://control-toolbox.org/OptimalControl.jl) package to define the 
-optimal control problem and [NLPModelsIpopt.jl](jso.dev/NLPModelsIpopt.jl) to solve it. 
+optimal control problem and [NLPModelsIpopt.jl](https://jso.dev/NLPModelsIpopt.jl) to solve it. 
 We also need to import the [Plots.jl](https://docs.juliaplots.org) package to plot the solution.
 
 ```@example main
