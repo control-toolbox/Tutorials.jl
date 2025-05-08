@@ -1,6 +1,6 @@
-# CTApp
+# Tutorials
 
-Documentation for [CTApp](https://github.com/control-toolbox/CTApp.jl).
+Documentation for [Tutorials](https://github.com/control-toolbox/Tutorials.jl).
 
 ## Dependencies
 

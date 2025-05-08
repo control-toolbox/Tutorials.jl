@@ -1,11 +1,11 @@
 using Documenter
 
-repo_url = "github.com/control-toolbox/CTApp.jl"
+repo_url = "github.com/control-toolbox/Tutorials.jl"
 
 makedocs(;
     remotes=nothing,
     warnonly=:cross_references,
-    sitename="CTApp",
+    sitename="Tutorials",
     format=Documenter.HTML(;
         repolink="https://" * repo_url,
         prettyurls=false,
