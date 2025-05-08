@@ -1,0 +1,3 @@
+var documenterSearchIndex = {"docs":
+[{"location":"index.html#Tutorials","page":"Introduction","title":"Tutorials","text":"","category":"section"},{"location":"index.html","page":"Introduction","title":"Introduction","text":"Documentation for Tutorials.","category":"page"},{"location":"index.html#Dependencies","page":"Introduction","title":"Dependencies","text":"","category":"section"},{"location":"index.html","page":"Introduction","title":"Introduction","text":"All the numerical simulations to generate this documentation are performed with the following packages.","category":"page"},{"location":"index.html","page":"Introduction","title":"Introduction","text":"using Pkg\nPkg.status()","category":"page"}]
+}
