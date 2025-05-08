@@ -3,11 +3,14 @@
 In this tutorial we present the indirect simple shooting method on a simple example.
 
 Let us start by importing the necessary packages.
+We import the [OptimalControl.jl](https://control-toolbox.org/OptimalControl.jl) package to define the optimal control problem. 
+We import the [Plots.jl](https://docs.juliaplots.org) package to plot the solution. 
+The [OrdinaryDiffEq.jl](https://docs.sciml.ai/OrdinaryDiffEq) package is used to define the shooting function for the indirect method and the [MINPACK.jl](https://github.com/sglyon/MINPACK.jl) package permits to solve the shooting equation.
+
 
 ```@example main
 using OptimalControl    # to define the optimal control problem and its flow
 using OrdinaryDiffEq    # to get the Flow function from OptimalControl
-using NonlinearSolve    # interface to NLE solvers
 using MINPACK           # NLE solver: use to solve the shooting equation
 using Plots             # to plot the solution
 ```
@@ -154,7 +157,7 @@ nothing # hide
 
 ### MINPACK.jl
 
-We can use [NonlinearSolve.jl](https://github.com/SciML/NonlinearSolve.jl) package or, instead, [MINPACK.jl](https://github.com/sglyon/MINPACK.jl) to solve the shooting equation. To compute the Jacobian of the shooting function we use [DifferentiationInterface.jl](https://gdalle.github.io/DifferentiationInterface.jl/DifferentiationInterface) with [ForwardDiff.jl](https://github.com/JuliaDiff/ForwardDiff.jl) backend.
+We can use [NonlinearSolve.jl](https://docs.sciml.ai/NonlinearSolve) package or, instead, [MINPACK.jl](https://github.com/sglyon/MINPACK.jl) to solve the shooting equation. To compute the Jacobian of the shooting function we use [DifferentiationInterface.jl](https://juliadiff.org/DifferentiationInterface.jl/DifferentiationInterface) with [ForwardDiff.jl](https://juliadiff.org/ForwardDiff.jl) backend.
 
 ```@setup main
 using MINPACK

@@ -7,9 +7,9 @@ CurrentModule =  OptimalControl
 We describe here some more advanced operations related to the discretized optimal control problem.
 When calling `solve(ocp)` three steps are performed internally:
 
-- first, the OCP is discretized into a DOCP (a nonlinear optimization problem) with [`direct_transcription`](@ref),
-- then, this DOCP is solved (with the internal function [`solve_docp`](@ref)),
-- finally, a functional solution of the OCP is rebuilt from the solution of the discretized problem, with [`OptimalControlSolution`](@ref).
+- first, the OCP is discretized into a DOCP (a nonlinear optimization problem),
+- then, this DOCP is solved with a nonlinear programming (NLP) solver, which returns a solution of the discretized problem,
+- finally, a functional solution of the OCP is rebuilt from the solution of the discretized problem.
 
 These steps can also be done separately, for instance if you want to use your own NLP solver. 
 
@@ -55,7 +55,7 @@ We can now use the solver of our choice to solve it.
 
 ## Resolution of the NLP problem
 
-For a first example we use the `ipopt` solver from [NLPModelsIpopt.jl](https://github.com/JuliaSmoothOptimizers/NLPModelsIpopt.jl) package to solve the NLP problem.
+For a first example we use the `ipopt` solver from [NLPModelsIpopt.jl](https://jso.dev/NLPModelsIpopt.jl) package to solve the NLP problem.
 
 ```@example main
 using NLPModelsIpopt
@@ -82,14 +82,14 @@ nlp_sol = madnlp(nlp)
 
 ## Initial guess
 
-An initial guess, including warm start, can be passed to [`direct_transcription`](@ref) the same way as for `solve`.
+An initial guess, including warm start, can be passed to [`direct_transcription`](https://control-toolbox.org/OptimalControl.jl/stable/dev-ctdirect.html#CTDirect.direct_transcription-Tuple{Model,%20Vararg{Any}}) the same way as for `solve`.
 
 ```@example main
 docp, nlp = direct_transcription(ocp; init=sol)
 nothing # hide
 ```
 
-It can also be changed after the transcription is done, with  [`set_initial_guess`](@ref).
+It can also be changed after the transcription is done, with  [`set_initial_guess`](https://control-toolbox.org/OptimalControl.jl/stable/dev-ctdirect.html#CTDirect.set_initial_guess-Tuple{CTDirect.DOCP,%20Any,%20Any}).
 
 ```@example main
 set_initial_guess(docp, nlp, sol)

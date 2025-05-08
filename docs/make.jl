@@ -8,7 +8,7 @@ makedocs(;
     sitename="Tutorials",
     format=Documenter.HTML(;
         repolink="https://" * repo_url,
-        prettyurls=true,
+        prettyurls=false,
         size_threshold_ignore=[
             ""
         ],

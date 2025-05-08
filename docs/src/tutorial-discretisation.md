@@ -5,7 +5,8 @@ When calling `solve`, the option `disc_method=...` can be used to set the discre
 In addition to the default implicit `:trapeze` method (aka Crank-Nicolson), other choices are available, namely implicit `:midpoint` and the Gauss-Legendre collocations with 2 and  stages, `:gauss_legendre_2` and `:gauss_legendre_3`, of order 4 and 6 respectively. 
 Note that higher order methods will typically lead to larger NLP problems for the same number of time steps, and that accuracy will also depend on the smoothness of the problem.
 
-As an example we will use the [Goddard problem](@ref tutorial-goddard)
+As an example we will use the [Goddard problem](@ref tutorial-goddard).
+
 ```@example main
 using OptimalControl  # to define the optimal control problem and more
 using NLPModelsIpopt  # to solve the problem via a direct method
@@ -57,23 +58,28 @@ nothing # hide
 ```
 Now let us compare different discretisations
 ```@example main
+x_style = (legend=:none,)
+p_style = (legend=:none,)
+
 sol_trapeze = solve(ocp; tol=1e-8)
-plot(sol_trapeze)
+plt = plot(sol_trapeze; solution_label="trapeze", state_style=x_style, costate_style=p_style)
 
 sol_midpoint = solve(ocp, disc_method=:midpoint; tol=1e-8)
-plot!(sol_midpoint)
+plot!(plt, sol_midpoint; solution_label="midpoint", state_style=x_style, costate_style=p_style);
 
 sol_euler = solve(ocp, disc_method=:euler; tol=1e-8)
-plot!(sol_euler)
+plot!(plt, sol_euler; solution_label="euler", state_style=x_style, costate_style=p_style);
 
 sol_euler_imp = solve(ocp, disc_method=:euler_implicit; tol=1e-8)
-plot!(sol_euler_imp)
+plot!(plt, sol_euler_imp; solution_label="euler implicit", state_style=x_style, costate_style=p_style);
 
 sol_gl2 = solve(ocp, disc_method=:gauss_legendre_2; tol=1e-8)
-plot!(sol_gl2)
+plot!(plt, sol_gl2; solution_label="gauss legendre 2", state_style=x_style, costate_style=p_style);
 
 sol_gl3 = solve(ocp, disc_method=:gauss_legendre_3; tol=1e-8)
-plot!(sol_gl3)
+plot!(plt, sol_gl3; solution_label="gauss legendre 3", state_style=x_style, costate_style=p_style);
+
+plot(plt, size=(800, 800))
 ```
 
 ## Large problems and AD backend
