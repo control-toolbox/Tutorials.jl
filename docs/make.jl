@@ -5,7 +5,7 @@ repo_url = "github.com/control-toolbox/Tutorials.jl"
 
 makedocs(;
     warnonly=[:cross_references, :autodocs_block],
-    sitename="Tutorials.jl",
+    sitename="Tutorials",
     format=Documenter.HTML(;
         repolink="https://" * repo_url,
         prettyurls=true,
