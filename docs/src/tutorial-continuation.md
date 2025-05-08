@@ -133,8 +133,8 @@ plt_obj = plot(Tmax_list, obj_list;
     xlabel="Maximal thrust (Tmax)",
     ylabel="Maximal altitude r(tf)")
 
-plt_sol = plot(sol0; solution_label="(Tmax = "*string(Tmax_list[1])*")")
-plot!(plt_sol, sol;  solution_label="(Tmax = "*string(Tmax_list[end])*")")
+plt_sol = plot(sol0; label="(Tmax = "*string(Tmax_list[1])*")")
+plot!(plt_sol, sol;  label="(Tmax = "*string(Tmax_list[end])*")")
 
 layout = grid(2, 1, heights=[0.2, 0.8])
 plot(plt_obj, plt_sol; layout=layout, size=(800, 1000), leftmargin=5mm)

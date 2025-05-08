@@ -109,7 +109,7 @@ nothing # hide
 and plot the solution
 
 ```@example main
-plt = plot(direct_sol, solution_label="(direct)", size=(800, 800))
+plt = plot(direct_sol, label="direct", size=(800, 800))
 ```
 
 ## [Structure of the solution](@id tutorial-goddard-structure)
@@ -359,7 +359,7 @@ We plot the solution of the indirect solution (in red) over the solution of the 
 f = f1 * (t1, fs) * (t2, fb) * (t3, f0) # concatenation of the flows
 flow_sol = f((t0, tf), x0, p0)          # compute the solution: state, costate, control...
 
-plot!(plt, flow_sol, solution_label="(indirect)")
+plot!(plt, flow_sol, label="indirect")
 ```
 
 ## References

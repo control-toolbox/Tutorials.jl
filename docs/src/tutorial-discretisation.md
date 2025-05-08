@@ -62,22 +62,22 @@ x_style = (legend=:none,)
 p_style = (legend=:none,)
 
 sol_trapeze = solve(ocp; tol=1e-8)
-plt = plot(sol_trapeze; solution_label="trapeze", state_style=x_style, costate_style=p_style)
+plt = plot(sol_trapeze; label="trapeze", state_style=x_style, costate_style=p_style)
 
 sol_midpoint = solve(ocp, disc_method=:midpoint; tol=1e-8)
-plot!(plt, sol_midpoint; solution_label="midpoint", state_style=x_style, costate_style=p_style);
+plot!(plt, sol_midpoint; label="midpoint", state_style=x_style, costate_style=p_style);
 
 sol_euler = solve(ocp, disc_method=:euler; tol=1e-8)
-plot!(plt, sol_euler; solution_label="euler", state_style=x_style, costate_style=p_style);
+plot!(plt, sol_euler; label="euler", state_style=x_style, costate_style=p_style);
 
 sol_euler_imp = solve(ocp, disc_method=:euler_implicit; tol=1e-8)
-plot!(plt, sol_euler_imp; solution_label="euler implicit", state_style=x_style, costate_style=p_style);
+plot!(plt, sol_euler_imp; label="euler implicit", state_style=x_style, costate_style=p_style);
 
 sol_gl2 = solve(ocp, disc_method=:gauss_legendre_2; tol=1e-8)
-plot!(plt, sol_gl2; solution_label="gauss legendre 2", state_style=x_style, costate_style=p_style);
+plot!(plt, sol_gl2; label="gauss legendre 2", state_style=x_style, costate_style=p_style);
 
 sol_gl3 = solve(ocp, disc_method=:gauss_legendre_3; tol=1e-8)
-plot!(plt, sol_gl3; solution_label="gauss legendre 3", state_style=x_style, costate_style=p_style);
+plot!(plt, sol_gl3; label="gauss legendre 3", state_style=x_style, costate_style=p_style);
 
 plot(plt, size=(800, 800))
 ```
