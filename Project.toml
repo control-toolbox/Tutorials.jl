@@ -1,7 +1,7 @@
 name = "Tutorials"
 uuid = "cb10daa6-a5e5-4c25-a171-ae181b8ea3c9"
 authors = ["Olivier Cots <olivier.cots@toulouse-inp.fr>"]
-version = "0.1.1"
+version = "0.1.2"
 
 [compat]
 julia = "1.10"
