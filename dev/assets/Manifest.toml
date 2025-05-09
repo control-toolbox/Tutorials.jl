@@ -210,9 +210,9 @@ weakdeps = ["OrdinaryDiffEq"]
 
 [[deps.CTModels]]
 deps = ["CTBase", "DocStringExtensions", "Interpolations", "LinearAlgebra", "MLStyle", "MacroTools", "OrderedCollections", "Parameters", "PrettyTables", "RecipesBase"]
-git-tree-sha1 = "214d034af47799e6bd74b8c3b96fdf2edbd34c63"
+git-tree-sha1 = "a67b17d64f5e58b78e360b17d712d62962cdd591"
 uuid = "34c4fa32-2049-4079-8329-de33c2a22e2d"
-version = "0.3.7"
+version = "0.3.8"
 
     [deps.CTModels.extensions]
     CTModelsJLD = "JLD2"
@@ -2268,7 +2268,7 @@ version = "1.4.0"
 [[deps.Tutorials]]
 path = "/home/runner/work/Tutorials.jl/Tutorials.jl"
 uuid = "cb10daa6-a5e5-4c25-a171-ae181b8ea3c9"
-version = "0.1.1"
+version = "0.1.2"
 
 [[deps.URIs]]
 git-tree-sha1 = "cbbebadbcc76c5ca1cc4b4f3b0614b3e603b5000"
