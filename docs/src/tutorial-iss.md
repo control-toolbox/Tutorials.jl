@@ -86,7 +86,7 @@ where $[t]~=  (x(t),p(t),u(x(t), p(t)))$.
 
 !!! note "Our goal"
 
-    Our goal is to solve this (BVP). Solving (BVP) consists in solving the Pontryagin Maximum Principle which provides necessary conditions of optimality.
+    Our goal is to solve this boundary value problem (BVP). Solving the BVP involves applying the Pontryagin Maximum Principle, which provides necessary conditions for optimality.
 
 ## Shooting function
 
