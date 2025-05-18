@@ -59,7 +59,6 @@ For a first example we use the `ipopt` solver from [NLPModelsIpopt.jl](https://j
 
 ```@example main
 using NLPModelsIpopt
-
 nlp_sol = ipopt(nlp; print_level=5, mu_strategy="adaptive", tol=1e-8, sb="yes")
 nothing # hide
 ```
@@ -76,7 +75,6 @@ Alternatively, we can use [MadNLP.jl](https://madnlp.github.io/MadNLP.jl) to sol
 
 ```@example main
 using MadNLP
-
 nlp_sol = madnlp(nlp)
 ```
 
