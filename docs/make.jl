@@ -8,6 +8,7 @@ cp("./docs/Project.toml", "./docs/src/assets/Project.toml", force = true)
 repo_url = "github.com/control-toolbox/Tutorials.jl"
 
 makedocs(;
+    draft = false,
     warnonly=[:cross_references, :autodocs_block],
     sitename="Tutorials",
     format=Documenter.HTML(;
@@ -29,6 +30,7 @@ makedocs(;
             "Goddard: direct, indirect" => "tutorial-goddard.md",
             "Linear–quadratic regulator" => "tutorial-lqr-basic.md",
             "Minimal action" => "tutorial-mam.md",
+            "Model Predictive Control" => "tutorial-mpc.md",
         ],
     ],
 )
