@@ -1,5 +1,9 @@
 # Navigation problem, MPC approach
 
+```@meta
+Draft = false
+```
+
 We consider a ship in a constant current $w=(w_x,w_y)$, where $\|w\|<1$. 
 The [heading angle](https://en.wikipedia.org/wiki/Heading) is controlled, leading to the following differential equations:
 
@@ -136,6 +140,10 @@ function solve(t0, x0, y0, θ0, xf, yf, θf, w;
         u ∈ R, control
 
         -1 ≤ u(t) ≤ 1
+
+        -2 ≤ x(t) ≤ 6
+        -2 ≤ y(t) ≤ 8
+        -2π ≤ x(t) ≤ 2π
 
         q(t0) == [ x0, y0, θ0 ]
         q(tf) == [ xf, yf, θf ]

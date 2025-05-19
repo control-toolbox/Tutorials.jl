@@ -8,7 +8,7 @@ cp("./docs/Project.toml", "./docs/src/assets/Project.toml", force = true)
 repo_url = "github.com/control-toolbox/Tutorials.jl"
 
 makedocs(;
-    draft = false,
+    draft = true,
     warnonly=[:cross_references, :autodocs_block],
     sitename="Tutorials",
     format=Documenter.HTML(;
