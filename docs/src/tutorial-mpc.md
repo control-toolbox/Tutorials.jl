@@ -83,6 +83,7 @@ plt = plot(
 
 plot_state!(plt, x0, y0, θ0; color=2)
 plot_state!(plt, xf, yf, θf; color=2)
+annotate!([(x0, y0, ("q₀", 12, :top)), (xf, yf, ("qf", 12, :bottom))])
 plot_current!(plt)
 ```
 
