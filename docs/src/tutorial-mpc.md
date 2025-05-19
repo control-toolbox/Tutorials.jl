@@ -146,10 +146,10 @@ function solve(t0, x0, y0, θ0, xf, yf, θf, w;
         -2 ≤ y(t) ≤ 8
         -2π ≤ x(t) ≤ 2π
 
-        q(t0) == [ x0, y0, θ0 ]
-        q(tf) == [ xf, yf, θf ]
+        q(t0) == [x0, y0, θ0]
+        q(tf) == [xf, yf, θf]
 
-        q̇(t) == [ w[1]+cos(θ(t)), 
+        q̇(t) == [w[1]+cos(θ(t)), 
                   w[2]+sin(θ(t)), 
                   u(t)]
 
