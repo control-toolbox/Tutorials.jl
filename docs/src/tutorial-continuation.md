@@ -1,10 +1,5 @@
 # Discrete continuation
 
-```@meta
-CurrentModule =  OptimalControl
-Draft = false
-```
-
 By using the warm start option, it is easy to implement a basic discrete continuation method, in which a sequence of problems is solved by using each solution as the initial guess for the next problem.
 This approach typically leads to faster and more reliable convergence than solving each problem with the same initial guess and is particularly useful for problems that require a good initial guess to converge.
 

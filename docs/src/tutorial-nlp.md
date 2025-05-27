@@ -1,4 +1,4 @@
-# NLP and DOCP manipulations
+# [NLP and DOCP manipulations](@id tutorial-nlp)
 
 ```@meta
 CurrentModule =  OptimalControl
