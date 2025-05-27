@@ -16,7 +16,7 @@ Tutorials = "cb10daa6-a5e5-4c25-a171-ae181b8ea3c9"
 [compat]
 DifferentiationInterface = "0.7"
 Documenter = "1.8"
-ForwardDiff = "0.10"
+ForwardDiff = "0.10, 1"
 LinearAlgebra = "1"
 MINPACK = "1.3"
 MadNLP = "0.8"
