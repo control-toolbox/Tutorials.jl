@@ -1,9 +1,5 @@
 # Navigation problem, MPC approach
 
-```@meta
-Draft = false
-```
-
 We consider a ship in a constant current $w=(w_x,w_y)$, where $\|w\|<1$. 
 The [heading angle](https://en.wikipedia.org/wiki/Heading) is controlled, leading to the following differential equations:
 
@@ -29,7 +25,7 @@ The angular velocity is limited and normalized: $\|u(t)\| \leq 1$. There are bou
 
 ## Data 
 
-```@example main
+```@example main-mpc
 using OptimalControl, NLPModelsIpopt, Plots, OrdinaryDiffEq, LinearAlgebra, Plots.PlotMeasures
 
 t0 = 0.
@@ -87,7 +83,7 @@ annotate!([(x0, y0, ("q₀", 12, :top)), (xf, yf, ("qf", 12, :bottom))])
 plot_current!(plt)
 ```
 
-```@example main
+```@example main-mpc
 function plot_trajectory!(plt, t, x, y, θ; N=5) # N: number of points where we will display θ
 
     # trajectory
@@ -128,7 +124,7 @@ nothing # hide
 
 ## OptimalControl solver
 
-```@example main
+```@example main-mpc
 function solve(t0, x0, y0, θ0, xf, yf, θf, w; 
     grid_size=300, tol=1e-8, max_iter=500, print_level=4, display=true)
 
@@ -193,7 +189,7 @@ nothing # hide
 
 We consider a constant current and we solve a first time the problem.
 
-```@example main
+```@example main-mpc
 # Resolution
 t, x, y, θ, u, tf, iter, cons = solve(t0, x0, y0, θ0, xf, yf, θf, current(x0, y0); display=false);
 
@@ -225,7 +221,7 @@ plot(plt_q, plt_u;
 
 In the previous simulation, we assumed that the current is constant. However, from a practical standpoint, the current depends on the position $(x, y)$. Given a current model, provided by the function `current`, we can simulate the actual trajectory of the ship, as long as we have the initial condition and the control over time.
 
-```@example main
+```@example main-mpc
 function realistic_trajectory(tf, t0, x0, y0, θ0, u, current; abstol=1e-12, reltol=1e-12, saveat=[])
     
     function rhs!(dq, q, dummy, t)
@@ -252,7 +248,7 @@ end
 nothing # hide
 ```
 
-```@example main
+```@example main-mpc
 # Realistic trajectory
 t, x, y, θ = realistic_trajectory(tf, t0, x0, y0, θ0, u, current)
 
@@ -281,7 +277,7 @@ plot(plt_q, plt_u;
 
 In practice, we do not have the actual current data for the entire trajectory in advance, which is why we will regularly recalculate the optimal control. The idea is to update the optimal control at regular time intervals, taking into account the current at the position where the ship is located. We are therefore led to solve a number of problems with constant current, with this being updated regularly. This is an introduction to the so-called Model Predictive Control (MPC) methods.
 
-```@example main
+```@example main-mpc
 function MPC(t0, x0, y0, θ0, xf, yf, θf, current)
 
     Nmax = 20   # maximum number of iterations for the MPC method
@@ -347,7 +343,7 @@ nothing # hide
 
 ## Display
 
-```@example main
+```@example main-mpc
 # Trajectory
 plt_q = plot(xlims=(-2, 6), ylims=(-1, 8), aspect_ratio=1, xlabel="x", ylabel="y")
 

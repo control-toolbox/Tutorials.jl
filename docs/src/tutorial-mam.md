@@ -5,7 +5,7 @@ This tutorial demonstrates how to implement MAM as an optimal control problem.
 
 ## Required Packages
 
-```@example oc_mam
+```@example main-mam
 using OptimalControl
 using NLPModelsIpopt
 using Plots, Printf
@@ -16,7 +16,7 @@ using Plots, Printf
 We'll consider a 2D system with a double-well flow, called the Maier-Stein model. It is a famous benchmark problem as it exhibits non-gradient dynamics with two stable equilibrium points at (-1,0) and (1,0), connected by a non-trivial transition path.
 The system's deterministic dynamics are given by:
 
-```@example oc_mam
+```@example main-mam
 # Define the vector field
 f(u, v) = [u - u^3 - 10*u*v^2,  -(1 - u^2)*v]
 f(x) = f(x...)
@@ -27,7 +27,7 @@ nothing # hide
 
 The minimal action path minimizes the deviation from the deterministic dynamics:
 
-```@example oc_mam
+```@example main-mam
 function ocp(T)
     action = @def begin
         t ∈ [0, T], time
@@ -47,7 +47,7 @@ nothing # hide
 
 We provide an initial guess for the path using a simple interpolation:
 
-```@example oc_mam
+```@example main-mam
 # Time horizon
 T = 50
 
@@ -68,7 +68,7 @@ nothing # hide
 
 We solve the problem in two steps for better accuracy:
 
-```@example oc_mam
+```@example main-mam
 # First solve with coarse grid
 sol = solve(ocp(T); init=init, grid_size=50)
 
@@ -83,11 +83,11 @@ objective(sol)
 
 Let's plot the solution trajectory and phase space:
 
-```@example oc_mam
+```@example main-mam
 plot(sol)
 ```
 
-```@example oc_mam
+```@example main-mam
 # Phase space plot
 MLP = state(sol).(time_grid(sol))
 scatter(first.(MLP), last.(MLP), 
@@ -103,7 +103,7 @@ The resulting path shows the most likely transition between the two stable state
 
 To find the maximum likelihood path, we also need to minimize the transient time `T`. Hence, we perform a discrete continuation over the parameter `T` by solving the optimal control problem over a continuous range of final times `T`, using each solution to initialize the next problem.
 
-```@example oc_mam
+```@example main-mam
 objectives = []
 Ts = range(1,100,100)
 sol = solve(ocp(Ts[1]); display=false, init=init, grid_size=50)
@@ -115,7 +115,7 @@ for T=Ts
 end
 ```
 
-```@example oc_mam
+```@example main-mam
 T_min = Ts[argmin(objectives)]
 plt1 = scatter(Ts, log10.(objectives), xlabel="Time", label="Objective (log10)")
 vline!(plt1, [T_min], label="Minimum", z_order=:back)

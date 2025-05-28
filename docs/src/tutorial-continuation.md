@@ -10,7 +10,7 @@ We illustrate this using a simple double integrator problem, where the fixed fin
 
 First we load the required packages:
 
-```@example main
+```@example main-cont
 using DataFrames
 using OptimalControl
 using NLPModelsIpopt
@@ -20,7 +20,7 @@ using Plots
 
 and write a function that returns the OCP for a given final time:
 
-```@example main
+```@example main-cont
 function problem(T)
 
     ocp = @def begin
@@ -49,7 +49,7 @@ nothing # hide
 
 Then we perform the continuation with a simple *for* loop, using each solution to initialize the next problem.
 
-```@example main
+```@example main-cont
 init = ()
 data = DataFrame(T=Float64[], Objective=Float64[], Iterations=Int[])
 for T ∈ range(1, 2, length=5)
@@ -67,7 +67,7 @@ As a second example, we show how to avoid redefining a new optimal control probl
 
 Let us first define the Goddard problem. Note that the formulation below illustrates all types of constraints, and the problem could be written more compactly.
 
-```@example main
+```@example main-cont
 # Parameters
 r0 = 1
 v0 = 0
@@ -127,7 +127,7 @@ sol0 = solve(goddard; display=false)
 
 Then, we perform the continuation on the maximal thrust.
 
-```@example main
+```@example main-cont
 sol = sol0 # Initialize the solution with the reference solution
 data = DataFrame(Tmax=Float64[], Objective=Float64[], Iterations=Int[])
 for Tmax_local ∈ range(Tmax_0, Tmax_f, length=6)
@@ -140,7 +140,7 @@ println(data)
 
 We plot now the objective with respect to the maximal thrust, as well as both solutions for `Tmax=3.5` and `Tmax=1`.
 
-```@example main
+```@example main-cont
 using Plots.PlotMeasures # for leftmargin
 
 plt_obj = plot(data.Tmax, data.Objective;

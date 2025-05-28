@@ -8,10 +8,12 @@ We import the [Plots.jl](https://docs.juliaplots.org) package to plot the soluti
 The [OrdinaryDiffEq.jl](https://docs.sciml.ai/OrdinaryDiffEq) package is used to define the shooting function for the indirect method and the [MINPACK.jl](https://github.com/sglyon/MINPACK.jl) package permits to solve the shooting equation.
 
 
-```@example main
+```@example main-iss
+using BenchmarkTools    # to benchmark the methods
 using OptimalControl    # to define the optimal control problem and its flow
 using OrdinaryDiffEq    # to get the Flow function from OptimalControl
 using MINPACK           # NLE solver: use to solve the shooting equation
+using NonlinearSolve    # interface to NLE solvers
 using Plots             # to plot the solution
 ```
 
@@ -32,7 +34,7 @@ Let us consider the following optimal control problem:
 
 with $t_0 = 0$, $t_f = 1$, $x_0 = -1$, $x_f = 0$, $\alpha=1.5$ and $\forall\, t \in [t_0, t_f]$, $x(t) \in \R$.
 
-```@example main
+```@example main-iss
 const t0 = 0
 const tf = 1
 const x0 = -1
@@ -110,7 +112,7 @@ Our goal becomes to solve
 
 where $\pi(x, p) = x$. To compute $\varphi$ with [OptimalControl.jl](https://control-toolbox.org/OptimalControl.jl) package, we define the flow of the associated Hamiltonian vector field by:
 
-```@example main
+```@example main-iss
 u(x, p) = p
 φ = Flow(ocp, u)
 nothing # hide
@@ -118,7 +120,7 @@ nothing # hide
 
 We define also the projection function on the state space.
 
-```@example main
+```@example main-iss
 π((x, p)) = x
 nothing # hide
 ```
@@ -141,7 +143,7 @@ Now, to solve the (BVP) we introduce the **shooting function**:
     \end{array}
 ```
 
-```@example main
+```@example main-iss
 S(p0) = π( φ(t0, x0, p0, tf) ) - xf    # shooting function
 nothing # hide
 ```
@@ -150,7 +152,7 @@ nothing # hide
 
 At the end, solving (BVP) is equivalent to solve $S(p_0) = 0$. This is what we call the **indirect simple shooting method**. We define an initial guess.
 
-```@example main
+```@example main-iss
 ξ = [0.1]    # initial guess
 nothing # hide
 ```
@@ -173,7 +175,7 @@ function fsolve(f, j, x; kwargs...)
 end
 ```
 
-```@example main
+```@example main-iss
 using DifferentiationInterface
 import ForwardDiff
 backend = AutoForwardDiff()
@@ -182,42 +184,78 @@ nothing # hide
 
 Let us define the problem to solve.
 
-```@example main
-nle!  = ( s, ξ) -> s[1] = S(ξ[1])                                 # auxiliary function
-jnle! = (js, ξ) -> jacobian!(nle!, similar(ξ), js, backend, ξ)    # Jacobian of nle
+```@example main-iss
+nle!(s, ξ) = s[1] = S(ξ[1])                                 # auxiliary function
+jnle!(js, ξ) = jacobian!(nle!, similar(ξ), js, backend, ξ)  # Jacobian of nle
 nothing # hide
 ```
 
 We are now in position to solve the problem with the `hybrj` solver from MINPACK.jl through the `fsolve` function, providing the Jacobian.
 Let us solve the problem and retrieve the initial costate solution.
 
-```@example main
-indirect_sol = fsolve(nle!, jnle!, ξ; show_trace=true)    # resolution of S(p0) = 0
-p0_sol = indirect_sol.x[1]                                # costate solution
+```@example main-iss
+sol = fsolve(nle!, jnle!, ξ; show_trace=true)    # resolution of S(p0) = 0
+p0_sol = sol.x[1]                                # costate solution
 println("\ncostate:    p0 = ", p0_sol)
 println("shoot: |S(p0)| = ", abs(S(p0_sol)), "\n")
+```
+
+### NonlinearSolve.jl
+
+Alternatively, we can use the [NonlinearSolve.jl](https://docs.sciml.ai/NonlinearSolve) package to solve the shooting equation. The code is similar, but we use the `solve` function instead of `fsolve`. Let us define the problem.
+
+```@example main-iss
+nle!(s, ξ, λ) = s[1] = S(ξ[1])    # auxiliary function
+prob = NonlinearProblem(nle!, ξ)  # NLE problem with initial guess
+nothing # hide
+```
+
+Now, let us solve the problem and retrieve the initial costate solution.
+
+```@example main-iss
+sol = solve(prob; show_trace=Val(true)) # resolution of S(p0) = 0  
+p0_sol = sol.u[1] # costate solution
+println("\ncostate:    p0 = ", p0_sol)
+println("shoot: |S(p0)| = ", abs(S(p0_sol)), "\n")
+```
+
+### Benchmarking
+
+Let us benchmark the methods to solve the shooting equation.
+
+```@example main-iss
+@benchmark fsolve(nle!, jnle!, ξ; show_trace=false) # MINPACK
+```
+
+```@example main-iss
+@benchmark solve(prob, SimpleNewtonRaphson(); show_trace=Val(false)) # NonlinearSolve
+```
+
+According to the NonlinearSolve documentation, for small nonlinear systems, it could be faster to use the 
+[`SimpleNewtonRaphson()` descent algorithm](https://docs.sciml.ai/NonlinearSolve/stable/tutorials/code_optimization/). 
+
+```@example main-iss
+@benchmark solve(prob, SimpleNewtonRaphson(); show_trace=Val(false)) # NonlinearSolve
 ```
 
 ## Plot of the solution
 
 The solution can be plot calling first the flow.
 
-```@example main
+```@example main-iss
 sol = φ((t0, tf), x0, p0_sol)
 plot(sol)
 ```
 
-In the indirect shooting method, the research of the optimal control is replaced by the computation of its associated extremal. This computation is equivalent to finding the initial covector solution to the shooting function. Let us plot the extremal in the phase space and the shooting function with  the solution.
+In the indirect shooting method, the search for the optimal control is replaced by the computation of its associated extremal. This computation is equivalent to finding the initial costate (or covector) that solves the shooting function. Let us now plot the extremal trajectory in the phase space, along with the shooting function and its solution.
 
 ```@raw html
-<article class="docstring">
-<header>
-    <a class="docstring-article-toggle-button fa-solid fa-chevron-right" href="javascript:;" title="Expand docstring"> </a>
-    <code>pretty_plot</code> — <span class="docstring-category">Function</span>
-</header>
-<section style="display: none;"><div><pre><code class="language-julia hljs">using Plots.PlotMeasures
+<details><summary>Code of the plot function in the phase space.</summary>
+```
 
-function pretty_plot(S, p0; Np0=20, kwargs...) 
+```@example main-iss
+using Plots.PlotMeasures 
+function Plots.plot(S::Function, p0::Float64; Np0=20, kwargs...) 
  
     # times for wavefronts
     times = range(t0, tf, length=3)
@@ -279,79 +317,14 @@ function pretty_plot(S, p0; Np0=20, kwargs...)
     # final plot 
     plot(plt_flow, plt_shoot; layout=(1,2), leftmargin=15px, bottommargin=15px, kwargs...) 
  
-end</code><button class="copy-button fa-solid fa-copy" aria-label="Copy this code ;opblock" title="Copy"></button></pre></div>
-</section>
-</article>
-```
-
-```@example main
-using Plots.PlotMeasures # hide
-function pretty_plot(S, p0; Np0=20, kwargs...) # hide
- # hide
-    # times for wavefronts# hide
-    times = range(t0, tf, length=3)# hide
-# hide
-    # times for trajectories# hide
-    tspan = range(t0, tf, length=100)# hide
-# hide
-    # interval of initial covector# hide
-    p0_min = -0.5 # hide
-    p0_max = 2 # hide
-# hide
-    # covector solution# hide
-    p0_sol = p0 # hide
- # hide
-    # plot of the flow in phase space# hide
-    plt_flow = plot() # hide
-    p0s = range(p0_min, p0_max, length=Np0) # hide
-    for i ∈ eachindex(p0s) # hide
-        sol = φ((t0, tf), x0, p0s[i])# hide
-        x = state(sol).(tspan)# hide
-        p = costate(sol).(tspan)# hide
-        label = i==1 ? "extremals" : false # hide
-        plot!(plt_flow, x, p, color=:blue, label=label) # hide
-    end # hide
- # hide
-    # plot of wavefronts in phase space # hide
-    p0s = range(p0_min, p0_max, length=200) # hide
-    xs  = zeros(length(p0s), length(times)) # hide
-    ps  = zeros(length(p0s), length(times)) # hide
-    for i ∈ eachindex(p0s) # hide
-        sol = φ((t0, tf), x0, p0s[i], saveat=times)# hide
-        xs[i, :] .= state(sol).(times) # hide
-        ps[i, :] .= costate(sol).(times) # hide
-    end # hide
-    for j ∈ eachindex(times) # hide
-        label = j==1 ? "flow at times" : false # hide
-        plot!(plt_flow, xs[:, j], ps[:, j], color=:green, linewidth=2, label=label) # hide
-    end # hide
- # hide
-    #  # hide
-    plot!(plt_flow, xlims=(-1.1, 1), ylims=(p0_min, p0_max)) # hide
-    plot!(plt_flow, [0, 0], [p0_min, p0_max], color=:black, xlabel="x", ylabel="p", label="x=xf") # hide
-     # hide
-    # solution # hide
-    sol = φ((t0, tf), x0, p0_sol)# hide
-    x = state(sol).(tspan)# hide
-    p = costate(sol).(tspan)# hide
-    plot!(plt_flow, x, p, color=:red, linewidth=2, label="extremal solution") # hide
-    plot!(plt_flow, [x[end]], [p[end]], seriestype=:scatter, color=:green, label=false) # hide
- # hide
-    # plot of the shooting function  # hide
-    p0s = range(p0_min, p0_max, length=200) # hide
-    plt_shoot = plot(xlims=(p0_min, p0_max), ylims=(-2, 4), xlabel="p₀", ylabel="y") # hide
-    plot!(plt_shoot, p0s, S, linewidth=2, label="S(p₀)", color=:green) # hide
-    plot!(plt_shoot, [p0_min, p0_max], [0, 0], color=:black, label="y=0") # hide
-    plot!(plt_shoot, [p0_sol, p0_sol], [-2, 0], color=:black, label="p₀ solution", linestyle=:dash) # hide
-    plot!(plt_shoot, [p0_sol], [0], seriestype=:scatter, color=:green, label=false) # hide
- # hide
-    # final plot # hide
-    plot(plt_flow, plt_shoot; layout=(1,2), leftmargin=15px, bottommargin=15px, kwargs...) # hide
- # hide
-end# hide
+end
 nothing # hide
 ```
 
-```@example main
-pretty_plot(S, p0_sol; size=(800, 450))
+```@raw html
+</details>
+```
+
+```@example main-iss
+plot(S, p0_sol; size=(800, 450))
 ```

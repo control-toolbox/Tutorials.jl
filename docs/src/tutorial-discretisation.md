@@ -5,7 +5,7 @@ These methods are used to convert a continuous-time optimal control problem (OCP
 
 Let us import the necessary packages and define the optimal control problem ([Goddard problem](@ref tutorial-goddard)) we will use as an example throughout this tutorial.
 
-```@example main
+```@example main-disc
 using BenchmarkTools  # for benchmarking
 using DataFrames      # to store the results
 using OptimalControl  # to define the optimal control problem and more
@@ -64,14 +64,14 @@ When calling `solve`, the option `disc_method=...` can be used to specify the di
 
 Let us first solve the problem with the default `:trapeze` method and display the solution.
 
-```@example main
+```@example main-disc
 sol = solve(ocp; disc_method=:trapeze, display=false)
 plot(sol; size=(800, 800))
 ```
 
 Let us now compare different discretization schemes to evaluate their accuracy and performance.
 
-```@example main
+```@example main-disc
 # Solve the problem with different discretization methods
 solutions = []
 data = DataFrame(
@@ -102,7 +102,7 @@ end
 println(data)
 ```
 
-```@example main
+```@example main-disc
 # Plot the results
 x_style = (legend=:none,)
 p_style = (legend=:none,)
@@ -120,14 +120,14 @@ plot(plt; size=(800, 800))
 
 For some large problems, you may notice that the solver takes a long time before the iterations actually begin. This is due to the computation of sparse derivatives — specifically, the Jacobian of the constraints and the Hessian of the Lagrangian — which can be quite costly. One possible alternative is to set the option `adnlp_backend=:manual`, which uses simpler sparsity patterns. The resulting matrices are faster to compute but are also less sparse, so this represents a trade-off between automatic differentiation (AD) preparation time and the efficiency of the optimization itself.
 
-```@example main
+```@example main-disc
 solve(ocp; disc_method=:gauss_legendre_3, grid_size=1000, adnlp_backend=:manual)
 nothing # hide
 ```
 
 Let us now compare the performance of the two backends. We will use the `@btimed` macro from the `BenchmarkTools` package to measure the time taken for both the preparation of the NLP problem and the execution of the solver. Besides, we will also collect the number of non-zero elements in the Jacobian and Hessian matrices, which can be useful to understand the sparsity of the problem, thanks to the functions `get_nnzo`, `get_nnzj`, and `get_nnzj` from the `NLPModels` package. The problem is first discretized with the `direct_transcription` method and then solved with the `ipopt` solver, see the [tutorial on direct transcription](@ref tutorial-nlp) for more details.
 
-```@example main
+```@example main-disc
 # DataFrame to store the results
 data = DataFrame(
     Backend=Symbol[],
@@ -191,7 +191,7 @@ println(data)
 
 The option `time_grid=...` allows you to provide the full time grid vector `t0, t1, ..., tf`, which is especially useful if a non-uniform grid is desired. In the case of a free initial and/or final time, you should provide a normalized grid ranging from 0 to 1. Note that `time_grid` overrides `grid_size` if both options are specified.
 
-```@example main
+```@example main-disc
 sol = solve(ocp; time_grid=[0, 0.1, 0.5, 0.9, 1], display=false)
 println(time_grid(sol))
 ```
