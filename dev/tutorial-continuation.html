@@ -1,45 +1,47 @@
 <!DOCTYPE html>
-<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Discrete continuation · Tutorials</title><meta name="title" content="Discrete continuation · Tutorials"/><meta property="og:title" content="Discrete continuation · Tutorials"/><meta property="twitter:title" content="Discrete continuation · Tutorials"/><meta name="description" content="Documentation for Tutorials."/><meta property="og:description" content="Documentation for Tutorials."/><meta property="twitter:description" content="Documentation for Tutorials."/><script data-outdated-warner src="assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.050/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="assets/documenter.js"></script><script src="search_index.js"></script><script src="siteinfo.js"></script><script src="../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="assets/themes/catppuccin-mocha.css" data-theme-name="catppuccin-mocha"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="assets/themes/catppuccin-macchiato.css" data-theme-name="catppuccin-macchiato"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="assets/themes/catppuccin-frappe.css" data-theme-name="catppuccin-frappe"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="assets/themes/catppuccin-latte.css" data-theme-name="catppuccin-latte"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="assets/themeswap.js"></script><link href="https://control-toolbox.org/assets/css/documentation.css" rel="stylesheet" type="text/css"/><script src="https://control-toolbox.org/assets/js/documentation.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit"><a href="index.html">Tutorials</a></span></div><button class="docs-search-query input is-rounded is-small is-clickable my-2 mx-auto py-1 px-2" id="documenter-search-query">Search docs (Ctrl + /)</button><ul class="docs-menu"><li><a class="tocitem" href="index.html">Getting Started</a></li><li><span class="tocitem">Tutorials and Advanced Features</span><ul><li class="is-active"><a class="tocitem" href="tutorial-continuation.html">Discrete continuation</a><ul class="internal"><li><a class="tocitem" href="#Continuation-on-parametric-OCP"><span>Continuation on parametric OCP</span></a></li><li><a class="tocitem" href="#Continuation-on-global-variable"><span>Continuation on global variable</span></a></li></ul></li><li><a class="tocitem" href="tutorial-discretisation.html">Discretisation methods</a></li><li><a class="tocitem" href="tutorial-nlp.html">NLP manipulations</a></li><li><a class="tocitem" href="tutorial-iss.html">Indirect simple shooting</a></li><li><a class="tocitem" href="tutorial-goddard.html">Goddard: direct, indirect</a></li><li><a class="tocitem" href="tutorial-lqr-basic.html">Linear–quadratic regulator</a></li><li><a class="tocitem" href="tutorial-mam.html">Minimal action</a></li><li><a class="tocitem" href="tutorial-mpc.html">Model Predictive Control</a></li></ul></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><a class="docs-sidebar-button docs-navbar-link fa-solid fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">Tutorials and Advanced Features</a></li><li class="is-active"><a href="tutorial-continuation.html">Discrete continuation</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href="tutorial-continuation.html">Discrete continuation</a></li></ul></nav><div class="docs-right"><a class="docs-navbar-link" href="https://github.com/control-toolbox/Tutorials.jl" title="View the repository on GitHub"><span class="docs-icon fa-brands"></span><span class="docs-label is-hidden-touch">GitHub</span></a><a class="docs-navbar-link" href="https://github.com/control-toolbox/Tutorials.jl/blob/main/docs/src/tutorial-continuation.md" title="Edit source on GitHub"><span class="docs-icon fa-solid"></span></a><a class="docs-settings-button docs-navbar-link fa-solid fa-gear" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-article-toggle-button fa-solid fa-chevron-up" id="documenter-article-toggle-button" href="javascript:;" title="Collapse all docstrings"></a></div></header><article class="content" id="documenter-page"><h1 id="Discrete-continuation"><a class="docs-heading-anchor" href="#Discrete-continuation">Discrete continuation</a><a id="Discrete-continuation-1"></a><a class="docs-heading-anchor-permalink" href="#Discrete-continuation" title="Permalink"></a></h1><p>Using the warm start option, it is easy to implement a basic discrete continuation method, where a sequence of problems is solved using each solution as initial guess for the next problem. This usually gives better and faster convergence than solving each problem with the same initial guess, and is a way to handle problems that require a good initial guess.</p><h2 id="Continuation-on-parametric-OCP"><a class="docs-heading-anchor" href="#Continuation-on-parametric-OCP">Continuation on parametric OCP</a><a id="Continuation-on-parametric-OCP-1"></a><a class="docs-heading-anchor-permalink" href="#Continuation-on-parametric-OCP" title="Permalink"></a></h2><p>The most compact syntax to perform a discrete continuation is to use a function that returns the OCP for a given value of the continuation parameter, and solve a sequence of these problems. We illustrate this on a very basic double integrator with increasing fixed final time.</p><p>First we load the required packages:</p><pre><code class="language-julia hljs">using OptimalControl
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Discrete continuation · Tutorials</title><meta name="title" content="Discrete continuation · Tutorials"/><meta property="og:title" content="Discrete continuation · Tutorials"/><meta property="twitter:title" content="Discrete continuation · Tutorials"/><meta name="description" content="Documentation for Tutorials."/><meta property="og:description" content="Documentation for Tutorials."/><meta property="twitter:description" content="Documentation for Tutorials."/><script data-outdated-warner src="assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.050/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="assets/documenter.js"></script><script src="search_index.js"></script><script src="siteinfo.js"></script><script src="../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="assets/themes/catppuccin-mocha.css" data-theme-name="catppuccin-mocha"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="assets/themes/catppuccin-macchiato.css" data-theme-name="catppuccin-macchiato"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="assets/themes/catppuccin-frappe.css" data-theme-name="catppuccin-frappe"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="assets/themes/catppuccin-latte.css" data-theme-name="catppuccin-latte"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="assets/themeswap.js"></script><link href="https://control-toolbox.org/assets/css/documentation.css" rel="stylesheet" type="text/css"/><script src="https://control-toolbox.org/assets/js/documentation.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit"><a href="index.html">Tutorials</a></span></div><button class="docs-search-query input is-rounded is-small is-clickable my-2 mx-auto py-1 px-2" id="documenter-search-query">Search docs (Ctrl + /)</button><ul class="docs-menu"><li><a class="tocitem" href="index.html">Getting Started</a></li><li><span class="tocitem">Tutorials and Advanced Features</span><ul><li class="is-active"><a class="tocitem" href="tutorial-continuation.html">Discrete continuation</a><ul class="internal"><li><a class="tocitem" href="#Continuation-on-parametric-OCP"><span>Continuation on parametric OCP</span></a></li><li><a class="tocitem" href="#Continuation-on-global-variable"><span>Continuation on global variable</span></a></li></ul></li><li><a class="tocitem" href="tutorial-discretisation.html">Discretisation methods</a></li><li><a class="tocitem" href="tutorial-nlp.html">NLP manipulations</a></li><li><a class="tocitem" href="tutorial-iss.html">Indirect simple shooting</a></li><li><a class="tocitem" href="tutorial-goddard.html">Goddard: direct, indirect</a></li><li><a class="tocitem" href="tutorial-lqr.html">Linear–quadratic regulator</a></li><li><a class="tocitem" href="tutorial-mam.html">Minimal action</a></li><li><a class="tocitem" href="tutorial-mpc.html">Model Predictive Control</a></li></ul></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><a class="docs-sidebar-button docs-navbar-link fa-solid fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">Tutorials and Advanced Features</a></li><li class="is-active"><a href="tutorial-continuation.html">Discrete continuation</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href="tutorial-continuation.html">Discrete continuation</a></li></ul></nav><div class="docs-right"><a class="docs-navbar-link" href="https://github.com/control-toolbox/Tutorials.jl" title="View the repository on GitHub"><span class="docs-icon fa-brands"></span><span class="docs-label is-hidden-touch">GitHub</span></a><a class="docs-navbar-link" href="https://github.com/control-toolbox/Tutorials.jl/blob/main/docs/src/tutorial-continuation.md" title="Edit source on GitHub"><span class="docs-icon fa-solid"></span></a><a class="docs-settings-button docs-navbar-link fa-solid fa-gear" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-article-toggle-button fa-solid fa-chevron-up" id="documenter-article-toggle-button" href="javascript:;" title="Collapse all docstrings"></a></div></header><article class="content" id="documenter-page"><h1 id="Discrete-continuation"><a class="docs-heading-anchor" href="#Discrete-continuation">Discrete continuation</a><a id="Discrete-continuation-1"></a><a class="docs-heading-anchor-permalink" href="#Discrete-continuation" title="Permalink"></a></h1><p>By using the warm start option, it is easy to implement a basic discrete continuation method, in which a sequence of problems is solved by using each solution as the initial guess for the next problem. This approach typically leads to faster and more reliable convergence than solving each problem with the same initial guess and is particularly useful for problems that require a good initial guess to converge.</p><h2 id="Continuation-on-parametric-OCP"><a class="docs-heading-anchor" href="#Continuation-on-parametric-OCP">Continuation on parametric OCP</a><a id="Continuation-on-parametric-OCP-1"></a><a class="docs-heading-anchor-permalink" href="#Continuation-on-parametric-OCP" title="Permalink"></a></h2><p>The most concise way to perform discrete continuation is to define a function that returns the optimal control problem for a given value of the continuation parameter, and then solve a sequence of such problems. We illustrate this using a simple double integrator problem, where the fixed final time is gradually increased.</p><p>First we load the required packages:</p><pre><code class="language-julia hljs">using DataFrames
+using OptimalControl
 using NLPModelsIpopt
 using Printf
-using Plots</code></pre><p>and write a function that returns the OCP for a given final time:</p><pre><code class="language-julia hljs">function ocp_T(T)
+using Plots</code></pre><p>and write a function that returns the OCP for a given final time:</p><pre><code class="language-julia hljs">function problem(T)
+
     ocp = @def begin
+
         t ∈ [0, T], time
         x ∈ R², state
         u ∈ R, control
+
         q = x₁
         v = x₂
+
         q(0) == 0
         v(0) == 0
         q(T) == 1
         v(T) == 0
-        ẋ(t) == [ v(t), u(t) ]
+        ẋ(t) == [v(t), u(t)]
+
         ∫(u(t)^2) → min
+
     end
+
     return ocp
-end</code></pre><p>Then we perform the continuation with a simple <em>for</em> loop, using each solution to initialize the next problem.</p><pre><code class="language-julia hljs">init1 = ()
-for T=1:5
-    ocp1 = ocp_T(T)
-    sol1 = solve(ocp1; display=false, init=init1)
-    global init1 = sol1
-    @printf(&quot;T %.2f objective %9.6f iterations %d\n&quot;, T, objective(sol1), iterations(sol1))
-end</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">T 1.00 objective 12.000766 iterations 2
-T 2.00 objective  1.500096 iterations 3
-T 3.00 objective  0.444473 iterations 3
-T 4.00 objective  0.187512 iterations 3
-T 5.00 objective  0.096006 iterations 3</code></pre><h2 id="Continuation-on-global-variable"><a class="docs-heading-anchor" href="#Continuation-on-global-variable">Continuation on global variable</a><a id="Continuation-on-global-variable-1"></a><a class="docs-heading-anchor-permalink" href="#Continuation-on-global-variable" title="Permalink"></a></h2><p>As a second example, we show how to avoid redefining a new OCP each time, and modify the original one instead. More precisely we now solve a Goddard problem for a decreasing maximal thrust. If we store the value for <em>Tmax</em> in a global variable, we can simply modify this variable and keep the same OCP problem during the continuation.</p><p>Let us first define the Goddard problem (note that the formulation below illustrates all the possible constraints types, and the problem could be defined in a more compact way).</p><pre><code class="language-julia hljs">Cd = 310
-Tmax = 3.5
-β = 500
-b = 2
-function F0(x)
-    r, v, m = x
-    D = Cd * v^2 * exp(-β*(r - 1))
-    return [ v, -D/m - 1/r^2, 0 ]
+end</code></pre><p>Then we perform the continuation with a simple <em>for</em> loop, using each solution to initialize the next problem.</p><pre><code class="language-julia hljs">init = ()
+data = DataFrame(T=Float64[], Objective=Float64[], Iterations=Int[])
+for T ∈ range(1, 2, length=5)
+    ocp = problem(T)
+    sol = solve(ocp; init=init, display=false)
+    global init = sol
+    push!(data, (T=T, Objective=objective(sol), Iterations=iterations(sol)))
 end
-function F1(x)
-    r, v, m = x
-    return [ 0, Tmax/m, -b*Tmax ]
-end
+println(data)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">5×3 DataFrame
+ Row │ T        Objective  Iterations
+     │ Float64  Float64    Int64
+─────┼────────────────────────────────
+   1 │    1.0    12.0008            2
+   2 │    1.25    6.14439           3
+   3 │    1.5     3.55578           3
+   4 │    1.75    2.23921           3
+   5 │    2.0     1.5001            3</code></pre><h2 id="Continuation-on-global-variable"><a class="docs-heading-anchor" href="#Continuation-on-global-variable">Continuation on global variable</a><a id="Continuation-on-global-variable-1"></a><a class="docs-heading-anchor-permalink" href="#Continuation-on-global-variable" title="Permalink"></a></h2><p>As a second example, we show how to avoid redefining a new optimal control problem at each step by modifying the original one instead. More precisely, we solve a Goddard problem with a decreasing maximum thrust. By storing the value of <code>Tmax</code> in a global variable, we can simply update this variable and reuse the same problem throughout the continuation.</p><p>Let us first define the Goddard problem. Note that the formulation below illustrates all types of constraints, and the problem could be written more compactly.</p><pre><code class="language-julia hljs"># Parameters
 r0 = 1
 v0 = 0
 m0 = 1
@@ -47,12 +49,16 @@ mf = 0.6
 x0 = [r0, v0, m0]
 vmax = 0.1
 
-@def ocp begin
+# Goddard problem definition
+@def goddard begin
+
     tf ∈ R, variable
     t ∈ [0, tf], time
     x ∈ R^3, state
     u ∈ R, control
+
     0.01 ≤ tf ≤ Inf
+
     r = x[1]
     v = x[2]
     m = x[3]
@@ -63,35 +69,59 @@ vmax = 0.1
     mf ≤ m(t) ≤ m0
     0 ≤ u(t) ≤ 1
     ẋ(t) == F0(x(t)) + u(t) * F1(x(t))
+
     r(tf) → max
+
 end
 
-sol0 = solve(ocp; display=false)
-@printf(&quot;Objective for reference solution %.6f\n&quot;, objective(sol0))</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Objective for reference solution 1.012576</code></pre><p>Then we perform the continuation on the maximal thrust.</p><pre><code class="language-julia hljs">sol       = sol0
-Tmax_list = []
-obj_list  = []
-for Tmax_local=3.5:-0.5:1
-    global Tmax = Tmax_local
-    global sol = solve(ocp; display=false, init=sol)
-    @printf(&quot;Tmax %.2f objective %.6f iterations %d\n&quot;, Tmax, objective(sol), iterations(sol))
-    push!(Tmax_list, Tmax)
-    push!(obj_list, objective(sol))
-end</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Tmax 3.50 objective 1.012576 iterations 14
-Tmax 3.00 objective 1.012372 iterations 17
-Tmax 2.50 objective 1.012023 iterations 20
-Tmax 2.00 objective 1.011262 iterations 19
-Tmax 1.50 objective 1.009172 iterations 18
-Tmax 1.00 objective 1.003593 iterations 19</code></pre><p>We plot now the objective w.r.t the maximal thrust, as well as both solutions for <em>Tmax</em>=3.5 and <em>Tmax</em>=1.</p><pre><code class="language-julia hljs">using Plots.PlotMeasures # for leftmargin
+# Dynamics
+function F0(x)
+    r, v, m = x
+    D = Cd * v^2 * exp(-β*(r - 1))
+    return [ v, -D/m - 1/r^2, 0 ]
+end
+function F1(x)
+    r, v, m = x
+    return [ 0, Tmax/m, -b*Tmax ]
+end
 
-plt_obj = plot(Tmax_list, obj_list;
+# Parameters for the dynamics
+Cd = 310
+β = 500
+b = 2
+Tmax_0 = 3.5
+Tmax_f = 1.0
+
+# Solve the problem with a reference value of Tmax
+Tmax = Tmax_0
+sol0 = solve(goddard; display=false)
+@printf(&quot;Objective for reference solution: %.6f\n&quot;, objective(sol0))</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Objective for reference solution: 1.012576</code></pre><p>Then, we perform the continuation on the maximal thrust.</p><pre><code class="language-julia hljs">sol = sol0 # Initialize the solution with the reference solution
+data = DataFrame(Tmax=Float64[], Objective=Float64[], Iterations=Int[])
+for Tmax_local ∈ range(Tmax_0, Tmax_f, length=6)
+    global Tmax = Tmax_local # Update the global variable Tmax
+    global sol = solve(goddard; init=sol, display=false)
+    push!(data, (Tmax=Tmax, Objective=objective(sol), Iterations=iterations(sol)))
+end
+println(data)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">6×3 DataFrame
+ Row │ Tmax     Objective  Iterations
+     │ Float64  Float64    Int64
+─────┼────────────────────────────────
+   1 │     3.5    1.01258          14
+   2 │     3.0    1.01237          17
+   3 │     2.5    1.01202          20
+   4 │     2.0    1.01126          19
+   5 │     1.5    1.00917          18
+   6 │     1.0    1.00359          19</code></pre><p>We plot now the objective with respect to the maximal thrust, as well as both solutions for <code>Tmax=3.5</code> and <code>Tmax=1</code>.</p><pre><code class="language-julia hljs">using Plots.PlotMeasures # for leftmargin
+
+plt_obj = plot(data.Tmax, data.Objective;
     seriestype=:scatter,
     title=&quot;Goddard problem&quot;,
     label=&quot;r(tf)&quot;,
     xlabel=&quot;Maximal thrust (Tmax)&quot;,
     ylabel=&quot;Maximal altitude r(tf)&quot;)
 
-plt_sol = plot(sol0; label=&quot;(Tmax = &quot;*string(Tmax_list[1])*&quot;)&quot;)
-plot!(plt_sol, sol;  label=&quot;(Tmax = &quot;*string(Tmax_list[end])*&quot;)&quot;)
+plt_sol = plot(sol0; label=&quot;Tmax=&quot;*string(data.Tmax[1]))
+plot!(plt_sol, sol;  label=&quot;Tmax=&quot;*string(data.Tmax[end]))
 
 layout = grid(2, 1, heights=[0.2, 0.8])
-plot(plt_obj, plt_sol; layout=layout, size=(800, 1000), leftmargin=5mm)</code></pre><img src="tutorial-continuation-75d58b1f.svg" alt="Example block output"/></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="index.html">« Getting Started</a><a class="docs-footer-nextpage" href="tutorial-discretisation.html">Discretisation methods »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.11.4 on <span class="colophon-date" title="Tuesday 27 May 2025 01:05">Tuesday 27 May 2025</span>. Using Julia version 1.11.5.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+plot(plt_obj, plt_sol; layout=layout, size=(800, 1000), leftmargin=5mm)</code></pre><img src="tutorial-continuation-2bbd4e1b.svg" alt="Example block output"/></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="index.html">« Getting Started</a><a class="docs-footer-nextpage" href="tutorial-discretisation.html">Discretisation methods »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.11.4 on <span class="colophon-date" title="Wednesday 28 May 2025 12:42">Wednesday 28 May 2025</span>. Using Julia version 1.11.5.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
