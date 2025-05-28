@@ -228,7 +228,7 @@ Let us benchmark the methods to solve the shooting equation.
 ```
 
 ```@example main-iss
-@benchmark solve(prob, SimpleNewtonRaphson(); show_trace=Val(false)) # NonlinearSolve
+@benchmark solve(prob; show_trace=Val(false)) # NonlinearSolve
 ```
 
 According to the NonlinearSolve documentation, for small nonlinear systems, it could be faster to use the 
