@@ -90,7 +90,7 @@ schemes = [
 ]
 for scheme in schemes
     bt = @btimed solve($ocp; disc_method=$scheme, tol=1e-8, display=false)
-    sol = bt.value
+    local sol = bt.value
     push!(solutions, (scheme, sol))
     push!(data, (
         Scheme=scheme, 
@@ -149,7 +149,7 @@ for adnlp_backend in backends
     # Discretize the problem with a large grid size and Gauss-Legendre method
     bt = @btimed direct_transcription($ocp; 
         disc_method=:gauss_legendre_3, 
-        grid_size=10, 
+        grid_size=1000, 
         adnlp_backend=$adnlp_backend,
     )
     docp, nlp = bt.value
