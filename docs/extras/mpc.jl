@@ -101,7 +101,7 @@ function plot_trajectory!(plt, t, x, y, θ; N=5) # N: number of points where we 
 end
 
 function solve(t0, x0, y0, θ0, xf, yf, θf, w; 
-    grid_size=300, tol=1e-8, max_iter=500, print_level=4, display=true)
+    grid_size=300, tol=1e-8, max_iter=500, print_level=4, display=true, disc_method=:euler)
 
     # Definition of the problem
     ocp = @def begin
@@ -142,7 +142,7 @@ function solve(t0, x0, y0, θ0, xf, yf, θf, w;
         max_iter=max_iter, 
         print_level=print_level, 
         display=display, 
-        disc_method=:euler,
+        disc_method=disc_method,
     )
 
     # Retrieval of useful data

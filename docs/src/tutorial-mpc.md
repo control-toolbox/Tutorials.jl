@@ -132,7 +132,7 @@ nothing # hide
 
 ```@example main-mpc
 function solve(t0, x0, y0, θ0, xf, yf, θf, w; 
-    grid_size=300, tol=1e-8, max_iter=500, print_level=4, display=true)
+    grid_size=300, tol=1e-8, max_iter=500, print_level=4, display=true, disc_method=:euler)
 
     # Definition of the problem
     ocp = @def begin
@@ -173,7 +173,7 @@ function solve(t0, x0, y0, θ0, xf, yf, θf, w;
         max_iter=max_iter, 
         print_level=print_level, 
         display=display, 
-        disc_method=:euler,
+        disc_method=disc_method,
     )
 
     # Retrieval of useful data
@@ -202,7 +202,9 @@ t, x, y, θ, u, tf, iter, cons = solve(t0, x0, y0, θ0, xf, yf, θf, current(x0,
 println("Iterations: ", iter)
 println("Constraints violation: ", cons)
 println("tf: ", tf)
+```
 
+```@example main-mpc
 # Displaying the trajectory
 plt_q = plot(xlims=(-2, 6), ylims=(-1, 8), aspect_ratio=1, xlabel="x", ylabel="y")
 plot_state!(plt_q, x0, y0, θ0; color=2)
@@ -398,5 +400,40 @@ plot(plt_q, plt_u;
     leftmargin=5mm, 
     bottommargin=5mm,
     plot_title="Simulation with Current Model"
+)
+```
+
+## Limitations
+
+If you use a discretization method other than `:euler`, the solver may converge to a local solution that is not globally optimal.
+
+```@example main-mpc
+# Resolution
+t, x, y, θ, u, tf, iter, cons = solve(t0, x0, y0, θ0, xf, yf, θf, current(x0, y0); 
+    display=false, disc_method=:gauss_legendre_3);
+
+println("Iterations: ", iter)
+println("Constraints violation: ", cons)
+println("tf: ", tf)
+```
+
+```@example main-mpc
+# Displaying the trajectory
+plt_q = plot(xlims=(-2, 6), ylims=(-1, 8), aspect_ratio=1, xlabel="x", ylabel="y")
+plot_state!(plt_q, x0, y0, θ0; color=2)
+plot_state!(plt_q, xf, yf, θf; color=2)
+plot_current!(plt_q; current=(x, y) -> current(x0, y0))
+plot_trajectory!(plt_q, t, x, y, θ)
+
+# Displaying the control
+plt_u = plot(t, u; color=1, legend=false, linewidth=2, xlabel="t", ylabel="u")
+
+# Final display
+plot(plt_q, plt_u; 
+    layout=(1, 2), 
+    size=(1200, 600),
+    leftmargin=5mm, 
+    bottommargin=5mm,
+    plot_title="Constant Current Simulation"
 )
 ```
