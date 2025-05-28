@@ -26,7 +26,13 @@ The angular velocity is limited and normalized: $\|u(t)\| \leq 1$. There are bou
 ## Data 
 
 ```@example main-mpc
-using OptimalControl, NLPModelsIpopt, Plots, OrdinaryDiffEq, LinearAlgebra, Plots.PlotMeasures
+using LinearAlgebra
+using NLPModelsIpopt
+using OptimalControl
+using OrdinaryDiffEq
+using Plots
+using Plots.PlotMeasures
+using Printf
 
 t0 = 0.
 x0 = 0. 
@@ -308,7 +314,6 @@ function MPC(t0, x0, y0, θ0, xf, yf, θf, current)
             t2 = t1 + Δt
         else
             t2 = tf
-            println("t2=tf: ", t2)
             stop = true
         end
 
@@ -324,7 +329,15 @@ function MPC(t0, x0, y0, θ0, xf, yf, θf, current)
 
         # Calculate the distance to the target position
         distance = norm([x1, y1, θ1] - [xf, yf, θf])
-        println("N: ", N, "\t distance: ", distance, "\t iterations: ", iter, "\t constraints: ", cons, "\t tf: ", tf)
+        if N == 1
+            println("     N    Distance  Iterations   Constraints       tf")
+            println("------------------------------------------------------")
+        end
+        @printf("%6d", N)
+        @printf("%12.4f", distance)
+        @printf("%12d", iter)
+        @printf("%14.4e", cons)
+        @printf("%10.4f\n", tf)
         if !((distance > ε) && (N < Nmax))
             stop = true
         end
