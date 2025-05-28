@@ -39,7 +39,7 @@ We import the [Plots.jl](https://docs.juliaplots.org) package to plot the soluti
 The [OrdinaryDiffEq.jl](https://docs.sciml.ai/OrdinaryDiffEq) package is used to 
 define the shooting function for the indirect method and the [MINPACK.jl](https://github.com/sglyon/MINPACK.jl) package permits to solve the shooting equation.
 
-```@example main
+```@example main-goddard
 using OptimalControl  # to define the optimal control problem and more
 using NLPModelsIpopt  # to solve the problem via a direct method
 using OrdinaryDiffEq  # to get the Flow function from OptimalControl
@@ -51,7 +51,7 @@ using Plots           # to plot the solution
 
 We define the problem
 
-```@example main
+```@example main-goddard
 const t0 = 0      # initial time
 const r0 = 1      # initial altitude
 const v0 = 0      # initial speed
@@ -101,14 +101,14 @@ nothing # hide
 
 We then solve it
 
-```@example main
+```@example main-goddard
 direct_sol = solve(ocp; grid_size=100)
 nothing # hide
 ```
 
 and plot the solution
 
-```@example main
+```@example main-goddard
 plt = plot(direct_sol, label="direct", size=(800, 800))
 ```
 
@@ -119,7 +119,7 @@ bang arc with maximal control, followed by a singular arc, then by a boundary ar
 arc is with zero control. Note that the switching function vanishes along the singular and
 boundary arcs.
 
-```@example main
+```@example main-goddard
 t = time_grid(direct_sol)   # the time grid as a vector
 x = state(direct_sol)       # the state as a function of time
 u = control(direct_sol)     # the control as a function of time
@@ -191,7 +191,7 @@ as well as the associated multiplier for the *order one* state constraint on the
 
 With the help of differential geometry primitives, these expressions are straightforwardly translated into Julia code:
 
-```@example main
+```@example main-goddard
 # Controls
 const u0 = 0                            # off control
 const u1 = 1                            # bang control
@@ -218,7 +218,7 @@ nothing # hide
 Then, we define the shooting function according to the optimal structure we have determined,
 that is a concatenation of four arcs.
 
-```@example main
+```@example main-goddard
 x0 = [r0, v0, m0] # initial state
 
 function shoot!(s, p0, t1, t2, t3, tf)
@@ -245,7 +245,7 @@ To solve the problem by an indirect shooting method, we then need a good initial
 that is a good approximation of the initial costate, the three switching times and the
 final time.
 
-```@example main
+```@example main-goddard
 η = 1e-3
 t13 = t[ abs.(φ.(t)) .≤ η ]
 t23 = t[ 0 .≤ (g ∘ x).(t) .≤ η ]
@@ -272,7 +272,7 @@ println("\nNorm of the shooting function: ‖s‖ = ", norm(s), "\n")
 
 We aggregate the data to define the initial guess vector.
 
-```@example main
+```@example main-goddard
 ξ = [p0..., t1, t2, t3, tf] # initial guess
 ```
 
@@ -304,7 +304,7 @@ function fsolve(f, j, x; kwargs...)
 end
 ```
 
-```@example main
+```@example main-goddard
 using DifferentiationInterface
 import ForwardDiff
 backend = AutoForwardDiff()
@@ -313,7 +313,7 @@ nothing # hide
 
 Let us define the problem to solve.
 
-```@example main
+```@example main-goddard
 # auxiliary function with aggregated inputs
 nle!  = ( s, ξ) -> shoot!(s, ξ[1:3], ξ[4], ξ[5], ξ[6], ξ[7])
 
@@ -326,7 +326,7 @@ We are now in position to solve the problem with the `hybrj` solver from MINPACK
 function, providing the Jacobian.
 Let us solve the problem and retrieve the initial costate solution.
 
-```@example main
+```@example main-goddard
 # resolution of S(ξ) = 0
 indirect_sol = fsolve(nle!, jnle!, ξ, show_trace=true)
 
@@ -355,7 +355,7 @@ println("\nNorm of the shooting function: ‖s‖ = ", norm(s), "\n")
 We plot the solution of the indirect solution (in red) over the solution of the direct method 
 (in blue).
 
-```@example main
+```@example main-goddard
 f = f1 * (t1, fs) * (t2, fb) * (t3, f0) # concatenation of the flows
 flow_sol = f((t0, tf), x0, p0)          # compute the solution: state, costate, control...
 

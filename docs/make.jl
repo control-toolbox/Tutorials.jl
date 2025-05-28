@@ -28,7 +28,7 @@ makedocs(;
             "NLP manipulations" => "tutorial-nlp.md",
             "Indirect simple shooting" => "tutorial-iss.md",
             "Goddard: direct, indirect" => "tutorial-goddard.md",
-            "Linear–quadratic regulator" => "tutorial-lqr-basic.md",
+            "Linear–quadratic regulator" => "tutorial-lqr.md",
             "Minimal action" => "tutorial-mam.md",
             "Model Predictive Control" => "tutorial-mpc.md",
         ],
