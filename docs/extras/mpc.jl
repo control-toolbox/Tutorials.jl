@@ -159,7 +159,8 @@ function solve(t0, x0, y0, θ0, xf, yf, θf, w;
 end
 
 # Resolution
-t, x, y, θ, u, tf, iter, cons = solve(t0, x0, y0, θ0, xf, yf, θf, current(x0, y0); display=false);
+t, x, y, θ, u, tf, iter, cons = solve(t0, x0, y0, θ0, xf, yf, θf, current(x0, y0); 
+    display=false, disc_method=:euler_implicit);
 
 println("Iterations: ", iter)
 println("Constraints violation: ", cons)
