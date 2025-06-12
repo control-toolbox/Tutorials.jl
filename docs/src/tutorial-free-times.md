@@ -46,7 +46,7 @@ You may need to add this type of constrain in your problem definition :
 0.05 ≤ tf ≤ Inf
 ```
 
-It is to ensure and help the convergence of the algorithm depending on your problem and you can also need it with t0.
+It is to ensure and help the convergence of the algorithm depending on your problem and it can also be needed when dealing with problems having a free initial time, as we will see in the next example.
 
 ##  Direct resolution with free final time :
 
@@ -168,5 +168,52 @@ end
 ```
 
 This example shows that problems with a free final time can be sensitive to discretization. A small grid may lead to suboptimal or slightly inaccurate results.
+
+
+# Now we will try an example with a free initial time
+
+```@example initial_time
+using OptimalControl
+using NLPModelsIpopt
+using BenchmarkTools
+using DataFrames
+using Plots
+using Printf
+
+function double_integrator_mint0()
+    @def ocp begin
+        t0 ∈ R, variable
+        tf=0
+        t ∈ [t0, tf], time
+        x ∈ R², state
+        u ∈ R, control
+        -1 ≤ u(t) ≤ 1
+        x(t0) == [0, 0]
+        x(tf) == [1, 0]
+        0.05 ≤ -t0 ≤ Inf
+        ẋ(t) == [x₂(t), u(t)]
+        -t0 → min
+    end
+    return ocp
+end
+nothing # hide
+```
+
+#  Direct resolution with free initial time :
+
+We now solve the problem using a direct method, with automatic treatment of the free initial time.
+
+```@example initial_time
+ocp = double_integrator_mint0()
+sol = solve(ocp; grid_size=100)
+plot(sol; label="direct", size=(800, 800))
+```
+
+
+
+
+
+
+
 
 ## From free final time to fixed final time :

@@ -1,6 +1,6 @@
 # This file is machine-generated - editing it directly is not advised
 
-julia_version = "1.11.5"
+julia_version = "1.11.2"
 manifest_format = "2.0"
 project_hash = "e7183c2ad8bb7ad385c3187377b285a34e621395"
 
@@ -1476,7 +1476,7 @@ version = "0.3.27+1"
 [[deps.OpenLibm_jll]]
 deps = ["Artifacts", "Libdl"]
 uuid = "05823500-19ac-5b8b-9628-191a04bc5112"
-version = "0.8.5+0"
+version = "0.8.1+2"
 
 [[deps.OpenSSH_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "OpenSSL_jll", "Zlib_jll"]
@@ -2317,7 +2317,7 @@ uuid = "781d530d-4396-4725-bb49-402e4bee1e77"
 version = "1.4.0"
 
 [[deps.Tutorials]]
-path = "C:\\Users\\youri\\Desktop\\ENSEEIHT\\Stage\\Tutorials.jl"
+path = "/Users/yassinmoukan/Desktop/stage_co/Tutorials.jl"
 uuid = "cb10daa6-a5e5-4c25-a171-ae181b8ea3c9"
 version = "0.1.4"
 
