@@ -211,9 +211,74 @@ plot(sol; label="direct", size=(800, 800))
 
 
 
+## Verification of results
 
+Here is the theoretical part using Pontryagin's Maximum Principle:
+```math
+H = p_1 x_2 + p_2 u + 1
+```
 
+Conditions from Pontryagin’s theorem:
+```math
+p_1' = 0 \quad \Rightarrow \quad p_1 = c_1 \quad (\text{constant}) \\
+p_2' = -p_1 \quad \Rightarrow \quad p_2 = -c_1 t + c_2
+```
 
+Switching condition:
+```math
+p_2(t_s) = 0 \quad \Rightarrow \quad c_2 = c_1 t_s
+```
+
+Optimal control:
+```math
+u(t) = 1 \quad \text{on} \quad [t_0, t_s] \\
+u(t) = -1 \quad \text{on} \quad [t_s, 0]
+```
+
+Now we integrate the system:
+
+On \( t \in [t_0, t_s] \) :
+```math
+x_2' = u = 1 \quad \Rightarrow \quad x_2(t) = t - t_0 \\
+x_1' = x_2 \quad \Rightarrow \quad x_1(t) = \frac{(t - t_0)^2}{2}
+```
+
+At switching time \( t = t_s \) :
+```math
+x_2(t_s) = t_s - t_0 \\
+x_1(t_s) = \frac{(t_s - t_0)^2}{2}
+```
+
+On \( t \in [t_s, 0] \) :
+```math
+x_2' = u = -1 \quad \Rightarrow \quad x_2(t) = x_2(t_s) - (t - t_s) \\
+x_1' = x_2 \quad \Rightarrow \quad x_1(t) = x_1(t_s) + \int_{t_s}^t x_2(s) ds
+```
+
+Final velocity condition:
+```math
+x_2(0) = 0 \quad \Rightarrow \quad t_s - t_0 + t_s = 0 \quad \Rightarrow \quad t_0 = 2 t_s
+```
+
+Final position:
+```math
+x_1(0) = x_1(t_s) + \frac{t_s^2}{2} \quad \Rightarrow \quad x_1(0) = t_s^2 = 1 \quad \Rightarrow \quad t_s = -1
+```
+
+We deduce:
+```math
+t_0 = 2 * t_s = -2
+```
+
+### Final solution:
+- Switching time: \( t_s = -1 \)
+- Initial time: \( t_0 = -2 \)
+
+Control:
+```math
+u(t) = 1 \quad \text{on} \quad [-2, -1] \\
+u(t) = -1 \quad \text{on} \quad [-1, 0]
+```
 
 
 ## From free final time to fixed final time :
