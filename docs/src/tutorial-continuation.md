@@ -1,3 +1,4 @@
+
 # Discrete continuation
 
 By using the warm start option, it is easy to implement a basic discrete continuation method, in which a sequence of problems is solved by using each solution as the initial guess for the next problem.
@@ -53,7 +54,7 @@ Then we perform the continuation with a simple *for* loop, using each solution t
 init = ()
 data = DataFrame(T=Float64[], Objective=Float64[], Iterations=Int[])
 for T ∈ range(1, 2, length=5)
-    ocp = problem(T) 
+    ocp = problem(T)
     sol = solve(ocp; init=init, display=false)
     global init = sol
     push!(data, (T=T, Objective=objective(sol), Iterations=iterations(sol)))
