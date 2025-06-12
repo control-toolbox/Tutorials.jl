@@ -158,6 +158,20 @@ u(t) = \begin{cases}
 \end{cases}
 ```
 
+Now we can compare the results found with the direct method whith the theoritical analysis :
+```@example main-disc
+tf = variable(sol)
+u = control(sol)
+p = costate(sol)
+x = state(sol)
+p° = -1
+
+xf = x(tf)
+pf = p(tf)
+
+Htf = pf[1]*xf[1] + pf[2]*u(tf)
+```
+
 We can analyse the influence of using different discretization sizes (grid_size), and observed the following results for the optimal tf:
 
 ```@example main-disc
@@ -278,6 +292,78 @@ Control:
 ```math
 u(t) = 1 \quad \text{on} \quad [-2, -1] \\
 u(t) = -1 \quad \text{on} \quad [-1, 0]
+```
+
+## An example with free final and free initial time :
+```@example both_time
+using OptimalControl
+using NLPModelsIpopt
+using BenchmarkTools
+using DataFrames
+using Plots
+using Printf
+
+function double_integrator_freet0tf()
+    @def ocp begin
+        v=(t0, tf) ∈ R², variable
+        t ∈ [t0, tf], time
+        x ∈ R², state
+        u ∈ R, control
+        -1 ≤ u(t) ≤ 1
+        x(t0) == [0, 0]
+        x(tf) == [1, 0]
+        0.05 ≤ t0 ≤ 10
+        0.05 ≤ tf ≤ 10
+        0.01 ≤ tf - t0 ≤ Inf
+        ẋ(t) == [x₂(t), u(t)]
+        t0 → max
+    end
+
+    return ocp
+end
+nothing # hide
+```
+
+#  Direct resolution with both free times :
+
+We now solve the problem using a direct method, with automatic treatment of the free initial time.
+
+```@example both_time
+ocp = double_integrator_freet0tf()
+sol = solve(ocp; grid_size=100)
+plot(sol; label="direct", size=(800, 800))
+```
+
+
+## A more concrete example about the change of orbit of a satellite :
+
+```@example orbit
+using OptimalControl
+using NLPModelsIpopt
+using BenchmarkTools
+using DataFrames
+using Plots
+using Printf
+
+function double_integrator_freet0tf()
+    @def ocp begin
+        v=(t0, tf) ∈ R², variable
+        t ∈ [t0, tf], time
+        x ∈ R², state
+        u ∈ R, control
+        -1 ≤ u(t) ≤ 1
+        x(t0) == [0, 0]
+        x(tf) == [1, 0]
+        0.05 ≤ t0 ≤ 10
+        0.05 ≤ tf ≤ 10
+        0.01 ≤ tf - t0 ≤ Inf
+        ẋ(t) == [x₂(t), u(t)]
+        t0 → max
+    end
+
+    return ocp
+end
+nothing # hide
 ```
 
 
