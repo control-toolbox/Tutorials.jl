@@ -62,7 +62,7 @@ plot(sol; label="direct", size=(800, 800))
 
 Here the theorical part :
 ```math
-H = p1*x1 + p2*u
+H = p1*x2 + p2*u
 ```
 Conditions of Pontryagin's theorem :
 ```math
@@ -169,8 +169,15 @@ p° = -1
 xf = x(tf)
 pf = p(tf)
 
-Htf = pf[1]*xf[1] + pf[2]*u(tf)
+Htf = pf[1]*xf[2] + pf[2]*u(tf)
+@printf("H(tf) = %.3f\n", Htf)
+@printf("x(tf) = [%.3f, %.3f]\n", xf[1], xf[2])
+@printf("p(tf) = [%.3f, %.3f]\n", pf[1], pf[2])
 ```
+
+The numerical results closely match the theoretical predictions: the final state x(tf)=[1,0] is exactly satisfied.
+The costate and Hamiltonian values at final time show a small deviation (≈ 0.01), likely due to numerical precision.
+Overall, the direct method confirms the theoretical analysis with excellent accuracy.
 
 We can analyse the influence of using different discretization sizes (grid_size), and observed the following results for the optimal tf:
 
@@ -345,26 +352,38 @@ using DataFrames
 using Plots
 using Printf
 
-function double_integrator_freet0tf()
+const x₁₀ = -42272.67       # initial position x
+const x₂₀ = 0               # initial position y
+const x₃₀ = 0               # initial velocity in x
+const x₄₀ = -5696.72        # initial velocity in y
+const μ = 5.1658620912*1e12 # gravitational parameter
+const γ_max = 0.05          # maximal thrust norm
+const r_f = 1.0             # target orbit radius (final distance to origin)
+
+function min_orbit_tf()
     @def ocp begin
-        v=(t0, tf) ∈ R², variable
-        t ∈ [t0, tf], time
-        x ∈ R², state
-        u ∈ R, control
-        -1 ≤ u(t) ≤ 1
-        x(t0) == [0, 0]
-        x(tf) == [1, 0]
-        0.05 ≤ t0 ≤ 10
-        0.05 ≤ tf ≤ 10
-        0.01 ≤ tf - t0 ≤ Inf
-        ẋ(t) == [x₂(t), u(t)]
-        t0 → max
+        tf ∈ R, variable
+        t ∈ [0, tf], time
+        x ∈ R^4, state
+        u ∈ R^2, control
+        norm(u(t)) ≤ γ_max
+        x(0) == [x₁₀, x₂₀, x₃₀, x₄₀]
+        x(tf)[1]^2 + x(tf)[2]^2 == r_f^2
+        x(tf)[3] == -√(μ / r_f^3) * x(tf)[2]
+        x(tf)[4] ==  √(μ / r_f^3) * x(tf)[1]
+        0.05 ≤ tf ≤ Inf
+        ẋ(t) == [
+            x[3](t),
+            x[4](t),
+            -μ * x[1](t) / ( (x[1](t)^2 + x[2](t)^2)^(3/2) ) + u[1](t),
+            -μ * x[2](t) / ( (x[1](t)^2 + x[2](t)^2)^(3/2) ) + u[2](t)
+        ]
+        tf → min
     end
 
     return ocp
 end
 nothing # hide
 ```
-
 
 ## From free final time to fixed final time :
