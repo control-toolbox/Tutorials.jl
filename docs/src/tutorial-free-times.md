@@ -360,23 +360,22 @@ const μ = 5.1658620912*1e12 # gravitational parameter
 const γ_max = 0.05          # maximal thrust norm
 const r_f = 1.0             # target orbit radius (final distance to origin)
 
+
 function min_orbit_tf()
     @def ocp begin
         tf ∈ R, variable
         t ∈ [0, tf], time
-        x ∈ R^4, state
-        u ∈ R^2, control
-        norm(u(t)) ≤ γ_max
+        x ∈ R⁴, state
+        u ∈ R², control
+        u₁(t)^2 + u₂(t)^2 ≤ γ_max^2
         x(0) == [x₁₀, x₂₀, x₃₀, x₄₀]
-        x(tf)[1]^2 + x(tf)[2]^2 == r_f^2
-        x(tf)[3] == -√(μ / r_f^3) * x(tf)[2]
-        x(tf)[4] ==  √(μ / r_f^3) * x(tf)[1]
+        x₁(tf)^2 + x₂(tf)^2 == r_f^2
         0.05 ≤ tf ≤ Inf
         ẋ(t) == [
-            x[3](t),
-            x[4](t),
-            -μ * x[1](t) / ( (x[1](t)^2 + x[2](t)^2)^(3/2) ) + u[1](t),
-            -μ * x[2](t) / ( (x[1](t)^2 + x[2](t)^2)^(3/2) ) + u[2](t)
+            x₃(t),
+            x₄(t),
+            -μ * x₁(t) / ((x₁(t)^2 + x₂(t)^2)^(3/2)) + u₁(t),
+            -μ * x₂(t) / ((x₁(t)^2 + x₂(t)^2)^(3/2)) + u₂(t)
         ]
         tf → min
     end
@@ -386,4 +385,126 @@ end
 nothing # hide
 ```
 
+#  Direct resolution with minimal orbital time :
+
+We now solve the problem using a direct method, with automatic treatment of the free initial time.
+
+@example orbit
+ocp = min_orbit_tf()
+sol = solve(ocp; grid_size=100)
+plot(sol; label="direct", size=(800, 800))
+
+## Indirect method
+
+We keep the structure of the solution found with the direct method
+```@example main-disc
+t = time_grid(sol)
+x = state(sol)
+u = control(sol)
+p = costate(sol)
+
+H(x,p,u,t) = p[1](t)*x[2](t) + p[2](t)*u(u)
+H(xf, pf, tf) = pf[1]*xf[2] + pf[2]*u(tf)
+
+# Hamiltonian vector field
+F1(x) = [0, 1]
+H1 = Lift(F1)
+φ(t) = H1(x(t), p(t))  # switching function
+```
+
+
+First, lets define the different flows
+```@example main-disc
+using OrdinaryDiffEq  # to get the Flow function from OptimalControl
+
+const u1 = 1
+const u0 = -1
+
+f1 = Flow(ocp, (x, p, tf) -> u1)
+f0 = Flow(ocp, (x, p, tf) -> u0)
+```
+
+And with this we have the following shooting function
+```@example main-disc
+x0 = [0.0, 0.0]  # état initial
+xf_target = [1.0, 0.0]  # état final
+
+function shoot!(s, p0, t1, tf)
+x1, p1 = f1(0.0, x0, p0, t1)
+xf, pf = f0(t1, x1, p1, tf)
+
+# Conditions de tir
+s[1:2] = xf .- xf_target  # état final
+s[3]   = H(xf, pf, tf) - 1  # condition de transversalité H(tf) = 1
+s[4]   = H1(x1, p1)       # φ = 0 au switch
+end
+```
+
+Before solving our problem we must find a good initial guess to help the convergence of the algorithm
+```@example main-disc
+p0 = p(0.0)
+φ_arr = abs.(φ.(t))
+t1 = t[argmin(φ_arr)]
+tf = t[end]
+
+println("p0 ≈ ", p0)
+println("t1 ≈ ", t1)
+println("tf ≈ ", tf)
+
+s = zeros(4)
+shoot!(s, p0, t1, tf)
+
+ξ = [p0..., t1, tf]
+```
+
+And we finally can solve the problem using an indirect method
+```@example main-disc
+using NonlinearSolve
+using DifferentiationInterface
+import ForwardDiff
+
+backend = AutoForwardDiff()
+
+struct MYSOL
+    x::Vector{Float64}
+end
+
+function fsolve(f, j, x; kwargs...)
+    try
+        MINPACK.fsolve(f, j, x; kwargs...)
+    catch e
+        println("MINPACK error:")
+        println(e)
+        println("→ Using NonlinearSolve fallback")
+
+        # Wrap pour respecter l'interface de NonlinearProblem
+        function wrapped_f(s, ξ, p)
+            f(s, ξ)
+            return nothing
+        end
+
+        prob = NonlinearProblem(wrapped_f, x)
+        sol = solve(prob; abstol=1e-8, reltol=1e-8)
+        return MYSOL(sol.u)
+    end
+end
+
+# Agrégation du problème
+nle!  = (s, ξ) -> shoot!(s, ξ[1:2], ξ[3], ξ[4])
+jnle! = (js, ξ) -> jacobian!(nle!, similar(ξ), js, backend, ξ)
+
+ξ0 = [p0... , t1, tf]
+indirect_sol = fsolve(nle!, jnle!, ξ0)
+
+p0 = indirect_sol.x[1:2]
+t1 = indirect_sol.x[3]
+tf = indirect_sol.x[4]
+
+f = f1 * (t1, f0)
+flow_sol = f((0.0, tf), x0, p0)
+
+plot!(flow_sol, label="indirect", color=:red)
+```
+
 ## From free final time to fixed final time :
+
