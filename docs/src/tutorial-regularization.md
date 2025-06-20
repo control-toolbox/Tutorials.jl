@@ -1,5 +1,5 @@
 ```@meta
-    draft=false
+Draft=false
 ```
 ## Regularization method application :
 
@@ -28,76 +28,60 @@ using Plots
 using Printf
 using LinearAlgebra
 
-const Tmax = 60                                # Maximum thrust (N)
-const cTmax = 3600^2 / 1e6; const T = Tmax * cTmax  # Conversion N → kg*Mm/h²
-const mass0 = 1500                             # Initial mass (kg)
-const β = 1.42e-2                              # Specific impulse
-const μ = 5165.8620912                         # Gravitational constant
+const μ = 5.1658620912e12       # Constante gravitationnelle
+const Tmax = 100.0              # Poussée max
+const γmax = Tmax * 3600^2 / (2000 * 1e3)  # Contrôle max
+const ε = 1e-2                  # Paramètre de régularisation
 
-const P0 = 11.625
-const ex0, ey0 = 0.75, 0
-const hx0, hy0 = 6.12e-2, 0
-const L0 = π
-const Pf = 42.165
-const exf, eyf = 0.0, 0.0
-const hxf, hyf = 0.0, 0.0
-const ε = 1e-2                                 # Regularization parameter
+# État initial en coordonnées de Gauss 2D : (P, ex, ey, L)
+x0 = [10000.0, 0.01, 0.0, 0.0]
 
-x0 = [P0, ex0, ey0, hx0, hy0, L0]
-xf = [Pf, exf, eyf, hxf, hyf]
+# État final en coordonnées de Gauss 2D
+xf = [42164.0, 0.0, 0.0, π]
+
+T_min_100 = 13.4                # Temps minimal avec Tmax=100 (donné)
+tf = 1.5 * T_min_100            # Temps final (à ajuster)
 ```
 
 Dynamic functions in Gauss coordinates :
 
 ```@example orbit
-asqrt(x; ε=1e-9) = sqrt(sqrt(x^2 + ε^2))
+asqrt(x; ε=1e-9) = sqrt(sqrt(x^2 + ε^2))  # sqrt lissée pour AD
 
 function F0(x)
-    P, ex, ey, hx, hy, L = x
+    P, ex, ey, L = x
     pdm = asqrt(P / μ)
-    cl = cos(L); sl = sin(L)
+    cl = cos(L)
+    sl = sin(L)
     w = 1 + ex * cl + ey * sl
-    F = zeros(eltype(x), 6)
-    F[6] = w^2 / (P * pdm)
+    F = zeros(eltype(x), 4)
+    F[4] = w^2 / (P * pdm)     # dérivée de L (anomalie vraie)
     return F
 end
 
 function F1(x)
-    P, ex, ey, hx, hy, L = x
+    # Direction de contrôle u₁ (dans le plan)
+    P, ex, ey, L = x
     pdm = asqrt(P / μ)
-    cl = cos(L); sl = sin(L)
-    F = zeros(eltype(x), 6)
-    F[2] = pdm * sl
-    F[3] = pdm * (-cl)
+    cl = cos(L)
+    sl = sin(L)
+    F = zeros(eltype(x), 4)
+    F[2] = pdm * sl            # dérivée de ex
+    F[3] = -pdm * cl           # dérivée de ey
     return F
 end
 
 function F2(x)
-    P, ex, ey, hx, hy, L = x
+    # Direction de contrôle u₂ (dans le plan)
+    P, ex, ey, L = x
     pdm = asqrt(P / μ)
-    cl = cos(L); sl = sin(L)
+    cl = cos(L)
+    sl = sin(L)
     w = 1 + ex * cl + ey * sl
-    F = zeros(eltype(x), 6)
-    F[1] = pdm * 2 * P / w
+    F = zeros(eltype(x), 4)
+    F[1] = pdm * 2 * P / w     # dérivée de P
     F[2] = pdm * (cl + (ex + cl) / w)
     F[3] = pdm * (sl + (ey + sl) / w)
-    return F
-end
-
-function F3(x)
-    P, ex, ey, hx, hy, L = x
-    pdm = asqrt(P / μ)
-    cl = cos(L); sl = sin(L)
-    w = 1 + ex * cl + ey * sl
-    pdmw = pdm / w
-    zz = hx * sl - hy * cl
-    uh = (1 + hx^2 + hy^2) / 2
-    F = zeros(eltype(x), 6)
-    F[2] = pdmw * (-zz * ey)
-    F[3] = pdmw * (zz * ex)
-    F[4] = pdmw * uh * cl
-    F[5] = pdmw * uh * sl
-    F[6] = pdmw * zz
     return F
 end
 ```
@@ -105,18 +89,32 @@ end
 Optimal control problem with regularization :
 
 ```@example orbit
-@def ocp begin
-    tf ∈ R, variable
-    t ∈ [0, tf], time
-    x = (P, ex, ey, hx, hy, L) ∈ R⁶, state
-    u ∈ R³, control
-    x(0) == x0
-    x[1:5](tf) == xf[1:5]
-    mass = mass0 - β * T * t
-    ẋ(t) == F0(x(t)) + (T / mass) * (u₁(t) * F1(x(t)) + u₂(t) * F2(x(t)) + u₃(t) * F3(x(t)))
-    u₁(t)^2 + u₂(t)^2 + u₃(t)^2 < 1
-    tf → min + ε * ∫(log(1 - (u₁(t)^2 + u₂(t)^2 + u₃(t)^2)))
+function min_conso()
+    @def ocp begin
+        t ∈ [0, tf], time
+        x = (P, ex, ey, L) ∈ R⁴, state
+        u ∈ R², control
+
+        # Conditions initiales et finales
+        x(0) == x0
+        x[1:3](tf) == xf[1:3]  # P, ex, ey à l'arrivée
+        x[4](tf) == xf[4]      # anomalie vraie à l'arrivée
+
+        # Dynamique
+        ẋ(t) == F0(x(t)) + Tmax * (u₁(t) * F1(x(t)) + u₂(t) * F2(x(t)))
+
+        norm = sqrt(u₁(t)^2 + u₂(t)^2)
+
+        # Contrôle borné
+        norm^2 ≤ γmax^2
+
+        # Coût avec barrière logarithmique pour régularisation
+        ∫(norm - ε * (log(norm) + log(γmax - norm))) → min
+    end
+
+    return ocp
 end
+nothing # hide
 ```
 
 # Direct numerical solution
@@ -124,9 +122,11 @@ end
 ```@example orbit
 using NLPModelsIpopt
 
-u0 = [0.1, 0.5, 0.0]
-xguess(t) = x0 + (xf - x0) * t / 15
-nlp_init = (state=xguess, control=u0, variable=15.0)
+u0 = [0.1, 0.0]
+xguess(t) = x0 + (xf - x0) * t / tf
+
+ocp = min_conso()
+nlp_init = (state = xguess, control = u0)
 nlp_sol = solve(ocp; init=nlp_init, grid_size=100)
 plot(nlp_sol)
 ```
