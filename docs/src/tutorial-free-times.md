@@ -473,6 +473,13 @@ using BenchmarkTools
 using DataFrames
 using Plots
 using Printf
+using OrdinaryDiffEq
+using NonlinearSolve
+using DifferentiationInterface
+import ForwardDiff
+using LinearAlgebra
+using NLsolve
+
 
 const x₁₀ = -42272.67       # initial position x
 const x₂₀ = 0               # initial position y
@@ -481,7 +488,8 @@ const x₄₀ = -5696.72        # initial velocity in y
 const μ = 5.1658620912*1e12 # gravitational parameter
 const γ_max = 0.05          # maximal thrust norm
 const r_f = 42165             # target orbit radius (final distance to origin)
-
+const rf3    = r_f^3
+const α  = sqrt(μ/rf3);
 
 function min_orbit_tf()
     @def ocp begin
@@ -515,4 +523,115 @@ We now solve the problem using a direct method, with automatic treatment of the 
 ocp = min_orbit_tf()
 sol = solve(ocp;init=(variable=13.4,), grid_size=100)
 plot(sol; label="direct", size=(800, 800))
+```
+# Indirect resolution with minimal orbital time :
+We write down the pseudo hamiltonien of our problem
+```@example orbit
+
+function H(x, p, u)
+    r3 = sqrt(x[1]^2 + x[2]^2)^3
+    h = p[1]*x[3] + p[2]*x[4] + p[3]*((-μ*x[1]/r3) + u[1]) + p[4]*((-μ*x[2]/r3) + u[2])
+    return h
+end
+
+function Hv(x, p, u)
+    n     = size(x, 1)
+    dx    = zeros(eltype(x), n)
+    dp    = zeros(eltype(x), n)
+    r = sqrt(x[1]^2 + x[2]^2)
+    dx[1],dx[2],dx[3],dx[4] = x[3], x[4], (-μ*x[1]/r^3) + u[1], (-μ*x[2]/r^3) + u[2]
+    dp[1],dp[2],dp[3],dp[4] = μ*((r^2 - 3*x[1]^2)*p[3]/r^5) -(3*p[4]*μ*x[2]*x[1]/r^5), μ*((r^2 - 3*x[2]^2)*p[4]/r^5) -(3*p[3]*μ*x[2]*x[1]/r^5), -p[1], -p[2]
+    return dx, dp
+end
+
+function control(p)
+    u    = zeros(eltype(p),2)
+    u[1] = (p[3]*γ_max)/sqrt(p[3]^2 + p[4]^2)
+    u[2] = (p[4]*γ_max)/sqrt(p[3]^2 + p[4]^2)
+    return u
+end
+```
+We calculate our hamitonien flow
+```@raw html
+<details style="margin-left:3em"><summary>Flow function.</summary>
+```
+```@example orbit
+
+function Flow(Hv)
+   function rhs!(dz, z, dummy, t)
+        n = size(z, 1)÷2
+        dz[1:n], dz[n+1:2n] = Hv(z[1:n], z[n+1:2n])
+    end
+    
+    # cas vectoriel
+    function f(tspan::Tuple{Real, Real}, x0::Vector{<:Real}, p0::Vector{<:Real}; abstol=1e-12, reltol=1e-12, saveat=0.01)
+        z0 = [ x0 ; p0 ]
+        ode = ODEProblem(rhs!, z0, tspan)
+        sol = solve(ode, Tsit5(), abstol=abstol, reltol=reltol, saveat=saveat)
+        return sol
+    end
+    
+    function f(t0::Real, x0::Vector{<:Real}, p0::Vector{<:Real}, tf::Real; abstol=1e-12, reltol=1e-12, saveat=[])
+        sol = f((t0, tf), x0, p0, abstol=abstol, reltol=reltol, saveat=saveat)
+        n = size(x0, 1)
+        return sol(tf)[1:n], sol(tf)[n+1:2n]
+    end
+    
+    # cas scalaire
+    function rhs_scalar!(dz, z, dummy, t)
+        dz[1], dz[2] = Hv(z[1], z[2])
+    end
+
+    function f(tspan::Tuple{Real, Real}, x0::Real, p0::Real; abstol=1e-12, reltol=1e-12, saveat=0.01)
+        z0 = [ x0 ; p0 ]
+        ode = ODEProblem(rhs_scalar!, z0, tspan)
+        sol = solve(ode, Tsit5(), abstol=abstol, reltol=reltol, saveat=saveat)
+        return sol
+    end
+
+    function f(t0::Real, x0::Real, p0::Real, tf::Real; abstol=1e-12, reltol=1e-12, saveat=[])
+        sol = f((t0, tf), x0, p0, abstol=abstol, reltol=reltol, saveat=saveat)
+        return sol(tf)[1], sol(tf)[2]
+    end
+
+    return f
+
+end;
+```
+```@raw html
+</details>
+```
+
+```@example orbit
+f = Flow((x, p) -> Hv(x, p, control(p)));
+```
+We calculate our shooting function
+
+```@example orbit
+const x0 = [x₁₀, x₂₀, x₃₀, x₄₀]
+function shoot(p0, tf)
+    s = zeros(eltype(p0), 5)
+    x, p = f(0, x0, p0, tf)
+    s[1] = sqrt(x[1]^2 + x[2]^2) - r_f
+    s[2] = x[3] + x[2]*α
+    s[3] = x[4] - x[1]*α
+    s[4] = x[2]*(p[1]+ α*p[4]) - x[1]*(p[2] - α*p[3])
+    s[5] = H(x, p, control(p)) -1
+    return s
+end;
+```
+Inital guess
+```@example orbit
+y_guess = [1.0323e-4, 4.915e-5, 3.568e-4, -1.554e-4, 13.4]
+```
+
+Jacobian of the shooting function
+```@example orbit
+foo(y)  = shoot(y[1:4], y[5])
+jfoo(y) = ForwardDiff.jacobian(foo, y)
+```
+
+Solving shoot(p0, tf) = 0 
+```@example orbit
+nl_sol = nlsolve(foo, y_guess; xtol=1e-8, method=:trust_region, show_trace=true, autodiff=:finite)
 ```
