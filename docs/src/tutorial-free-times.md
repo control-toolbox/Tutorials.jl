@@ -525,113 +525,218 @@ sol = solve(ocp;init=(variable=13.4,), grid_size=100)
 plot(sol; label="direct", size=(800, 800))
 ```
 # Indirect resolution with minimal orbital time :
-We write down the pseudo hamiltonien of our problem
+
+
+## Hamiltonian and optimal control
+
+From the Pontryagin Maximum Principle, the optimal control is bang-bang:
+
 ```@example orbit
+ocp = min_orbit_tf()
 
-function H(x, p, u)
-    r3 = sqrt(x[1]^2 + x[2]^2)^3
-    h = p[1]*x[3] + p[2]*x[4] + p[3]*((-μ*x[1]/r3) + u[1]) + p[4]*((-μ*x[2]/r3) + u[2])
-    return h
-end
-
-function Hv(x, p, u)
-    n     = size(x, 1)
-    dx    = zeros(eltype(x), n)
-    dp    = zeros(eltype(x), n)
-    r = sqrt(x[1]^2 + x[2]^2)
-    dx[1],dx[2],dx[3],dx[4] = x[3], x[4], (-μ*x[1]/r^3) + u[1], (-μ*x[2]/r^3) + u[2]
-    dp[1],dp[2],dp[3],dp[4] = μ*((r^2 - 3*x[1]^2)*p[3]/r^5) -(3*p[4]*μ*x[2]*x[1]/r^5), μ*((r^2 - 3*x[2]^2)*p[4]/r^5) -(3*p[3]*μ*x[2]*x[1]/r^5), -p[1], -p[2]
-    return dx, dp
-end
-
-function control(p)
-    u    = zeros(eltype(p),2)
-    u[1] = (p[3]*γ_max)/sqrt(p[3]^2 + p[4]^2)
-    u[2] = (p[4]*γ_max)/sqrt(p[3]^2 + p[4]^2)
-    return u
-end
-```
-We calculate our hamitonien flow
-```@raw html
-<details style="margin-left:3em"><summary>Flow function.</summary>
-```
-```@example orbit
-
-function Flow(Hv)
-   function rhs!(dz, z, dummy, t)
-        n = size(z, 1)÷2
-        dz[1:n], dz[n+1:2n] = Hv(z[1:n], z[n+1:2n])
-    end
+function optimal_control(p)
+    p₃, p₄ = p[3], p[4]
+    p_norm = sqrt(p₃^2 + p₄^2)
     
-    # cas vectoriel
-    function f(tspan::Tuple{Real, Real}, x0::Vector{<:Real}, p0::Vector{<:Real}; abstol=1e-12, reltol=1e-12, saveat=0.01)
-        z0 = [ x0 ; p0 ]
-        ode = ODEProblem(rhs!, z0, tspan)
-        sol = solve(ode, Tsit5(), abstol=abstol, reltol=reltol, saveat=saveat)
+    if p_norm > 1e-10
+        u₁ = -γ_max * p₃ / p_norm
+        u₂ = -γ_max * p₄ / p_norm
+        return [u₁, u₂]
+    else
+        return [0.0, 0.0]
+    end
+end
+
+function hamiltonian(x, p, u)
+    x₁, x₂, x₃, x₄ = x
+    p₁, p₂, p₃, p₄ = p
+    u₁, u₂ = u
+    
+    r = sqrt(x₁^2 + x₂^2)
+    r³ = r^3
+    
+    return (p₁*x₃ + p₂*x₄ + 
+            p₃*(-μ*x₁/r³ + u₁) + 
+            p₄*(-μ*x₂/r³ + u₂))
+end
+```
+
+## Augmented dynamics
+
+We define the combined state-costate system:
+
+```@example orbit
+function augmented_dynamics!(dx, x_aug, params, t)
+    x = x_aug[1:4]
+    p = x_aug[5:8]
+    
+    x₁, x₂, x₃, x₄ = x
+    p₁, p₂, p₃, p₄ = p
+    
+    r = sqrt(x₁^2 + x₂^2)
+    r³ = r^3
+    r⁵ = r^5
+    
+    u = optimal_control(p)
+    u₁, u₂ = u
+    
+    # State dynamics
+    dx[1] = x₃
+    dx[2] = x₄
+    dx[3] = -μ*x₁/r³ + u₁
+    dx[4] = -μ*x₂/r³ + u₂
+    
+    # Costate dynamics
+    dx[5] = -p₃ * μ * (2*x₁^2 - x₂^2) / r⁵
+    dx[6] = -p₄ * μ * (2*x₂^2 - x₁^2) / r⁵
+    dx[7] = -p₁
+    dx[8] = -p₂
+end
+
+function create_flow()
+    function flow_func(t_span, x0, p0)
+        x_aug0 = vcat(x0, p0)
+        prob = ODEProblem(augmented_dynamics!, x_aug0, t_span)
+        sol = solve(prob, Tsit5(), reltol=1e-12, abstol=1e-12)
         return sol
     end
+    return flow_func
+end
+
+flow = create_flow()
+```
+
+## Shooting function
+
+The shooting function encodes the boundary conditions:
+
+```@example orbit
+function shooting_function!(s, ξ)
+    p0 = ξ[1:4]
+    tf = ξ[5]
     
-    function f(t0::Real, x0::Vector{<:Real}, p0::Vector{<:Real}, tf::Real; abstol=1e-12, reltol=1e-12, saveat=[])
-        sol = f((t0, tf), x0, p0, abstol=abstol, reltol=reltol, saveat=saveat)
-        n = size(x0, 1)
-        return sol(tf)[1:n], sol(tf)[n+1:2n]
+    x0 = [x₁₀, x₂₀, x₃₀, x₄₀]
+    
+    try
+        sol = flow((0.0, tf), x0, p0)
+        
+        x_final = sol.u[end][1:4]
+        p_final = sol.u[end][5:8]
+        
+        x₁f, x₂f, x₃f, x₄f = x_final
+        p₁f, p₂f, p₃f, p₄f = p_final
+        
+        s[1] = x₁f^2 + x₂f^2 - r_f^2
+        s[2] = p₁f
+        s[3] = p₂f
+        
+        u_final = optimal_control(p_final)
+        H_final = hamiltonian(x_final, p_final, u_final)
+        s[4] = H_final
+        
+        s[5] = p₁f^2 + p₂f^2 + p₃f^2 + p₄f^2 - 1.0
+        
+    catch e
+        fill!(s, 1e6)
     end
     
-    # cas scalaire
-    function rhs_scalar!(dz, z, dummy, t)
-        dz[1], dz[2] = Hv(z[1], z[2])
+    return nothing
+end
+```
+
+## Initial guess and solver setup
+
+```@example orbit
+# Initial guess for the shooting variables [p₀, tf]
+# We use the direct solution to get a good initial guess
+function get_initial_guess()
+    # Use the direct solution final time as initial guess
+    tf_guess = 13.4 
+    
+    # Initial guess for costates - start with normalized values
+    p0_guess = [1.0323e-4, 4.915e-5, 3.568e-4, -1.554e-4]
+    
+    return vcat(p0_guess, tf_guess)
+end
+
+ξ_init = get_initial_guess()
+println("Initial guess: p₀ = $(ξ_init[1:4]), tf = $(ξ_init[5])")
+```
+
+## Solve the shooting problem
+
+```@example orbit
+# Solve the shooting problem using NLsolve
+function solve_indirect_method()
+    println("Solving indirect method...")
+    
+    # Set up the shooting problem
+    result = nlsolve(shooting_function!, ξ_init, 
+                    method=:trust_region,
+                    ftol=1e-10,
+                    xtol=1e-10,
+                    iterations=1000,
+                    show_trace=false)
+    
+    if result.f_converged || result.x_converged
+        println("Shooting method converged!")
+        println("Final residual norm: $(norm(result.zero))")
+        return result.zero
+    else
+        println("Shooting method failed to converge")
+        println("Final residual norm: $(norm(result.zero))")
+        return nothing
     end
+end
 
-    function f(tspan::Tuple{Real, Real}, x0::Real, p0::Real; abstol=1e-12, reltol=1e-12, saveat=0.01)
-        z0 = [ x0 ; p0 ]
-        ode = ODEProblem(rhs_scalar!, z0, tspan)
-        sol = solve(ode, Tsit5(), abstol=abstol, reltol=reltol, saveat=saveat)
-        return sol
+ξ_solution = solve_indirect_method()
+
+if ξ_solution !== nothing
+    p0_opt = ξ_solution[1:4]
+    tf_opt = ξ_solution[5]
+    
+    println("\nOptimal solution:")
+    println("p₀ = $(p0_opt)")
+    println("tf = $(tf_opt)")
+    
+    # Verify the solution
+    s_check = zeros(5)
+    shooting_function!(s_check, ξ_solution)
+    println("Shooting function residual: $(s_check)")
+end
+```
+
+## Generate the indirect solution trajectory
+
+```@example orbit
+if ξ_solution !== nothing
+    # Generate the optimal trajectory
+    x0 = [x₁₀, x₂₀, x₃₀, x₄₀]
+    p0_opt = ξ_solution[1:4]
+    tf_opt = ξ_solution[5]
+    
+    # Solve the optimal trajectory
+    sol_indirect = flow((0.0, tf_opt), x0, p0_opt)
+    
+    # Extract time points for plotting
+    t_indirect = range(0, tf_opt, length=1000)
+    
+    # Evaluate solution at time points
+    x_traj = zeros(length(t_indirect), 4)
+    p_traj = zeros(length(t_indirect), 4)
+    u_traj = zeros(length(t_indirect), 2)
+    
+    for (i, t) in enumerate(t_indirect)
+        state_full = sol_indirect(t)
+        x_traj[i, :] = state_full[1:4]
+        p_traj[i, :] = state_full[5:8]
+        u_traj[i, :] = optimal_control(state_full[5:8])
     end
-
-    function f(t0::Real, x0::Real, p0::Real, tf::Real; abstol=1e-12, reltol=1e-12, saveat=[])
-        sol = f((t0, tf), x0, p0, abstol=abstol, reltol=reltol, saveat=saveat)
-        return sol(tf)[1], sol(tf)[2]
-    end
-
-    return f
-
-end;
-```
-```@raw html
-</details>
+    
+    println("Indirect solution generated successfully!")
+    println("Final time: $(tf_opt)")
+    println("Final position: $(x_traj[end, 1:2])")
+    println("Final radius: $(sqrt(x_traj[end, 1]^2 + x_traj[end, 2]^2))")
+end
 ```
 
-```@example orbit
-f = Flow((x, p) -> Hv(x, p, control(p)));
-```
-We calculate our shooting function
-
-```@example orbit
-const x0 = [x₁₀, x₂₀, x₃₀, x₄₀]
-function shoot(p0, tf)
-    s = zeros(eltype(p0), 5)
-    x, p = f(0, x0, p0, tf)
-    s[1] = sqrt(x[1]^2 + x[2]^2) - r_f
-    s[2] = x[3] + x[2]*α
-    s[3] = x[4] - x[1]*α
-    s[4] = x[2]*(p[1]+ α*p[4]) - x[1]*(p[2] - α*p[3])
-    s[5] = H(x, p, control(p)) -1
-    return s
-end;
-```
-Inital guess
-```@example orbit
-y_guess = [1.0323e-4, 4.915e-5, 3.568e-4, -1.554e-4, 13.4]
-```
-
-Jacobian of the shooting function
-```@example orbit
-foo(y)  = shoot(y[1:4], y[5])
-jfoo(y) = ForwardDiff.jacobian(foo, y)
-```
-
-Solving shoot(p0, tf) = 0 
-```@example orbit
-nl_sol = nlsolve(foo, y_guess; xtol=1e-8, method=:trust_region, show_trace=true, autodiff=:finite)
-```
