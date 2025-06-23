@@ -29,7 +29,7 @@ using Printf
 using LinearAlgebra
 
 const μ = 5.1658620912e12       # Constante gravitationnelle
-const Tmax = 100.0              # Poussée max
+const Tmax = 60.0              # Poussée max
 const γmax = Tmax * 3600^2 / (2000 * 1e3)  # Contrôle max
 const ε = 1e-2                  # Paramètre de régularisation
 
@@ -40,7 +40,7 @@ x0 = [10000.0, 0.01, 0.0, 0.0]
 xf = [42164.0, 0.0, 0.0, π]
 
 T_min_100 = 13.4                # Temps minimal avec Tmax=100 (donné)
-tf = 1.5 * T_min_100            # Temps final (à ajuster)
+# tf = 1.5 * T_min_100            # Temps final (à ajuster)
 ```
 
 Dynamic functions in Gauss coordinates :
@@ -95,20 +95,20 @@ function min_conso()
         x = (P, ex, ey, L) ∈ R⁴, state
         u ∈ R², control
 
-        # Conditions initiales et finales
+        # Constrains
         x(0) == x0
         x[1:3](tf) == xf[1:3]  # P, ex, ey à l'arrivée
         x[4](tf) == xf[4]      # anomalie vraie à l'arrivée
 
-        # Dynamique
-        ẋ(t) == F0(x(t)) + Tmax * (u₁(t) * F1(x(t)) + u₂(t) * F2(x(t)))
-
         norm = sqrt(u₁(t)^2 + u₂(t)^2)
 
-        # Contrôle borné
+        # Control limit
         norm^2 ≤ γmax^2
 
-        # Coût avec barrière logarithmique pour régularisation
+        # Dynamic
+        ẋ(t) == F0(x(t)) + Tmax * (u₁(t) * F1(x(t)) + u₂(t) * F2(x(t)))
+
+        # Regularization with logarithmic barrier
         ∫(norm - ε * (log(norm) + log(γmax - norm))) → min
     end
 
@@ -117,13 +117,55 @@ end
 nothing # hide
 ```
 
+Initialisation avec le problème à temps min
+
+```@example orbit
+function min_tf()
+    @def ocp begin
+        tf ∈ R, variable
+        t ∈ [0, tf], time
+        x = (P, ex, ey, L) ∈ R⁴, state
+        u ∈ R², control
+
+        # Constrains
+        x(0) == x0
+        x[1:3](tf) == xf[1:3]  # P, ex, ey à l'arrivée
+        x[4](tf) == xf[4]      # anomalie vraie à l'arrivée
+        0.05 ≤ tf ≤ Inf
+                
+        norm = sqrt(u₁(t)^2 + u₂(t)^2)
+
+        # Control limit
+        norm^2 ≤ γmax^2
+
+        # Dynamic
+        ẋ(t) == F0(x(t)) + Tmax * (u₁(t) * F1(x(t)) + u₂(t) * F2(x(t)))
+
+        # Regularization with logarithmic barrier
+        tf → min
+    end
+
+    return ocp
+end
+nothing # hide
+
+ocp1 = min_tf()
+sol = solve(ocp1, grid_size=100)
+```
+
+
 # Direct numerical solution
 
 ```@example orbit
 using NLPModelsIpopt
 
+const Tmax = 100.0              # Poussée max
+const γmax = Tmax * 3600^2 / (2000 * 1e3)  # Contrôle max
+
 u0 = [0.1, 0.0]
 xguess(t) = x0 + (xf - x0) * t / tf
+
+tf = variable(sol)
 
 ocp = min_conso()
 nlp_init = (state = xguess, control = u0)
@@ -133,7 +175,46 @@ plot(nlp_sol)
 
 # Indirect solution (Regularized shooting)
 
+```@example orbit
+function ur(x, p)
+    H1 = p' * F1(x)
+    H2 = p' * F2(x)
 
+    normH = sqrt(H1^2 + H2^2)
+    if normH < 1e-8
+        return [0.0, 0.0]
+    end
+    γ = γmax
+    u_norm = normH
+
+    # optimal control with logarithm barrier
+    u = [H1, H2] / u_norm
+    return u
+end
+
+
+fr = Flow(ocp, ur) # Regular flow (first version)
+
+function shoot(ξ::Vector)
+    tf = ξ[1]
+    p0 = ξ[2:end]
+    xsol, psol = fr(0.0, x0, p0)
+    xT = xsol[end]
+    pT = psol[end]
+
+    s = zeros(5)
+    s[1:4] .= xT .- xf      # Conditions sur (P, ex, ey, L)
+    s[5] = norm(p0)^2 - 1   # Normalisation du co-état
+    return s
+end
+
+ξ = [T_min_100 * 1.5; randn(4)]
+ξ[2:end] ./= norm(ξ[2:end])  # Normalisation initiale de p0
+jshoot(ξ) = ForwardDiff.jacobian(shoot, ξ)
+shoot!(s, ξ) = (s[:] = shoot(ξ); nothing)
+jshoot!(js, ξ) = (js[:] = jshoot(ξ); nothing)
+bvp_sol = fsolve(shoot!, jshoot!, ξ; show_trace=true); println(bvp_sol)
+```
 
 # Conclusion
 
