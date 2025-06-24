@@ -60,7 +60,8 @@ plot(sol; label="direct", size=(800, 800))
 
 # Verification of results
 ```@raw html
-<details style="margin-left:3em"><summary>Verification of results.</summary>
+<details>
+<summary> Click to show/hide mathematical verification.</summary>
 ```
 
 Here the theorical part :
@@ -197,7 +198,7 @@ end
 
 This example shows that problems with a free final time can be sensitive to discretization. A small grid may lead to suboptimal or slightly inaccurate results.
 
-## Indirect method
+#  Direct resolution with free initial time :
 
 We keep the structure of the solution found with the direct method
 ```@example main-disc
@@ -352,7 +353,8 @@ plot(sol; label="direct", size=(800, 800))
 
 ## Verification of results
 ```@raw html
-<details style="margin-left:3em"><summary>Verification of results.</summary>
+<details>
+<summary> Click to show/hide mathematical verification.</summary>
 ```
 Here is the theoretical part using Pontryagin's Maximum Principle:
 ```math
@@ -423,7 +425,7 @@ u(t) = -1 \quad \text{on} \quad [-1, 0]
 ```@raw html
 </details>
 ```
-## An example with free final and free initial time :
+## An example with both final and inital times being free:
 ```@example both_time
 using OptimalControl
 using NLPModelsIpopt
@@ -453,7 +455,8 @@ end
 nothing # hide
 ```
 
-#  Direct resolution with both free times :
+#  Direct resolution with both final and inital times being free:
+
 
 We now solve the problem using a direct method, with automatic treatment of the free initial time.
 
@@ -464,7 +467,7 @@ plot(sol; label="direct", size=(800, 800))
 ```
 
 
-## A more concrete example about the change of orbit of a satellite :
+## A more concrete example about the change of orbit of a satellite:
 
 ```@example orbit
 using OptimalControl
@@ -539,8 +542,8 @@ function optimal_control(p)
     p_norm = sqrt(p₃^2 + p₄^2)
     
     if p_norm > 1e-10
-        u₁ = -γ_max * p₃ / p_norm
-        u₂ = -γ_max * p₄ / p_norm
+        u₁ = γ_max * p₃ / p_norm
+        u₂ = γ_max * p₄ / p_norm
         return [u₁, u₂]
     else
         return [0.0, 0.0]
@@ -562,7 +565,10 @@ end
 ```
 
 ## Augmented dynamics
-
+```@raw html
+<details>
+<summary>Click to show/hide Augmented dynamics code</summary>
+```
 We define the combined state-costate system:
 
 ```@example orbit
@@ -580,17 +586,17 @@ function augmented_dynamics!(dx, x_aug, params, t)
     u = optimal_control(p)
     u₁, u₂ = u
     
-    # State dynamics
+    # State dynamics (unchanged)
     dx[1] = x₃
     dx[2] = x₄
     dx[3] = -μ*x₁/r³ + u₁
     dx[4] = -μ*x₂/r³ + u₂
     
-    # Costate dynamics
-    dx[5] = -p₃ * μ * (2*x₁^2 - x₂^2) / r⁵
-    dx[6] = -p₄ * μ * (2*x₂^2 - x₁^2) / r⁵
-    dx[7] = -p₁
-    dx[8] = -p₂
+    # CORRECTED Costate dynamics: ṗ = -∂H/∂x
+    dx[5] = -(p₃ * μ * (3*x₁^2/r⁵ - 1/r³) + p₄ * μ * (3*x₁*x₂/r⁵))  # -∂H/∂x₁
+    dx[6] = -(p₃ * μ * (3*x₁*x₂/r⁵) + p₄ * μ * (3*x₂^2/r⁵ - 1/r³))   # -∂H/∂x₂
+    dx[7] = -p₁  # -∂H/∂x₃
+    dx[8] = -p₂  # -∂H/∂x₄
 end
 
 function create_flow()
@@ -605,7 +611,9 @@ end
 
 flow = create_flow()
 ```
-
+```@raw html
+</details>
+```
 ## Shooting function
 
 The shooting function encodes the boundary conditions:
@@ -614,32 +622,32 @@ The shooting function encodes the boundary conditions:
 function shooting_function!(s, ξ)
     p0 = ξ[1:4]
     tf = ξ[5]
-    
+
     x0 = [x₁₀, x₂₀, x₃₀, x₄₀]
-    
+
     try
         sol = flow((0.0, tf), x0, p0)
-        
+
         x_final = sol.u[end][1:4]
         p_final = sol.u[end][5:8]
-        
+
         x₁f, x₂f, x₃f, x₄f = x_final
         p₁f, p₂f, p₃f, p₄f = p_final
-        
+
         s[1] = x₁f^2 + x₂f^2 - r_f^2
         s[2] = p₁f
         s[3] = p₂f
-        
+
         u_final = optimal_control(p_final)
         H_final = hamiltonian(x_final, p_final, u_final)
         s[4] = H_final
-        
+
         s[5] = p₁f^2 + p₂f^2 + p₃f^2 + p₄f^2 - 1.0
-        
+
     catch e
         fill!(s, 1e6)
     end
-    
+
     return nothing
 end
 ```
@@ -648,12 +656,10 @@ end
 
 ```@example orbit
 # Initial guess for the shooting variables [p₀, tf]
-# We use the direct solution to get a good initial guess
+
 function get_initial_guess()
-    # Use the direct solution final time as initial guess
-    tf_guess = 13.4 
+    tf_guess = 13.4
     
-    # Initial guess for costates - start with normalized values
     p0_guess = [1.0323e-4, 4.915e-5, 3.568e-4, -1.554e-4]
     
     return vcat(p0_guess, tf_guess)
@@ -669,15 +675,15 @@ println("Initial guess: p₀ = $(ξ_init[1:4]), tf = $(ξ_init[5])")
 # Solve the shooting problem using NLsolve
 function solve_indirect_method()
     println("Solving indirect method...")
-    
+
     # Set up the shooting problem
-    result = nlsolve(shooting_function!, ξ_init, 
+    result = nlsolve(shooting_function!, ξ_init,
                     method=:trust_region,
                     ftol=1e-10,
                     xtol=1e-10,
                     iterations=1000,
                     show_trace=false)
-    
+
     if result.f_converged || result.x_converged
         println("Shooting method converged!")
         println("Final residual norm: $(norm(result.zero))")
@@ -694,11 +700,11 @@ end
 if ξ_solution !== nothing
     p0_opt = ξ_solution[1:4]
     tf_opt = ξ_solution[5]
-    
+
     println("\nOptimal solution:")
     println("p₀ = $(p0_opt)")
     println("tf = $(tf_opt)")
-    
+
     # Verify the solution
     s_check = zeros(5)
     shooting_function!(s_check, ξ_solution)
@@ -739,4 +745,51 @@ if ξ_solution !== nothing
     println("Final radius: $(sqrt(x_traj[end, 1]^2 + x_traj[end, 2]^2))")
 end
 ```
+# Visualistion of results
+```@raw html
+<details>
+<summary>Click to show/hide indirect method visualization code</summary>
+```
 
+```@example orbit
+
+
+# Simple visualization - just the basic plots
+if ξ_solution !== nothing
+    p0_opt = ξ_solution[1:4]
+    tf_opt = ξ_solution[5]
+    
+    x0 = [x₁₀, x₂₀, x₃₀, x₄₀]
+    sol_indirect = flow((0.0, tf_opt), x0, p0_opt)
+    
+    t_indirect = range(0, tf_opt, length=1000)
+    
+    x_traj = zeros(length(t_indirect), 4)
+    p_traj = zeros(length(t_indirect), 4)
+    u_traj = zeros(length(t_indirect), 2)
+    
+    for (i, t) in enumerate(t_indirect)
+        state_full = sol_indirect(t)
+        x_traj[i, :] = state_full[1:4]
+        p_traj[i, :] = state_full[5:8]
+        u_traj[i, :] = optimal_control(state_full[5:8])
+    end
+    
+    # Combined plot with 3 rows
+    plt = plot(layout=(3,1), size=(800, 900))
+    
+    plot!(plt[1], t_indirect, [x_traj[:,1] x_traj[:,2] x_traj[:,3] x_traj[:,4]], 
+          label=["x₁" "x₂" "x₃" "x₄"], title="States")
+    
+    plot!(plt[2], t_indirect, [p_traj[:,1] p_traj[:,2] p_traj[:,3] p_traj[:,4]], 
+          label=["p₁" "p₂" "p₃" "p₄"], title="Costates")
+    
+    plot!(plt[3], t_indirect, [u_traj[:,1] u_traj[:,2]], 
+          label=["u₁" "u₂"], title="Control")
+    
+    plt  # This returns the plot for documentation
+end
+```
+```@raw html
+</details>
+```
