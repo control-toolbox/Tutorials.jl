@@ -29,7 +29,12 @@ makedocs(;
         "Tutorials and Advanced Features" => [
             "Discrete continuation" => "tutorial-continuation.md",
             "Discretisation methods" => "tutorial-discretisation.md",
-            "Free times" => "tutorial-free-times.md",
+            "Free times" => [
+                "Final time" => "tutorial-free-times-final.md",
+                "Initial time" => "tutorial-free-times-initial.md",
+                "Final and initial times" => "tutorial-free-times-final-initial.md",
+                "Orbital transfer min time" => "tutorial-free-times-orbital.md",
+            ],
             "NLP manipulations" => "tutorial-nlp.md",
             "Indirect simple shooting" => "tutorial-iss.md",
             "Goddard: direct, indirect" => "tutorial-goddard.md",
