@@ -142,57 +142,48 @@ plt = plot(sol; label="direct", size=(800, 800))
     x1(t1) = (1/2)*t1^2
     ```
 
-    On t ∈ [t1,tf]
+    On $t \in [t_1,t_f]$
     ```math
-    x2(t) = -t + 2*t1 \\
-    x1(t) = -(1/2)*t^2 + 2*t1*t + C2 \\
+    x_2(t) = -t + 2t_1 \\
+    x_1(t) = -\frac{1}{2}t^2 + 2t_1 t + C_2 \\
     ```
-
     ```math
-    x1(t1) = -(1/2)*t1^2 + 2*t1^2 + C2 = (1/2)*t1^2 \\
-    C2 = -t1^2 \\
+    x_1(t_1) = -\frac{1}{2}t_1^2 + 2t_1^2 + C_2 = \frac{1}{2}t_1^2 \\
+    C_2 = -t_1^2 \\
     ```
-
     ```math
-    x1(t) = -(1/2)*t^2 + 2*t1*t - t1^2
+    x_1(t) = -\frac{1}{2}t^2 + 2t_1 t - t_1^2
     ```
-
     Finally you can solve the terminal conditions :
     ```math
-    x1(tf) = 1, \quad x2(tf) = 0 \\
+    x_1(t_f) = 1, \quad x_2(t_f) = 0 \\
     ```
-
     ```math
-    x2(tf) = -tf + 2*t1 = 0 \\
-    tf = 2*t1 \\
+    x_2(t_f) = -t_f + 2t_1 = 0 \\
+    t_f = 2t_1 \\
     ```
-
     ```math
-    x1(tf) = -(1/2)*tf^2 + 2*t1*tf - t1^2 = 1 \\
-    -2*t1^2 + 4*t1 - t1^2 = t1 = 1 \\
+    x_1(t_f) = -\frac{1}{2}t_f^2 + 2t_1 t_f - t_1^2 = 1 \\
+    -2t_1^2 + 4t_1^2 - t_1^2 = t_1^2 = 1 \\
     ```
-
     ```math
-    t1 = 1, \quad t2 = 2
+    t_1 = 1, \quad t_f = 2
     ```
-
     To sum up we find the following solutions :
     ```math
-    x1(t) = \begin{cases}
-    (1/2)*t^2 & \text{si } t \in [0, 1) \\
-    -(1/2)*t^2 + 2*t - 1 & \text{si } t \in [1, 2]
+    x_1(t) = \begin{cases}
+    \frac{1}{2}t^2 & \text{si } t \in [0, 1) \\
+    -\frac{1}{2}t^2 + 2t - 1 & \text{si } t \in [1, 2]
     \end{cases}
     \qquad
-    x2(t) = \begin{cases}
+    x_2(t) = \begin{cases}
     t & \text{si } t \in [0, 1) \\
     2 - t & \text{si } t \in [1, 2]
     \end{cases}
     ```
-
     ```math
-    p1(t) = 1, \quad p2(t) = 1-t, \quad p°=-1
+    p_1(t) = 1, \quad p_2(t) = 1-t, \quad p^0=-1
     ```
-
     ```math
     u(t) = \begin{cases}
     1 & \text{si } t \in [0, 1) \\
