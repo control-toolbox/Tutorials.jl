@@ -44,6 +44,7 @@ The [OrdinaryDiffEq.jl](https://docs.sciml.ai/OrdinaryDiffEq) package is used to
 define the shooting function for the indirect method and the [MINPACK.jl](https://github.com/sglyon/MINPACK.jl) package permits to solve the shooting equation.
 
 ```@example main-goddard
+using BenchmarkTools
 using OptimalControl  # to define the optimal control problem and more
 using NLPModelsIpopt  # to solve the problem via a direct method
 using OrdinaryDiffEq  # to get the Flow function from OptimalControl
