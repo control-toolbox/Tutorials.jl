@@ -360,7 +360,7 @@ println("\nNorm of the shooting function: ‖s‖ = ", norm(s), "\n")
 # NonlinearSolve resolution
 nle_new!(s, ξ, p) = shoot!(s, ξ[1:3], ξ[4], ξ[5], ξ[6], ξ[7])
 prob_nls = NonlinearProblem(nle_new!, ξ)
-sol_nls = solve(prob_nls, NewtonRaphson(); show_trace=Val(true))
+sol_nls = solve(prob_nls; show_trace=Val(true))
 
 ξ_nls = sol_nls.u
 p0_nls = ξ_nls[1:3]
@@ -373,18 +373,22 @@ s = similar(ξ_nls, 7)
 shoot!(s, p0_nls, t1, t2, t3, tf)
 
 println("\nNonlinearSolve results :")
-@show ξ_nls
+println("p0 = ", p0_nls)
+println("t1 = ", t1)
+println("t2 = ", t2)
+println("t3 = ", t3)
+println("tf = ", tf)
 @show norm(s)
 ```
 
 Lets benchmark these two resolution to compare their performances.
 
 ```@example main-goddard
-@benchmark fsolve(nle!, jnle!, ξ, show_trace=false)
+@benchmark fsolve(nle!, jnle!, ξ, show_trace=false) #MINPACK
 ```
 
 ```@example main-goddard
-@benchmark solve(prob_nls, NewtonRaphson(); show_trace=Val(false)) #NonlinearSolve
+@benchmark solve(prob_nls; show_trace=Val(false)) #NonlinearSolve
 ```
 
 ## [Plot of the solution](@id tutorial-goddard-plot)
