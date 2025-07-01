@@ -1,3 +1,7 @@
+```@meta
+Draft = false
+```
+
 # [Direct and indirect methods for the Goddard problem](@id tutorial-goddard)
 
 ## Introduction
@@ -348,6 +352,39 @@ println("tf = ", tf)
 s = similar(p0, 7)
 shoot!(s, p0, t1, t2, t3, tf)
 println("\nNorm of the shooting function: ‖s‖ = ", norm(s), "\n")
+```
+
+# Comparision with NonlinearSolve.jl
+
+```@example main-goddard
+# NonlinearSolve resolution
+nle_new!(s, ξ, p) = shoot!(s, ξ[1:3], ξ[4], ξ[5], ξ[6], ξ[7])
+prob_nls = NonlinearProblem(nle_new!, ξ)
+sol_nls = solve(prob_nls, NewtonRaphson(); show_trace=Val(true))
+
+ξ_nls = sol_nls.u
+p0_nls = ξ_nls[1:3]
+t1 = ξ_nls[4]
+t2 = ξ_nls[5]
+t3 = ξ_nls[6]
+tf = ξ_nls[7]
+
+s = similar(ξ_nls, 7)
+shoot!(s, p0_nls, t1, t2, t3, tf)
+
+println("\nNonlinearSolve results :")
+@show ξ_nls
+@show norm(s)
+```
+
+Lets benchmark these two resolution to compare their performances.
+
+```@example main-goddard
+@benchmark fsolve(nle!, jnle!, ξ, show_trace=false)
+```
+
+```@example main-goddard
+@benchmark solve(prob_nls, NewtonRaphson(); show_trace=Val(false)) #NonlinearSolve
 ```
 
 ## [Plot of the solution](@id tutorial-goddard-plot)
