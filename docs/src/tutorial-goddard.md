@@ -370,19 +370,20 @@ t2 = ξ_nls[5]
 t3 = ξ_nls[6]
 tf = ξ_nls[7]
 
-s = similar(ξ_nls, 7)
-shoot!(s, p0_nls, t1, t2, t3, tf)
-
 println("\nNonlinearSolve results :")
 println("p0 = ", p0_nls)
 println("t1 = ", t1)
 println("t2 = ", t2)
 println("t3 = ", t3)
 println("tf = ", tf)
-@show norm(s)
+
+s = similar(p0_nls, 7)
+shoot!(s, p0_nls, t1, t2, t3, tf)
+
+println("\nNorm of the shooting function: ‖s‖ = ", norm(s), "\n")
 ```
 
-Lets benchmark these two resolution to compare their performances.
+The results found for the different parameters are extremely close so now, lets benchmark these two resolution to compare their performances.
 
 ```@example main-goddard
 @benchmark fsolve(nle!, jnle!, ξ, show_trace=false) #MINPACK
@@ -391,6 +392,8 @@ Lets benchmark these two resolution to compare their performances.
 ```@example main-goddard
 @benchmark solve(prob_nls; show_trace=Val(false)) #NonlinearSolve
 ```
+
+The MINPACK (fsolve) method is much faster than NonlinearSolve (solve) on this problem. It also uses less memory (1.95 GiB vs 6.10 GiB). Both methods have a similar GC overhead (~24–25%), but MINPACK is overall more efficient here.
 
 ## [Plot of the solution](@id tutorial-goddard-plot)
 
