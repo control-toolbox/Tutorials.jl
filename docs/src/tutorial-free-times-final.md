@@ -127,50 +127,79 @@ plt = plot(sol; label="direct", size=(800, 800))
 
     On t ∈ [0,t1] :
     ```math
-    x1' = x2 \\
-    x2'= u = 1 \\
+        \begin{aligned}
+            \dot{x}_1(t) &= x_2(t) \\
+            \dot{x}_2(t) &= 1 \\
+        \end{aligned}
     ```
 
     ```math
-    x2(t) = t \\
-    x1(t) = (1/2)*t^2
+        \begin{aligned}
+            x_2(t) &= t \\
+            x_1(t) &= (1/2)*t^2
+        \end{aligned}
+
     ```
 
     When t = t1 :
     ```math
-    x2(t1) = t1 \\
-    x1(t1) = (1/2)*t1^2
+        \begin{aligned}
+            x_2(t1) &= t_1 \\
+            x_1(t1) &= (1/2)*t_1^2
+        \end{aligned}
     ```
 
     On $t \in [t_1,t_f]$
     ```math
-    x_2(t) = -t + 2t_1 \\
-    x_1(t) = -\frac{1}{2}t^2 + 2t_1 t + C_2 \\
+        \begin{aligned}
+            x_2(t) &= -t + 2t_1 \\
+            x_1(t) &= -\frac{1}{2}t^2 + 2t_1 t + C_2 \\
+        \end{aligned}
     ```
     ```math
-    x_1(t_1) = -\frac{1}{2}t_1^2 + 2t_1^2 + C_2 = \frac{1}{2}t_1^2 \\
-    C_2 = -t_1^2 \\
+        \begin{aligned}
+            x_1(t_1) &= -\frac{1}{2}t_1^2 + 2t_1^2 + C_2 &= \frac{1}{2}t_1^2 \\ 
+            C_2 &= -t_1^2 \\
+        \end{aligned}
     ```
+
     ```math
-    x_1(t) = -\frac{1}{2}t^2 + 2t_1 t - t_1^2
+        \begin{aligned}
+            x_1(t) &= -\frac{1}{2}t^2 + 2t_1 t - t_1^2
+        \end{aligned}
     ```
     Finally you can solve the terminal conditions :
     ```math
-    x_1(t_f) = 1, \quad x_2(t_f) = 0 \\
+        \begin{aligned}
+            x_1(t_f) &= 1, \quad x_2(t_f) &= 0 \\
+        \end{aligned}
     ```
     ```math
-    x_2(t_f) = -t_f + 2t_1 = 0 \\
-    t_f = 2t_1 \\
+        \begin{aligned}
+            x_2(t_f) &= -t_f + 2t_1 &= 0 \\
+            t_f &= 2t_1 \\
+        \end{aligned}
     ```
     ```math
-    x_1(t_f) = -\frac{1}{2}t_f^2 + 2t_1 t_f - t_1^2 = 1 \\
-    -2t_1^2 + 4t_1^2 - t_1^2 = t_1^2 = 1 \\
+        \begin{aligned}
+            x_1(t_f)& = -\frac{1}{2}t_f^2 + 2t_1 t_f - t_1^2 &= 1 \\
+        \end{aligned}
     ```
+    and 
     ```math
-    t_1 = 1, \quad t_f = 2
+        \begin{aligned}
+            -2t_1^2 + 4t_1^2 - t_1^2 &= t_1^2 &= 1 \\
+        \end{aligned}
+    ```
+    gets us
+    ```math
+        \begin{aligned}
+            t_1 &= 1, \quad t_f &= 2
+        \end{aligned}
     ```
     To sum up we find the following solutions :
     ```math
+
     x_1(t) = \begin{cases}
     \frac{1}{2}t^2 & \text{si } t \in [0, 1) \\
     -\frac{1}{2}t^2 + 2t - 1 & \text{si } t \in [1, 2]

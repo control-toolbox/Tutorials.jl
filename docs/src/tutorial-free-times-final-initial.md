@@ -7,7 +7,7 @@ Draft = false
 In this tutorial, we explore optimal control problems with free initial time `t₀` and final time `t_f`. 
 
 
-## Here is the required packages for the tutorial:
+## Here are the required packages for the tutorial:
 
 ```@example both_time
 using OptimalControl
@@ -21,24 +21,21 @@ using Printf
 
 ```@example both_time
 
-function double_integrator_freet0tf()
-    @def ocp begin
-        v=(t0, tf) ∈ R², variable
-        t ∈ [t0, tf], time
-        x ∈ R², state
-        u ∈ R, control
-        -1 ≤ u(t) ≤ 1
-        x(t0) == [0, 0]
-        x(tf) == [1, 0]
-        0.05 ≤ t0 ≤ 10
-        0.05 ≤ tf ≤ 10
-        0.01 ≤ tf - t0 ≤ Inf
-        ẋ(t) == [x₂(t), u(t)]
-        t0 → max
-    end
-
-    return ocp
+@def ocp begin
+    v=(t0, tf) ∈ R², variable
+    t ∈ [t0, tf], time
+    x ∈ R², state
+    u ∈ R, control
+    -1 ≤ u(t) ≤ 1
+    x(t0) == [0, 0]
+    x(tf) == [1, 0]
+    0.05 ≤ t0 ≤ 10
+    0.05 ≤ tf ≤ 10
+    0.01 ≤ tf - t0 ≤ Inf
+    ẋ(t) == [x₂(t), u(t)]
+    t0 → max
 end
+
 nothing # hide
 ```
 
@@ -48,7 +45,6 @@ nothing # hide
 We now solve the problem using a direct method, with automatic treatment of the free initial time.
 
 ```@example both_time
-ocp = double_integrator_freet0tf()
 sol = solve(ocp; grid_size=100)
 ```
 And plot the solution.

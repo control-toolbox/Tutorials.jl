@@ -8,7 +8,7 @@ Draft = false
 
 ## In this tutorial, we explore an optimal control problem with free initial time `t0`.
 
-Here is the required packages for the tutorial:
+Here are the required packages for the tutorial:
 
 ```@example initial_time
 using OptimalControl
@@ -21,21 +21,18 @@ using Printf
 ## Definition of the problem
 ```@example initial_time
 
-function double_integrator_mint0()
-    @def ocp begin
-        t0 ∈ R, variable
-        tf=0
-        t ∈ [t0, tf], time
-        x ∈ R², state
-        u ∈ R, control
-        -1 ≤ u(t) ≤ 1
-        x(t0) == [0, 0]
-        x(tf) == [1, 0]
-        0.05 ≤ -t0 ≤ Inf
-        ẋ(t) == [x₂(t), u(t)]
-        -t0 → min
-    end
-    return ocp
+@def ocp begin
+    t0 ∈ R, variable
+    tf=0
+    t ∈ [t0, tf], time
+    x ∈ R², state
+    u ∈ R, control
+    -1 ≤ u(t) ≤ 1
+    x(t0) == [0, 0]
+    x(tf) == [1, 0]
+    0.05 ≤ -t0 ≤ Inf
+    ẋ(t) == [x₂(t), u(t)]
+    -t0 → min
 end
 nothing # hide
 ```
@@ -45,7 +42,6 @@ nothing # hide
 We now solve the problem using a direct method, with automatic treatment of the free initial time.
 
 ```@example initial_time
-ocp = double_integrator_mint0()
 sol = solve(ocp; grid_size=100)
 ```
 And plot the solution.
@@ -69,8 +65,12 @@ plot(sol; label="direct", size=(800, 800))
 
     Conditions from Pontryagin’s theorem:
     ```math
-    p_1' = 0 \quad \Rightarrow \quad p_1 = c_1 \quad (\text{constant}) \\
-    p_2' = -p_1 \quad \Rightarrow \quad p_2 = -c_1 t + c_2
+        \begin{aligned}
+
+            \dot{p}_1(t) &= 0,  \quad \Rightarrow \quad p_1 = c_1 \quad (\text{constant}) \\
+
+            \dot{p}_2(t) &= -p_1 \quad \Rightarrow \quad p_2 = -c_1 t + c_2
+        \end{aligned}
     ```
 
     Switching condition:
@@ -86,22 +86,22 @@ plot(sol; label="direct", size=(800, 800))
 
     Now we integrate the system:
 
-    On \( t \in [t_0, t_s] \) :
+    On ( t in [t_0, t_s] ) :
     ```math
     x_2' = u = 1 \quad \Rightarrow \quad x_2(t) = t - t_0 \\
     x_1' = x_2 \quad \Rightarrow \quad x_1(t) = \frac{(t - t_0)^2}{2}
     ```
 
-    At switching time \( t = t_s \) :
+    At switching time ( t = t_s ) :
     ```math
-    x_2(t_s) = t_s - t_0 \\
-    x_1(t_s) = \frac{(t_s - t_0)^2}{2}
+    \dot{x}_2(t_s) = t_s - t_0 \\
+    \dot{x}_1(t_s) = \frac{(t_s - t_0)^2}{2}
     ```
 
-    On \( t \in [t_s, 0] \) :
+    when ( t in [t_s, 0] ) :
     ```math
-    x_2' = u = -1 \quad \Rightarrow \quad x_2(t) = x_2(t_s) - (t - t_s) \\
-    x_1' = x_2 \quad \Rightarrow \quad x_1(t) = x_1(t_s) + \int_{t_s}^t x_2(s) ds
+    \dot{x}_2(t) = u(t) = -1 \quad \Rightarrow \quad x_2(t) = x_2(t_s) - (t - t_s) \\
+    \dot{x}_1(t) = x_2(t) \quad \Rightarrow \quad x_1(t) = x_1(t_s) + \int_{t_s}^t x_2(s) ds
     ```
 
     Final velocity condition:
@@ -120,8 +120,14 @@ plot(sol; label="direct", size=(800, 800))
     ```
 
     ### Final solution:
-    - Switching time: \( t_s = -1 \)
-    - Initial time: \( t_0 = -2 \)
+    - Switching time:
+    ```math
+    t_s = -1 
+    ```
+    - Initial time:
+    ```math
+    t_0 = -2 
+    ```
 
     Control:
     ```math
