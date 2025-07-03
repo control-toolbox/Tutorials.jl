@@ -22,25 +22,26 @@ Problem data and constants :
 ```@example orbit
 using OptimalControl
 using NLPModelsIpopt
-using BenchmarkTools
-using DataFrames
+using OrdinaryDiffEq
 using Plots
-using Printf
+using MINPACK
+using ForwardDiff
 using LinearAlgebra
 
-const μ = 5.1658620912e12       # Constante gravitationnelle
-const Tmax = 60.0              # Poussée max
-const γmax = Tmax * 3600^2 / (2000 * 1e3)  # Contrôle max
-const ε = 1e-2                  # Paramètre de régularisation
 
-# État initial en coordonnées de Gauss 2D : (P, ex, ey, L)
-x0 = [10000.0, 0.01, 0.0, 0.0]
+γ_max = 0.1            # maximal thrust norm
+const ε = 0.5           # Regularization parameter
+const μ = 5.1658620912*1e12 # gravitational parameter
+const P0 = 11625                                # Initial semilatus rectum
+const ex0, ey0 = 0.75, 0                         # Initial eccentricity
+const L0 = π                                     # Initial longitude
+const Pf = 42165                                # Final semilatus rectum
+const exf, eyf = 0, 0                            # Final eccentricity
 
-# État final en coordonnées de Gauss 2D
-xf = [42164.0, 0.0, 0.0, π]
-
-T_min_100 = 13.4                # Temps minimal avec Tmax=100 (donné)
-# tf = 1.5 * T_min_100            # Temps final (à ajuster)
+tf = 30                                      # Estimation of final time
+const Lf = 3π                                      # Estimation of final longitude
+const x0 = [P0, ex0, ey0, L0]            # Initial state
+const xf = [Pf, exf, eyf, Lf]            # Final state
 ```
 
 Dynamic functions in Gauss coordinates :
@@ -100,16 +101,17 @@ function min_conso()
         x[1:3](tf) == xf[1:3]  # P, ex, ey à l'arrivée
         x[4](tf) == xf[4]      # anomalie vraie à l'arrivée
 
-        norm = sqrt(u₁(t)^2 + u₂(t)^2)
+        u_norm = sqrt(u₁(t)^2 + u₂(t)^2) + 1e-4
 
         # Control limit
-        norm^2 ≤ γmax^2
+        0.01 ≤ u_norm ≤ γmax - 0.01
+        u_gamma = max(1e-10, γmax - u_norm)
 
         # Dynamic
         ẋ(t) == F0(x(t)) + Tmax * (u₁(t) * F1(x(t)) + u₂(t) * F2(x(t)))
 
         # Regularization with logarithmic barrier
-        ∫(norm - ε * (log(norm) + log(γmax - norm))) → min
+        ∫(u_norm - ε * (log(u_norm) + log(u_gamma))) → min
     end
 
     return ocp
@@ -124,52 +126,54 @@ function min_tf()
     @def ocp begin
         tf ∈ R, variable
         t ∈ [0, tf], time
-        x = (P, ex, ey, L) ∈ R⁴, state
+        x = (P, ex, ey, L) ∈ R^4, state
         u ∈ R², control
-
-        # Constrains
+        
         x(0) == x0
-        x[1:3](tf) == xf[1:3]  # P, ex, ey à l'arrivée
-        x[4](tf) == xf[4]      # anomalie vraie à l'arrivée
-        0.05 ≤ tf ≤ Inf
-                
-        norm = sqrt(u₁(t)^2 + u₂(t)^2)
-
-        # Control limit
-        norm^2 ≤ γmax^2
-
-        # Dynamic
-        ẋ(t) == F0(x(t)) + Tmax * (u₁(t) * F1(x(t)) + u₂(t) * F2(x(t)))
-
-        # Regularization with logarithmic barrier
+        x(tf) == xf
+        0.05 ≤ tf
+        
+        ẋ(t) == F0(x(t)) + γ_max * (u₁(t) * F1(x(t)) + u₂(t) * F2(x(t)))
+        u₁(t)^2 + u₂(t)^2 ≤ γ_max^2
+        
         tf → min
     end
 
     return ocp
 end
 nothing # hide
-
-ocp1 = min_tf()
-sol = solve(ocp1, grid_size=100)
 ```
 
 
 # Direct numerical solution
 
 ```@example orbit
-using NLPModelsIpopt
+x(t) = x0 + (xf - x0) * t / tf               # Linear interpolation
+u = [0.01, 0.05]                        # Initial guess for the control
+init = (state=x, control=u, variable=tf) # Initial guess for the NLP
+ocp_tf = min_tf()
+sol = solve(ocp_tf; init=init, grid_size=100)
 
-const Tmax = 100.0              # Poussée max
-const γmax = Tmax * 3600^2 / (2000 * 1e3)  # Contrôle max
-
-u0 = [0.1, 0.0]
-xguess(t) = x0 + (xf - x0) * t / tf
+Tmax = 100.0              # Poussée max
+γmax = Tmax * 3600^2 / 1e6  # Contrôle max
 
 tf = variable(sol)
 
+u0(t) = [0.05, 0.0]  # meilleur contrôle initial : norme non-nulle, mais pas au bord
+function xguess(t)
+    # Initialisation douce en évitant w ≈ 0
+    α(t) = t / tf
+    P = x0[1] + (xf[1] - x0[1]) * α(t)
+    ex = (1 - α(t)) * x0[2]       # ex va vers 0 mais lentement
+    ey = (1 - α(t)^2) * x0[3]     # idem
+    L = α(t) * 2π + 0.1           # éviter cos(L) = -1
+    return [P, ex, ey, L]
+end
+
 ocp = min_conso()
 nlp_init = (state = xguess, control = u0)
-nlp_sol = solve(ocp; init=nlp_init, grid_size=100)
+
+nlp_sol = solve(ocp; init=nlp_init, grid_size=100, max_iter = 3000)
 plot(nlp_sol)
 ```
 
