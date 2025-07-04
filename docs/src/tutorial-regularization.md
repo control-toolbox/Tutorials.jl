@@ -29,19 +29,20 @@ using ForwardDiff
 using LinearAlgebra
 
 
-γ_max = 0.1            # maximal thrust norm
-const ε = 0.5           # Regularization parameter
-const μ = 5.1658620912*1e12 # gravitational parameter
-const P0 = 11625                                # Initial semilatus rectum
-const ex0, ey0 = 0.75, 0                         # Initial eccentricity
-const L0 = π                                     # Initial longitude
-const Pf = 42165                                # Final semilatus rectum
-const exf, eyf = 0, 0                            # Final eccentricity
+Tmax = 60                                  # Maximum thrust in Newtons
+cTmax = 3600^2 / 1e6; T = Tmax * cTmax     # Conversion from Newtons to kg x Mm / h²
+mass0 = 1500                               # Initial mass of the spacecraft
+β = 1.42e-02                               # Engine specific impulsion
+μ = 5165.8620912                           # Earth gravitation constant
+P0 = 11.625                                # Initial semilatus rectum
+ex0, ey0 = 0.75, 0                         # Initial eccentricity
+hx0, hy0 = 6.12e-2, 0                      # Initial ascending node and inclination
+L0 = π                                     # Initial longitude
+Pf = 42.165                                # Final semilatus rectum
+exf, eyf = 0, 0                            # Final eccentricity
+hxf, hyf = 0, 0                            # Final ascending node and inclination
 
-tf = 30                                      # Estimation of final time
-const Lf = 3π                                      # Estimation of final longitude
-const x0 = [P0, ex0, ey0, L0]            # Initial state
-const xf = [Pf, exf, eyf, Lf]            # Final state
+ε = 1e-1                             # Regularization parameter for logarithmic barrier
 ```
 
 Dynamic functions in Gauss coordinates :
@@ -50,130 +51,131 @@ Dynamic functions in Gauss coordinates :
 asqrt(x; ε=1e-9) = sqrt(sqrt(x^2 + ε^2))  # sqrt lissée pour AD
 
 function F0(x)
-    P, ex, ey, L = x
+    P, ex, ey, hx, hy, L = x
     pdm = asqrt(P / μ)
     cl = cos(L)
     sl = sin(L)
     w = 1 + ex * cl + ey * sl
-    F = zeros(eltype(x), 4)
-    F[4] = w^2 / (P * pdm)     # dérivée de L (anomalie vraie)
+    F = zeros(eltype(x), 6) # Use eltype to allow overloading for AD
+    F[6] = w^2 / (P * pdm)
     return F
 end
 
 function F1(x)
-    # Direction de contrôle u₁ (dans le plan)
-    P, ex, ey, L = x
+    P, ex, ey, hx, hy, L = x
     pdm = asqrt(P / μ)
     cl = cos(L)
     sl = sin(L)
-    F = zeros(eltype(x), 4)
-    F[2] = pdm * sl            # dérivée de ex
-    F[3] = -pdm * cl           # dérivée de ey
+    F = zeros(eltype(x), 6)
+    F[2] = pdm *   sl
+    F[3] = pdm * (-cl)
     return F
 end
 
 function F2(x)
-    # Direction de contrôle u₂ (dans le plan)
-    P, ex, ey, L = x
+    P, ex, ey, hx, hy, L = x
     pdm = asqrt(P / μ)
     cl = cos(L)
     sl = sin(L)
     w = 1 + ex * cl + ey * sl
-    F = zeros(eltype(x), 4)
-    F[1] = pdm * 2 * P / w     # dérivée de P
+    F = zeros(eltype(x), 6)
+    F[1] = pdm * 2 * P / w
     F[2] = pdm * (cl + (ex + cl) / w)
     F[3] = pdm * (sl + (ey + sl) / w)
     return F
+end
+
+function F3(x)
+    P, ex, ey, hx, hy, L = x
+    pdm = asqrt(P / μ)
+    cl = cos(L)
+    sl = sin(L)
+    w = 1 + ex * cl + ey * sl
+    pdmw = pdm / w
+    zz = hx * sl - hy * cl
+    uh = (1 + hx^2 + hy^2) / 2
+    F = zeros(eltype(x), 6)
+    F[2] = pdmw * (-zz * ey)
+    F[3] = pdmw *   zz * ex
+    F[4] = pdmw *   uh * cl
+    F[5] = pdmw *   uh * sl
+    F[6] = pdmw *   zz
+    return F
+end
+```
+
+Initialisation with minimal time problem
+
+```@example orbit
+tf = 15                                      # Estimation of final time
+Lf = 3π                                      # Estimation of final longitude
+x0 = [P0, ex0, ey0, hx0, hy0, L0]            # Initial state
+xf = [Pf, exf, eyf, hxf, hyf, Lf]            # Final state
+x(t) = x0 + (xf - x0) * t / tf               # Linear interpolation
+u = [0.1, 0.5, 0.]                        # Initial guess for the control
+nlp_init = (state=x, control=u, variable=tf) # Initial guess for the NLP
+
+function min_tf()
+    @def ocp begin
+        tf ∈ R, variable
+        t ∈ [0, tf], time
+        x = (P, ex, ey, hx, hy, L) ∈ R⁶, state
+        u ∈ R³, control
+        x(0) == x0
+        x[1:5](tf) == xf[1:5]
+        mass = mass0 - β * T * t
+        ẋ(t) == F0(x(t)) + T / mass * (u₁(t) * F1(x(t)) + u₂(t) * F2(x(t)) + u₃(t) * F3(x(t)))
+        u₁(t)^2 + u₂(t)^2 + u₃(t)^2 ≤ 1
+        tf → min
+    end
+    return ocp
 end
 ```
 
 Optimal control problem with regularization :
 
+
 ```@example orbit
 function min_conso()
     @def ocp begin
         t ∈ [0, tf], time
-        x = (P, ex, ey, L) ∈ R⁴, state
-        u ∈ R², control
-
-        # Constrains
+        x = (P, ex, ey, hx, hy, L) ∈ R⁶, state
+        u ∈ R³, control
         x(0) == x0
-        x[1:3](tf) == xf[1:3]  # P, ex, ey à l'arrivée
-        x[4](tf) == xf[4]      # anomalie vraie à l'arrivée
+        x[1:5](tf) == xf[1:5]
+        mass = mass0 - β * T * t
 
-        u_norm = sqrt(u₁(t)^2 + u₂(t)^2) + 1e-4
-
-        # Control limit
-        0.01 ≤ u_norm ≤ γmax - 0.01
-        u_gamma = max(1e-10, γmax - u_norm)
+        u_norm = sqrt(u₁(t)^2 + u₂(t)^2 + u₃(t)^2)
 
         # Dynamic
-        ẋ(t) == F0(x(t)) + Tmax * (u₁(t) * F1(x(t)) + u₂(t) * F2(x(t)))
+        ẋ(t) == F0(x(t)) + T / mass * (u₁(t) * F1(x(t)) + u₂(t) * F2(x(t)) + u₃(t) * F3(x(t)))
+        1e-3 ≤ u_norm^2 ≤ 1
+        u_g = max(1e-10, 1 - u_norm)
+
 
         # Regularization with logarithmic barrier
-        ∫(u_norm - ε * (log(u_norm) + log(u_gamma))) → min
+        ∫(u_norm - ε * (log(u_norm) + log(u_g))) → min
     end
 
     return ocp
 end
-nothing # hide
 ```
-
-Initialisation avec le problème à temps min
-
-```@example orbit
-function min_tf()
-    @def ocp begin
-        tf ∈ R, variable
-        t ∈ [0, tf], time
-        x = (P, ex, ey, L) ∈ R^4, state
-        u ∈ R², control
-        
-        x(0) == x0
-        x(tf) == xf
-        0.05 ≤ tf
-        
-        ẋ(t) == F0(x(t)) + γ_max * (u₁(t) * F1(x(t)) + u₂(t) * F2(x(t)))
-        u₁(t)^2 + u₂(t)^2 ≤ γ_max^2
-        
-        tf → min
-    end
-
-    return ocp
-end
-nothing # hide
-```
-
 
 # Direct numerical solution
 
 ```@example orbit
-x(t) = x0 + (xf - x0) * t / tf               # Linear interpolation
-u = [0.01, 0.05]                        # Initial guess for the control
-init = (state=x, control=u, variable=tf) # Initial guess for the NLP
-ocp_tf = min_tf()
-sol = solve(ocp_tf; init=init, grid_size=100)
+ocp1 = min_tf()  # Define the optimal control problem
+sol = solve(ocp1; init=nlp_init, grid_size=100)
 
 Tmax = 100.0              # Poussée max
-γmax = Tmax * 3600^2 / 1e6  # Contrôle max
+T = Tmax * cTmax
 
 tf = variable(sol)
 
-u0(t) = [0.05, 0.0]  # meilleur contrôle initial : norme non-nulle, mais pas au bord
-function xguess(t)
-    # Initialisation douce en évitant w ≈ 0
-    α(t) = t / tf
-    P = x0[1] + (xf[1] - x0[1]) * α(t)
-    ex = (1 - α(t)) * x0[2]       # ex va vers 0 mais lentement
-    ey = (1 - α(t)^2) * x0[3]     # idem
-    L = α(t) * 2π + 0.1           # éviter cos(L) = -1
-    return [P, ex, ey, L]
-end
-
 ocp = min_conso()
-nlp_init = (state = xguess, control = u0)
+nlp_init = (state = state(sol), control = control(sol))
 
-nlp_sol = solve(ocp; init=nlp_init, grid_size=100, max_iter = 3000)
+nlp_sol = solve(ocp; init=nlp_init, grid_size=500)
 plot(nlp_sol)
 ```
 
