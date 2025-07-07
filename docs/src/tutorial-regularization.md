@@ -176,26 +176,71 @@ ocp = min_conso()
 nlp_init = (state = state(sol), control = control(sol))
 
 nlp_sol = solve(ocp; init=nlp_init, grid_size=500)
-plot(nlp_sol)
+plot(nlp_sol; control=:norm, size=(800, 300), layout=:group)
+```
+
+Plot in 3D :
+
+```@example orbit
+xsol = state(nlp_sol)
+t = time_grid(nlp_sol)
+N = size(t, 1)
+nx = length(state(nlp_sol)(t[1]))  # nombre de variables d'état, par ex 6 ici
+
+# Construire une matrice (nx x N) en évaluant xsol en chaque instant
+X = zeros(nx, N)
+for i in 1:N
+    X[:, i] = xsol(t[i])
+end
+
+# Maintenant on peut accéder aux lignes comme prévu
+P  = X[1, :]
+ex = X[2, :]
+ey = X[3, :]
+hx = X[4, :]
+hy = X[5, :]
+L  = X[6, :]
+
+cL = cos.(L)
+sL = sin.(L)
+w  = @. 1 + ex * cL + ey * sL
+Z  = @. hx * sL - hy * cL
+C  = @. 1 + hx^2 + hy^2
+
+q1 = @. P *((1 + hx^2 - hy^2) * cL + 2 * hx * hy * sL) / (C * w)
+q2 = @. P *((1 - hx^2 + hy^2) * sL + 2 * hx * hy * cL) / (C * w)
+q3 = @. 2 * P * Z / (C * w)
+
+plt1 = plot3d(1; xlim = (-60, 60), ylim = (-60, 60), zlim = (-5, 5), title = "Orbit transfer (direct)", legend=false)
+@gif for i = 1:N
+    push!(plt1, q1[i], q2[i], q3[i])
+end every N ÷ min(N, 100)
 ```
 
 # Indirect solution (Regularized shooting)
-
-```@example orbit
+```@math
 function ur(x, p)
     H1 = p' * F1(x)
     H2 = p' * F2(x)
+    H3 = p' * F3(x)
 
-    normH = sqrt(H1^2 + H2^2)
-    if normH < 1e-8
-        return [0.0, 0.0]
+    grad_H = [H1, H2, H3]
+    normH = norm(grad_H)
+
+    function φ(α)
+        if α <= 1e-8 || α >= 1 - 1e-8
+            return -Inf
+        end
+        return α * normH - ε * (log(α) + log(1 - α))
     end
-    γ = γmax
-    u_norm = normH
 
-    # optimal control with logarithm barrier
-    u = [H1, H2] / u_norm
-    return u
+    # Maximize φ(α) on [0,1]
+    αs = range(1e-3, 1 - 1e-3, length=200)
+    vals = φ.(αs)
+    i = argmax(vals)
+    αopt = αs[i]
+
+    return αopt * grad_H / normH
 end
 
 
@@ -204,22 +249,23 @@ fr = Flow(ocp, ur) # Regular flow (first version)
 function shoot(ξ::Vector)
     tf = ξ[1]
     p0 = ξ[2:end]
-    xsol, psol = fr(0.0, x0, p0)
-    xT = xsol[end]
-    pT = psol[end]
+    xf_, pf = fr(0, x0, p0, tf)
 
-    s = zeros(5)
-    s[1:4] .= xT .- xf      # Conditions sur (P, ex, ey, L)
-    s[5] = norm(p0)^2 - 1   # Normalisation du co-état
+    s = [xf_[1:5] .- xf[1:5]; norm(p0)^2 - 1]
+
     return s
 end
 
-ξ = [T_min_100 * 1.5; randn(4)]
-ξ[2:end] ./= norm(ξ[2:end])  # Normalisation initiale de p0
 jshoot(ξ) = ForwardDiff.jacobian(shoot, ξ)
 shoot!(s, ξ) = (s[:] = shoot(ξ); nothing)
 jshoot!(js, ξ) = (js[:] = jshoot(ξ); nothing)
-bvp_sol = fsolve(shoot!, jshoot!, ξ; show_trace=true); println(bvp_sol)
+
+ξ0 = randn(6)
+ξ0 ./= norm(ξ0)  # Normalize
+
+# resolution of the shooting system with fsolve
+bvp_sol = fsolve(shoot!, jshoot!, ξ0; show_trace=true)
+println("Solution de la méthode de tir : ", bvp_sol)
 ```
 
 # Conclusion
