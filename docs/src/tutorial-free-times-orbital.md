@@ -4,25 +4,21 @@ Draft = false
 
 # [Optimal control problem with free final orbital time](@id tutorial-free-times-orbital)
 
-
-
-
 ## A more concrete example about the change of orbit of a satellite:
+
+## Here are the required packages for the tutorial:
 
 ```@example orbit
 using OptimalControl
 using NLPModelsIpopt
-using BenchmarkTools
-using DataFrames
 using Plots
 using Printf
-using OrdinaryDiffEq
-using NonlinearSolve
-using DifferentiationInterface
-import ForwardDiff
 using LinearAlgebra
 using NLsolve
+```
+## Definition of the problem
 
+```@example orbit
 
 const x₁₀ = -42272.67       # initial position x
 const x₂₀ = 0               # initial position y
@@ -44,7 +40,7 @@ function min_orbit_tf()
         x(0) == [x₁₀, x₂₀, x₃₀, x₄₀]
         x₁(tf)^2 + x₂(tf)^2 == r_f^2
         0.05 ≤ tf ≤ Inf
-        ẋ(t) == [
+        ẋ(t) == [
             x₃(t),
             x₄(t),
             -μ * x₁(t) / ((x₁(t)^2 + x₂(t)^2)^(3/2)) + u₁(t),
@@ -81,7 +77,7 @@ From the Pontryagin Maximum Principle, the optimal control is bang-bang:
 ```@example orbit
 ocp = min_orbit_tf()
 
-function optimal_control(p)
+function optimal_control(x, p, tf)
     p₃, p₄ = p[3], p[4]
     p_norm = sqrt(p₃^2 + p₄^2)
     
@@ -106,58 +102,11 @@ function hamiltonian(x, p, u)
             p₃*(-μ*x₁/r³ + u₁) + 
             p₄*(-μ*x₂/r³ + u₂))
 end
+# Create flow using OptimalControl.jl
+flow = Flow(ocp, optimal_control)
 ```
 
-## Augmented dynamics
-```@raw html
-<details>
-<summary>Click to show/hide Augmented dynamics code</summary>
-```
-We define the combined state-costate system:
 
-```@example orbit
-function augmented_dynamics!(dx, x_aug, params, t)
-    x = x_aug[1:4]
-    p = x_aug[5:8]
-    
-    x₁, x₂, x₃, x₄ = x
-    p₁, p₂, p₃, p₄ = p
-    
-    r = sqrt(x₁^2 + x₂^2)
-    r³ = r^3
-    r⁵ = r^5
-    
-    u = optimal_control(p)
-    u₁, u₂ = u
-    
-    # State dynamics (unchanged)
-    dx[1] = x₃
-    dx[2] = x₄
-    dx[3] = -μ*x₁/r³ + u₁
-    dx[4] = -μ*x₂/r³ + u₂
-    
-    # CORRECTED Costate dynamics: ṗ = -∂H/∂x
-    dx[5] = -(p₃ * μ * (3*x₁^2/r⁵ - 1/r³) + p₄ * μ * (3*x₁*x₂/r⁵))  # -∂H/∂x₁
-    dx[6] = -(p₃ * μ * (3*x₁*x₂/r⁵) + p₄ * μ * (3*x₂^2/r⁵ - 1/r³))   # -∂H/∂x₂
-    dx[7] = -p₁  # -∂H/∂x₃
-    dx[8] = -p₂  # -∂H/∂x₄
-end
-
-function create_flow()
-    function flow_func(t_span, x0, p0)
-        x_aug0 = vcat(x0, p0)
-        prob = ODEProblem(augmented_dynamics!, x_aug0, t_span)
-        sol = solve(prob, Tsit5(), reltol=1e-12, abstol=1e-12)
-        return sol
-    end
-    return flow_func
-end
-
-flow = create_flow()
-```
-```@raw html
-</details>
-```
 ## Shooting function
 
 The shooting function encodes the boundary conditions:
@@ -170,10 +119,8 @@ function shooting_function!(s, ξ)
     x0 = [x₁₀, x₂₀, x₃₀, x₄₀]
 
     try
-        sol = flow((0.0, tf), x0, p0)
-
-        x_final = sol.u[end][1:4]
-        p_final = sol.u[end][5:8]
+        # Use OptimalControl.jl Flow interface with variable
+        x_final, p_final = flow(0.0, x0, p0, tf, tf)
 
         x₁f, x₂f, x₃f, x₄f = x_final
         p₁f, p₂f, p₃f, p₄f = p_final
@@ -182,7 +129,7 @@ function shooting_function!(s, ξ)
         s[2] = p₁f
         s[3] = p₂f
 
-        u_final = optimal_control(p_final)
+        u_final = optimal_control(x_final, p_final, tf)
         H_final = hamiltonian(x_final, p_final, u_final)
         s[4] = H_final
 
@@ -265,46 +212,41 @@ if ξ_solution !== nothing
     p0_opt = ξ_solution[1:4]
     tf_opt = ξ_solution[5]
     
+    # Define time points for plotting FIRST
+    t_indirect = range(0, tf_opt, length=1000)
+    
     # Solve the optimal trajectory
     sol_indirect = flow((0.0, tf_opt), x0, p0_opt)
     
-    # Extract time points for plotting
-    t_indirect = range(0, tf_opt, length=1000)
-    
-    # Evaluate solution at time points
+    # Extract trajectories by evaluating at time points
     x_traj = zeros(length(t_indirect), 4)
     p_traj = zeros(length(t_indirect), 4)
     u_traj = zeros(length(t_indirect), 2)
     
     for (i, t) in enumerate(t_indirect)
-        state_full = sol_indirect(t)
-        x_traj[i, :] = state_full[1:4]
-        p_traj[i, :] = state_full[5:8]
-        u_traj[i, :] = optimal_control(state_full[5:8])
+        x_traj[i, :], p_traj[i, :] = flow(0.0, x0, p0_opt, t)
+        u_traj[i, :] = optimal_control(x_traj[i, :], p_traj[i, :], tf_opt)    
     end
-    
+
     println("Indirect solution generated successfully!")
     println("Final time: $(tf_opt)")
     println("Final position: $(x_traj[end, 1:2])")
     println("Final radius: $(sqrt(x_traj[end, 1]^2 + x_traj[end, 2]^2))")
 end
 ```
-# Visualistion of results
+# Visualisation of results
 ```@raw html
 <details>
 <summary>Click to show/hide indirect method visualization code</summary>
 ```
 
 ```@example orbit
-
-
 # Simple visualization - just the basic plots
 if ξ_solution !== nothing
     p0_opt = ξ_solution[1:4]
     tf_opt = ξ_solution[5]
     
     x0 = [x₁₀, x₂₀, x₃₀, x₄₀]
-    sol_indirect = flow((0.0, tf_opt), x0, p0_opt)
     
     t_indirect = range(0, tf_opt, length=1000)
     
@@ -312,11 +254,10 @@ if ξ_solution !== nothing
     p_traj = zeros(length(t_indirect), 4)
     u_traj = zeros(length(t_indirect), 2)
     
+    # Use flow function directly to evaluate at each time point
     for (i, t) in enumerate(t_indirect)
-        state_full = sol_indirect(t)
-        x_traj[i, :] = state_full[1:4]
-        p_traj[i, :] = state_full[5:8]
-        u_traj[i, :] = optimal_control(state_full[5:8])
+        x_traj[i, :], p_traj[i, :] = flow(0.0, x0, p0_opt, t)
+        u_traj[i, :] = optimal_control(x_traj[i, :], p_traj[i, :], tf_opt)
     end
     
     # Combined plot with 3 rows
