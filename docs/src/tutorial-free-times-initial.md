@@ -24,7 +24,6 @@ We consider the double integrator in minimum time but we fix the final time and 
 ```@example initial_time
 tf = 0 # final time
 @def ocp begin
-
     t0 ∈ R, variable    # the initial time is free
     t ∈ [t0, tf], time
     x ∈ R², state
@@ -39,15 +38,14 @@ tf = 0 # final time
 
     ẋ(t) == [x₂(t), u(t)]
 
-    -t0 → min
-
+    t0 → max
 end
 nothing # hide
 ```
 
 #  Direct resolution
 
-We now solve the problem using a direct method, with automatic treatment of the free initial time.
+Let us solve the problem with a direct method.
 
 ```@example initial_time
 sol = solve(ocp)
