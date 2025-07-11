@@ -1,5 +1,5 @@
 ```@meta
-Draft = false
+Draft = true
 ```
 
 # [Optimal control problem with free final time](@id tutorial-free-times-final)
