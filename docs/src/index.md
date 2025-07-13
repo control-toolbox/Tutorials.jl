@@ -1,6 +1,6 @@
 # Tutorials
 
-This collection of tutorials is part of the [control-toolbox ecosystem](https://github.com/control-toolbox). The control-toolbox ecosystem gathers Julia packages for mathematical control and applications. It aims to provide tools to model and solve optimal control problems with ordinary differential equations by direct and indirect methods. If you want to define an optimal control problem and solve it, please check the [documentation](https://control-toolbox.org/OptimalControl.jl).
+This collection of tutorials is part of the [control-toolbox ecosystem](https://github.com/control-toolbox). The control-toolbox ecosystem gathers Julia packages for mathematical control and applications. It aims to provide tools to model and solve optimal control problems with ordinary differential equations by direct and indirect methods, both on CPU and GPU. If you want to define an optimal control problem and solve it, please check the [documentation](https://control-toolbox.org/OptimalControl.jl).
 
 From this page, you can find a list of tutorials to solve optimal control problems with OptimalControl.
 
