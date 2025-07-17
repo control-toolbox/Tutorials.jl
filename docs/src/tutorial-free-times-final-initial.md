@@ -52,5 +52,3 @@ And plot the solution.
 ```@example both_time
 plot(sol; label="direct", size=(800, 800))
 ```
-
-
