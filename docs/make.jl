@@ -8,7 +8,11 @@ cp("./docs/Project.toml", "./docs/src/assets/Project.toml"; force=true)
 repo_url = "github.com/control-toolbox/Tutorials.jl"
 
 makedocs(;
-    draft=false, # if draft is true, then the julia code from .md is not executed
+    draft=true, # if draft is true, then the julia code from .md is not executed
+    # to disable the draft mode in a specific markdown file, use the following:
+    # ```@meta
+    # Draft = false
+    # ```
     warnonly=[:cross_references, :autodocs_block],
     sitename="Tutorials",
     format=Documenter.HTML(;
@@ -25,6 +29,12 @@ makedocs(;
         "Tutorials and Advanced Features" => [
             "Discrete continuation" => "tutorial-continuation.md",
             "Discretisation methods" => "tutorial-discretisation.md",
+            "Free times" => [
+                "Final time" => "tutorial-free-times-final.md",
+                "Initial time" => "tutorial-free-times-initial.md",
+                "Final and initial times" => "tutorial-free-times-final-initial.md",
+                "Orbital transfer min time" => "tutorial-free-times-orbital.md",
+            ],
             "NLP manipulations" => "tutorial-nlp.md",
             "Indirect simple shooting" => "tutorial-iss.md",
             "Goddard: direct, indirect" => "tutorial-goddard.md",
