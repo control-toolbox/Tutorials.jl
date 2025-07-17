@@ -144,7 +144,7 @@ Optimal control problem with regularization :
 
 
 ```@example orbit
-function min_conso()
+function min_conso(e)
     @def ocp begin
         t ∈ [0, tf], time
         x = (P, ex, ey, hx, hy, L) ∈ R⁶, state
@@ -162,7 +162,7 @@ function min_conso()
 
 
         # Regularization with logarithmic barrier
-        ∫(u_norm - ε * (log(u_norm) + log(u_g))) → min
+        ∫(u_norm - e * (log(u_norm) + log(u_g))) → min
     end
 
     return ocp
@@ -180,20 +180,40 @@ T = Tmax * cTmax
 
 tf = variable(sol)
 
-ocp = min_conso()
+ocp = min_conso(ε)
 nlp_init = (state = state(sol), control = control(sol))
+```
 
-nlp_sol = solve(ocp; init=nlp_init, grid_size=500)
-plot(nlp_sol; control=:norm, size=(800, 300), layout=:group)
+Minimize the regularization parameter
+```@example orbit
+eps = [1e-1, 1e-2, 1e-3, 1e-4, 1e-5]
+i = nlp_init
+s = sol
+
+for e in eps[2:end]
+    ocp = min_conso(e)
+    global s = solve(ocp; init=i, grid_size=500)
+    global i = s
+end
+
+```
+```@example orbit
+plt = plot(s; label="ε = $(eps[5])")  # plot initial avec le premier ε
+```
+
+```@example orbit
+t = time_grid(s)
+u = control(s)
+plot(t, norm∘u; label="‖u‖", xlabel="t")
 ```
 
 Plot in 3D :
 
 ```@example orbit
-xsol = state(nlp_sol)
-t = time_grid(nlp_sol)
+xsol = state(s)
+t = time_grid(s)
 N = size(t, 1)
-nx = length(state(nlp_sol)(t[1]))  # number of state variables
+nx = length(state(s)(t[1]))  # number of state variables
 
 # generate a matrix
 X = zeros(nx, N)
@@ -226,6 +246,8 @@ end every N ÷ min(N, 100)
 
 # Indirect solution (Regularized shooting)
 ```@example orbit
+tf = 1.5*variable(sol)
+ocp = min_conso(1e-5)
 function ur(x, p)
     H1 = p' * F1(x)
     H2 = p' * F2(x)
@@ -278,6 +300,17 @@ Plots 3D
 ```@example orbit
 p0 = bvp_sol.x
 ode_sol = fr((0, tf), x0, p0)
+plot(ode_sol)
+```
+
+```@example orbit
+t  = time_grid(ode_sol); N = size(t, 1)
+u = control(ode_sol)
+plot(t, norm∘u; label="‖u‖", xlabel="t")
+```
+
+```@example orbit
+
 t  = time_grid(ode_sol); N = size(t, 1)
 
 x_ode = state(ode_sol)  # State function
