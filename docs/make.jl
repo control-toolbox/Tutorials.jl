@@ -8,7 +8,7 @@ cp("./docs/Project.toml", "./docs/src/assets/Project.toml"; force=true)
 repo_url = "github.com/control-toolbox/Tutorials.jl"
 
 makedocs(;
-    draft=false, # if draft is true, then the julia code from .md is not executed
+    draft=true, # if draft is true, then the julia code from .md is not executed
     warnonly=[:cross_references, :autodocs_block],
     sitename="Tutorials",
     format=Documenter.HTML(;
@@ -31,6 +31,7 @@ makedocs(;
             "Linear–quadratic regulator" => "tutorial-lqr.md",
             "Minimal action" => "tutorial-mam.md",
             "Model Predictive Control" => "tutorial-mpc.md",
+            "Regularization methods" => "tutorial-regularization.md",
         ],
     ],
 )
