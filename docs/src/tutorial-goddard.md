@@ -1,3 +1,7 @@
+```@meta
+Draft = false
+```
+
 # [Direct and indirect methods for the Goddard problem](@id tutorial-goddard)
 
 ## Introduction
@@ -40,6 +44,7 @@ The [OrdinaryDiffEq.jl](https://docs.sciml.ai/OrdinaryDiffEq) package is used to
 define the shooting function for the indirect method and the [MINPACK.jl](https://github.com/sglyon/MINPACK.jl) package permits to solve the shooting equation.
 
 ```@example main-goddard
+using BenchmarkTools
 using OptimalControl  # to define the optimal control problem and more
 using NLPModelsIpopt  # to solve the problem via a direct method
 using OrdinaryDiffEq  # to get the Flow function from OptimalControl
@@ -349,6 +354,46 @@ s = similar(p0, 7)
 shoot!(s, p0, t1, t2, t3, tf)
 println("\nNorm of the shooting function: ‖s‖ = ", norm(s), "\n")
 ```
+
+# Comparision with NonlinearSolve.jl
+
+```@example main-goddard
+# NonlinearSolve resolution
+nle_new!(s, ξ, p) = shoot!(s, ξ[1:3], ξ[4], ξ[5], ξ[6], ξ[7])
+prob_nls = NonlinearProblem(nle_new!, ξ)
+sol_nls = solve(prob_nls; show_trace=Val(true))
+
+ξ_nls = sol_nls.u
+p0_nls = ξ_nls[1:3]
+t1 = ξ_nls[4]
+t2 = ξ_nls[5]
+t3 = ξ_nls[6]
+tf = ξ_nls[7]
+
+println("\nNonlinearSolve results :")
+println("p0 = ", p0_nls)
+println("t1 = ", t1)
+println("t2 = ", t2)
+println("t3 = ", t3)
+println("tf = ", tf)
+
+s = similar(p0_nls, 7)
+shoot!(s, p0_nls, t1, t2, t3, tf)
+
+println("\nNorm of the shooting function: ‖s‖ = ", norm(s), "\n")
+```
+
+The results found for the different parameters are extremely close so now, lets benchmark these two resolution to compare their performances.
+
+```@example main-goddard
+@benchmark fsolve(nle!, jnle!, ξ, show_trace=false) #MINPACK
+```
+
+```@example main-goddard
+@benchmark solve(prob_nls; show_trace=Val(false)) #NonlinearSolve
+```
+
+The MINPACK (fsolve) method is much faster than NonlinearSolve (solve) on this problem. It also uses less memory (1.95 GiB vs 6.10 GiB). Both methods have a similar GC overhead (~24–25%), but MINPACK is overall more efficient here.
 
 ## [Plot of the solution](@id tutorial-goddard-plot)
 
