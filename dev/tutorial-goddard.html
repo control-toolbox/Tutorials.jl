@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Goddard: direct, indirect · Tutorials</title><meta name="title" content="Goddard: direct, indirect · Tutorials"/><meta property="og:title" content="Goddard: direct, indirect · Tutorials"/><meta property="twitter:title" content="Goddard: direct, indirect · Tutorials"/><meta name="description" content="Documentation for Tutorials."/><meta property="og:description" content="Documentation for Tutorials."/><meta property="twitter:description" content="Documentation for Tutorials."/><script data-outdated-warner src="assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.050/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="assets/documenter.js"></script><script src="search_index.js"></script><script src="siteinfo.js"></script><script src="../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="assets/themes/catppuccin-mocha.css" data-theme-name="catppuccin-mocha"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="assets/themes/catppuccin-macchiato.css" data-theme-name="catppuccin-macchiato"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="assets/themes/catppuccin-frappe.css" data-theme-name="catppuccin-frappe"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="assets/themes/catppuccin-latte.css" data-theme-name="catppuccin-latte"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="assets/themeswap.js"></script><link href="https://control-toolbox.org/assets/css/documentation.css" rel="stylesheet" type="text/css"/><script src="https://control-toolbox.org/assets/js/documentation.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit"><a href="index.html">Tutorials</a></span></div><button class="docs-search-query input is-rounded is-small is-clickable my-2 mx-auto py-1 px-2" id="documenter-search-query">Search docs (Ctrl + /)</button><ul class="docs-menu"><li><a class="tocitem" href="index.html">Getting Started</a></li><li><span class="tocitem">Tutorials and Advanced Features</span><ul><li><a class="tocitem" href="tutorial-continuation.html">Discrete continuation</a></li><li><a class="tocitem" href="tutorial-discretisation.html">Discretisation methods</a></li><li><a class="tocitem" href="tutorial-nlp.html">NLP manipulations</a></li><li><a class="tocitem" href="tutorial-iss.html">Indirect simple shooting</a></li><li class="is-active"><a class="tocitem" href="tutorial-goddard.html">Goddard: direct, indirect</a><ul class="internal"><li><a class="tocitem" href="#Introduction"><span>Introduction</span></a></li><li><a class="tocitem" href="#Optimal-control-problem"><span>Optimal control problem</span></a></li><li><a class="tocitem" href="#Direct-method"><span>Direct method</span></a></li><li><a class="tocitem" href="#tutorial-goddard-structure"><span>Structure of the solution</span></a></li><li><a class="tocitem" href="#Shooting-function"><span>Shooting function</span></a></li><li><a class="tocitem" href="#Initial-guess"><span>Initial guess</span></a></li><li><a class="tocitem" href="#Indirect-shooting"><span>Indirect shooting</span></a></li><li><a class="tocitem" href="#tutorial-goddard-plot"><span>Plot of the solution</span></a></li><li><a class="tocitem" href="#References"><span>References</span></a></li></ul></li><li><a class="tocitem" href="tutorial-lqr.html">Linear–quadratic regulator</a></li><li><a class="tocitem" href="tutorial-mam.html">Minimal action</a></li><li><a class="tocitem" href="tutorial-mpc.html">Model Predictive Control</a></li></ul></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><a class="docs-sidebar-button docs-navbar-link fa-solid fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">Tutorials and Advanced Features</a></li><li class="is-active"><a href="tutorial-goddard.html">Goddard: direct, indirect</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href="tutorial-goddard.html">Goddard: direct, indirect</a></li></ul></nav><div class="docs-right"><a class="docs-navbar-link" href="https://github.com/control-toolbox/Tutorials.jl" title="View the repository on GitHub"><span class="docs-icon fa-brands"></span><span class="docs-label is-hidden-touch">GitHub</span></a><a class="docs-navbar-link" href="https://github.com/control-toolbox/Tutorials.jl/blob/main/docs/src/tutorial-goddard.md" title="Edit source on GitHub"><span class="docs-icon fa-solid"></span></a><a class="docs-settings-button docs-navbar-link fa-solid fa-gear" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-article-toggle-button fa-solid fa-chevron-up" id="documenter-article-toggle-button" href="javascript:;" title="Collapse all docstrings"></a></div></header><article class="content" id="documenter-page"><h1 id="tutorial-goddard"><a class="docs-heading-anchor" href="#tutorial-goddard">Direct and indirect methods for the Goddard problem</a><a id="tutorial-goddard-1"></a><a class="docs-heading-anchor-permalink" href="#tutorial-goddard" title="Permalink"></a></h1><h2 id="Introduction"><a class="docs-heading-anchor" href="#Introduction">Introduction</a><a id="Introduction-1"></a><a class="docs-heading-anchor-permalink" href="#Introduction" title="Permalink"></a></h2><img src="./assets/Goddard_and_Rocket.jpg" style="float: left; margin: auto 10px;" width="200px"><p>For this example, we consider the well-known Goddard problem<sup class="footnote-reference"><a id="citeref-1" href="#footnote-1">[1]</a></sup> <sup class="footnote-reference"><a id="citeref-2" href="#footnote-2">[2]</a></sup> which models the ascent of a rocket through the atmosphere, and we restrict here ourselves to vertical (one dimensional) trajectories. The state variables are the altitude <span>$r$</span>, speed <span>$v$</span> and mass <span>$m$</span> of the rocket during the flight, for a total dimension of 3. The rocket is subject to gravity <span>$g$</span>, thrust <span>$u$</span> and drag force <span>$D$</span> (function of speed and altitude). The final time <span>$t_f$</span> is free, and the objective is to reach a maximal altitude with a bounded fuel consumption.</p><p>We thus want to solve the optimal control problem in Mayer form</p><p class="math-container">\[    r(t_f) \to \max\]</p><p>subject to the controlled dynamics</p><p class="math-container">\[    \dot{r} = v, \quad
     \dot{v} = \frac{T_{\max}\,u - D(r,v)}{m} - g, \quad
-    \dot{m} = -u,\]</p><p>and subject to the control constraint <span>$u(t) \in [0,1]$</span> and the state constraint <span>$v(t) \leq v_{\max}$</span>. The initial state is fixed while only the final mass is prescribed.</p><div class="admonition is-info" id="Nota-bene-932a1802dabf04c9"><header class="admonition-header">Nota bene<a class="admonition-anchor" href="#Nota-bene-932a1802dabf04c9" title="Permalink"></a></header><div class="admonition-body"><p>The Hamiltonian is affine with respect to the control, so singular arcs may occur, as well as constrained arcs due to the path constraint on the velocity (see below).</p></div></div><p>We import the <a href="https://control-toolbox.org/OptimalControl.jl">OptimalControl.jl</a> package to define the optimal control problem and <a href="https://jso.dev/NLPModelsIpopt.jl">NLPModelsIpopt.jl</a> to solve it.  We import the <a href="https://docs.juliaplots.org">Plots.jl</a> package to plot the solution.  The <a href="https://docs.sciml.ai/OrdinaryDiffEq">OrdinaryDiffEq.jl</a> package is used to  define the shooting function for the indirect method and the <a href="https://github.com/sglyon/MINPACK.jl">MINPACK.jl</a> package permits to solve the shooting equation.</p><pre><code class="language-julia hljs">using OptimalControl  # to define the optimal control problem and more
+    \dot{m} = -u,\]</p><p>and subject to the control constraint <span>$u(t) \in [0,1]$</span> and the state constraint <span>$v(t) \leq v_{\max}$</span>. The initial state is fixed while only the final mass is prescribed.</p><div class="admonition is-info" id="Nota-bene-932a1802dabf04c9"><header class="admonition-header">Nota bene<a class="admonition-anchor" href="#Nota-bene-932a1802dabf04c9" title="Permalink"></a></header><div class="admonition-body"><p>The Hamiltonian is affine with respect to the control, so singular arcs may occur, as well as constrained arcs due to the path constraint on the velocity (see below).</p></div></div><p>We import the <a href="https://control-toolbox.org/OptimalControl.jl">OptimalControl.jl</a> package to define the optimal control problem and <a href="https://jso.dev/NLPModelsIpopt.jl">NLPModelsIpopt.jl</a> to solve it. We import the <a href="https://docs.juliaplots.org">Plots.jl</a> package to plot the solution. The <a href="https://docs.sciml.ai/OrdinaryDiffEq">OrdinaryDiffEq.jl</a> package is used to define the shooting function for the indirect method and the <a href="https://github.com/sglyon/MINPACK.jl">MINPACK.jl</a> package permits to solve the shooting equation.</p><pre><code class="language-julia hljs">using BenchmarkTools
+using OptimalControl  # to define the optimal control problem and more
 using NLPModelsIpopt  # to solve the problem via a direct method
 using OrdinaryDiffEq  # to get the Flow function from OptimalControl
 using MINPACK         # NLE solver: use to solve the shooting equation
@@ -94,12 +95,12 @@ iter    objective    inf_pr   inf_du lg(mu)  ||d||  lg(rg) alpha_du alpha_pr  ls
 Number of Iterations....: 24
 
                                    (scaled)                 (unscaled)
-Objective...............:  -1.0125716188789131e+00   -1.0125716188789131e+00
-Dual infeasibility......:   1.0759975803420478e-09    1.0759975803420478e-09
-Constraint violation....:   1.5779044737485037e-11    1.2476886190881942e-10
+Objective...............:  -1.0125716188789129e+00   -1.0125716188789129e+00
+Dual infeasibility......:   1.0759898712201739e-09    1.0759898712201739e-09
+Constraint violation....:   1.5779266782089962e-11    1.2476868149757792e-10
 Variable bound violation:   6.1594570555101313e-09    6.1594570555101313e-09
-Complementarity.........:   1.5140175167758125e-11    1.5140175167758125e-11
-Overall NLP error.......:   1.5779044737485037e-11    1.0759975803420478e-09
+Complementarity.........:   1.5140175167764649e-11    1.5140175167764649e-11
+Overall NLP error.......:   1.5779266782089962e-11    1.0759898712201739e-09
 
 
 Number of objective function evaluations             = 25
@@ -109,9 +110,9 @@ Number of inequality constraint evaluations          = 0
 Number of equality constraint Jacobian evaluations   = 25
 Number of inequality constraint Jacobian evaluations = 0
 Number of Lagrangian Hessian evaluations             = 24
-Total seconds in IPOPT                               = 2.327
+Total seconds in IPOPT                               = 2.310
 
-EXIT: Optimal Solution Found.</code></pre><p>and plot the solution</p><pre><code class="language-julia hljs">plt = plot(direct_sol, label=&quot;direct&quot;, size=(800, 800))</code></pre><img src="tutorial-goddard-1acb9579.svg" alt="Example block output"/><h2 id="tutorial-goddard-structure"><a class="docs-heading-anchor" href="#tutorial-goddard-structure">Structure of the solution</a><a id="tutorial-goddard-structure-1"></a><a class="docs-heading-anchor-permalink" href="#tutorial-goddard-structure" title="Permalink"></a></h2><p>We first determine visually the structure of the optimal solution which is composed of a bang arc with maximal control, followed by a singular arc, then by a boundary arc and the final arc is with zero control. Note that the switching function vanishes along the singular and boundary arcs.</p><pre><code class="language-julia hljs">t = time_grid(direct_sol)   # the time grid as a vector
+EXIT: Optimal Solution Found.</code></pre><p>and plot the solution</p><pre><code class="language-julia hljs">plt = plot(direct_sol, label=&quot;direct&quot;, size=(800, 800))</code></pre><img src="tutorial-goddard-13241056.svg" alt="Example block output"/><h2 id="tutorial-goddard-structure"><a class="docs-heading-anchor" href="#tutorial-goddard-structure">Structure of the solution</a><a id="tutorial-goddard-structure-1"></a><a class="docs-heading-anchor-permalink" href="#tutorial-goddard-structure" title="Permalink"></a></h2><p>We first determine visually the structure of the optimal solution which is composed of a bang arc with maximal control, followed by a singular arc, then by a boundary arc and the final arc is with zero control. Note that the switching function vanishes along the singular and boundary arcs.</p><pre><code class="language-julia hljs">t = time_grid(direct_sol)   # the time grid as a vector
 x = state(direct_sol)       # the state as a function of time
 u = control(direct_sol)     # the control as a function of time
 p = costate(direct_sol)     # the costate as a function of time
@@ -120,11 +121,11 @@ H1 = Lift(F1)           # H1(x, p) = p&#39; * F1(x)
 φ(t) = H1(x(t), p(t))   # switching function
 g(x) = vmax - x[2]      # state constraint v ≤ vmax
 
-u_plot  = plot(t, u,     label = &quot;u(t)&quot;)
-H1_plot = plot(t, φ,     label = &quot;H₁(x(t), p(t))&quot;)
-g_plot  = plot(t, g ∘ x, label = &quot;g(x(t))&quot;)
+u_plot  = plot(t, u,     linewidth=2, label = &quot;u(t)&quot;)
+H1_plot = plot(t, φ,     linewidth=2, label = &quot;H₁(x(t), p(t))&quot;)
+g_plot  = plot(t, g ∘ x, linewidth=2, label = &quot;g(x(t))&quot;)
 
-plot(u_plot, H1_plot, g_plot, layout=(3,1), size=(500, 500))</code></pre><img src="tutorial-goddard-370ea38a.svg" alt="Example block output"/><p>We are now in position to solve the problem by an indirect shooting method. We first define the four control laws in feedback form and their associated flows. For this we need to compute some Lie derivatives, namely <a href="https://en.wikipedia.org/wiki/Poisson_bracket">Poisson brackets</a> of Hamiltonians (themselves obtained as lifts to the cotangent bundle of vector fields), or derivatives of functions along a vector field. For instance, the control along the <em>minimal order</em> singular arcs is obtained as the quotient</p><p class="math-container">\[u_s = -\frac{H_{001}}{H_{101}}\]</p><p>of length three Poisson brackets:</p><p class="math-container">\[H_{001} = \{H_0,\{H_0,H_1\}\}, \quad H_{101} = \{H_1,\{H_0,H_1\}\}\]</p><p>where, for two Hamiltonians <span>$H$</span> and <span>$G$</span>,</p><p class="math-container">\[\{H,G\} := (\nabla_p H|\nabla_x G) - (\nabla_x H|\nabla_p G).\]</p><p>While the Lie derivative of a function <span>$f$</span> <em>wrt.</em> a vector field <span>$X$</span> is simply obtained as</p><p class="math-container">\[(X \cdot f)(x) := f&#39;(x) \cdot X(x),\]</p><p>and is used to the compute the control along the boundary arc,</p><p class="math-container">\[u_b(x) = -(F_0 \cdot g)(x) / (F_1 \cdot g)(x),\]</p><p>as well as the associated multiplier for the <em>order one</em> state constraint on the velocity:</p><p class="math-container">\[\mu(x, p) = H_{01}(x, p) / (F_1 \cdot g)(x).\]</p><div class="admonition is-info" id="Poisson-bracket-and-Lie-derivative-1dba42dec39fe2e1"><header class="admonition-header">Poisson bracket and Lie derivative<a class="admonition-anchor" href="#Poisson-bracket-and-Lie-derivative-1dba42dec39fe2e1" title="Permalink"></a></header><div class="admonition-body"><p>The Poisson bracket <span>$\{H,G\}$</span> is also given by the Lie derivative of <span>$G$</span> along the Hamiltonian vector field <span>$X_H = (\nabla_p H, -\nabla_x H)$</span> of <span>$H$</span>, that is</p><p class="math-container">\[    \{H,G\} = X_H \cdot G\]</p><p>which is the reason why we use the <code>@Lie</code> macro to compute Poisson brackets below.</p></div></div><p>With the help of differential geometry primitives, these expressions are straightforwardly translated into Julia code:</p><pre><code class="language-julia hljs"># Controls
+plot(u_plot, H1_plot, g_plot, layout=(3,1), size=(600, 600))</code></pre><img src="tutorial-goddard-706b50f2.svg" alt="Example block output"/><p>We are now in position to solve the problem by an indirect shooting method. We first define the four control laws in feedback form and their associated flows. For this we need to compute some Lie derivatives, namely <a href="https://en.wikipedia.org/wiki/Poisson_bracket">Poisson brackets</a> of Hamiltonians (themselves obtained as lifts to the cotangent bundle of vector fields), or derivatives of functions along a vector field. For instance, the control along the <em>minimal order</em> singular arcs is obtained as the quotient</p><p class="math-container">\[u_s = -\frac{H_{001}}{H_{101}}\]</p><p>of length three Poisson brackets:</p><p class="math-container">\[H_{001} = \{H_0,\{H_0,H_1\}\}, \quad H_{101} = \{H_1,\{H_0,H_1\}\}\]</p><p>where, for two Hamiltonians <span>$H$</span> and <span>$G$</span>,</p><p class="math-container">\[\{H,G\} := (\nabla_p H|\nabla_x G) - (\nabla_x H|\nabla_p G).\]</p><p>While the Lie derivative of a function <span>$f$</span> <em>wrt.</em> a vector field <span>$X$</span> is simply obtained as</p><p class="math-container">\[(X \cdot f)(x) := f&#39;(x) \cdot X(x),\]</p><p>and is used to the compute the control along the boundary arc,</p><p class="math-container">\[u_b(x) = -(F_0 \cdot g)(x) / (F_1 \cdot g)(x),\]</p><p>as well as the associated multiplier for the <em>order one</em> state constraint on the velocity:</p><p class="math-container">\[\mu(x, p) = H_{01}(x, p) / (F_1 \cdot g)(x).\]</p><div class="admonition is-info" id="Poisson-bracket-and-Lie-derivative-1dba42dec39fe2e1"><header class="admonition-header">Poisson bracket and Lie derivative<a class="admonition-anchor" href="#Poisson-bracket-and-Lie-derivative-1dba42dec39fe2e1" title="Permalink"></a></header><div class="admonition-body"><p>The Poisson bracket <span>$\{H,G\}$</span> is also given by the Lie derivative of <span>$G$</span> along the Hamiltonian vector field <span>$X_H = (\nabla_p H, -\nabla_x H)$</span> of <span>$H$</span>, that is</p><p class="math-container">\[    \{H,G\} = X_H \cdot G\]</p><p>which is the reason why we use the <code>@Lie</code> macro to compute Poisson brackets below.</p></div></div><p>With the help of differential geometry primitives, these expressions are straightforwardly translated into Julia code:</p><pre><code class="language-julia hljs"># Controls
 const u0 = 0                            # off control
 const u1 = 1                            # bang control
 
@@ -150,12 +151,12 @@ function shoot!(s, p0, t1, t2, t3, tf)
     x3, p3 = fb(t2, x2, p2, t3)
     xf, pf = f0(t3, x3, p3, tf)
 
-    s[1] = xf[3] - mf                             # final mass constraint
-    s[2:3] = pf[1:2] - [1, 0]                     # transversality conditions
-    s[4] = H1(x1, p1)                             # H1 = H01 = 0
-    s[5] = H01(x1, p1)                            # at the entrance of the singular arc
-    s[6] = g(x2)                                  # g = 0 when entering the boundary arc
-    s[7] = H0(xf, pf)                             # since tf is free
+    s[1] = xf[3] - mf               # final mass constraint
+    s[2:3] = pf[1:2] - [1, 0]       # transversality conditions
+    s[4] = H1(x1, p1)               # H1 = H01 = 0
+    s[5] = H01(x1, p1)              # at the entrance of the singular arc
+    s[6] = g(x2)                    # g = 0 when entering the boundary arc
+    s[7] = H0(xf, pf)               # since tf is free
 
 end</code></pre><h2 id="Initial-guess"><a class="docs-heading-anchor" href="#Initial-guess">Initial guess</a><a id="Initial-guess-1"></a><a class="docs-heading-anchor-permalink" href="#Initial-guess" title="Permalink"></a></h2><p>To solve the problem by an indirect shooting method, we then need a good initial guess, that is a good approximation of the initial costate, the three switching times and the final time.</p><pre><code class="language-julia hljs">η = 1e-3
 t13 = t[ abs.(φ.(t)) .≤ η ]
@@ -176,36 +177,33 @@ println(&quot;tf = &quot;, tf)
 using LinearAlgebra: norm
 s = similar(p0, 7)
 shoot!(s, p0, t1, t2, t3, tf)
-println(&quot;\nNorm of the shooting function: ‖s‖ = &quot;, norm(s), &quot;\n&quot;)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">p0 = [3.94209135581226, 0.14627140398405186, 0.05411785715965971]
-t1 = 0.018178502658805343
-t2 = 0.06059500886268448
-t3 = 0.07877351152148983
-tf = 0.20198336287561494
+println(&quot;\nNorm of the shooting function: ‖s‖ = &quot;, norm(s), &quot;\n&quot;)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">p0 = [3.942091355812247, 0.1462714039840518, 0.05411785715965977]
+t1 = 0.018178502658805416
+t2 = 0.060595008862684714
+t3 = 0.07877351152149013
+tf = 0.20198336287561572
 
-Norm of the shooting function: ‖s‖ = 3.24985537443863</code></pre><h2 id="Indirect-shooting"><a class="docs-heading-anchor" href="#Indirect-shooting">Indirect shooting</a><a id="Indirect-shooting-1"></a><a class="docs-heading-anchor-permalink" href="#Indirect-shooting" title="Permalink"></a></h2><p>We aggregate the data to define the initial guess vector.</p><pre><code class="language-julia hljs">ξ = [p0..., t1, t2, t3, tf] # initial guess</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">7-element Vector{Float64}:
- 3.94209135581226
- 0.14627140398405186
- 0.05411785715965971
- 0.018178502658805343
- 0.06059500886268448
- 0.07877351152148983
- 0.20198336287561494</code></pre><h3 id="MINPACK.jl"><a class="docs-heading-anchor" href="#MINPACK.jl">MINPACK.jl</a><a id="MINPACK.jl-1"></a><a class="docs-heading-anchor-permalink" href="#MINPACK.jl" title="Permalink"></a></h3><p>We can use <a href="https://docs.sciml.ai/NonlinearSolve">NonlinearSolve.jl</a> package or, instead, the  <a href="https://github.com/sglyon/MINPACK.jl">MINPACK.jl</a> package to solve  the shooting equation. To compute the Jacobian of the shooting function we use the  <a href="https://juliadiff.org/DifferentiationInterface.jl/DifferentiationInterface">DifferentiationInterface.jl</a> package with  <a href="https://juliadiff.org/ForwardDiff.jl">ForwardDiff.jl</a> backend.</p><pre><code class="language-julia hljs">using DifferentiationInterface
+Norm of the shooting function: ‖s‖ = 3.2498553744370993</code></pre><h2 id="Indirect-shooting"><a class="docs-heading-anchor" href="#Indirect-shooting">Indirect shooting</a><a id="Indirect-shooting-1"></a><a class="docs-heading-anchor-permalink" href="#Indirect-shooting" title="Permalink"></a></h2><p>We aggregate the data to define the initial guess vector.</p><pre><code class="language-julia hljs">ξ = [p0..., t1, t2, t3, tf] # initial guess</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">7-element Vector{Float64}:
+ 3.942091355812247
+ 0.1462714039840518
+ 0.05411785715965977
+ 0.018178502658805416
+ 0.060595008862684714
+ 0.07877351152149013
+ 0.20198336287561572</code></pre><h3 id="MINPACK.jl"><a class="docs-heading-anchor" href="#MINPACK.jl">MINPACK.jl</a><a id="MINPACK.jl-1"></a><a class="docs-heading-anchor-permalink" href="#MINPACK.jl" title="Permalink"></a></h3><p>We can use the <a href="https://github.com/sglyon/MINPACK.jl">MINPACK.jl</a> package to solve the shooting equation. To compute the Jacobian of the shooting function we use the <a href="https://juliadiff.org/DifferentiationInterface.jl/DifferentiationInterface">DifferentiationInterface.jl</a> package with <a href="https://juliadiff.org/ForwardDiff.jl">ForwardDiff.jl</a> backend.</p><pre><code class="language-julia hljs">using DifferentiationInterface
 import ForwardDiff
 backend = AutoForwardDiff()</code></pre><p>Let us define the problem to solve.</p><pre><code class="language-julia hljs"># auxiliary function with aggregated inputs
-nle!  = ( s, ξ) -&gt; shoot!(s, ξ[1:3], ξ[4], ξ[5], ξ[6], ξ[7])
+nle!(s, ξ) = shoot!(s, ξ[1:3], ξ[4], ξ[5], ξ[6], ξ[7])
 
 # Jacobian of the (auxiliary) shooting function
-jnle! = (js, ξ) -&gt; jacobian!(nle!, similar(ξ), js, backend, ξ)</code></pre><p>We are now in position to solve the problem with the <code>hybrj</code> solver from MINPACK.jl through the <code>fsolve</code>  function, providing the Jacobian. Let us solve the problem and retrieve the initial costate solution.</p><pre><code class="language-julia hljs"># resolution of S(ξ) = 0
+jnle!(js, ξ) = jacobian!(nle!, similar(ξ), js, backend, ξ)</code></pre><p>We are now in position to solve the problem with the <code>hybrj</code> solver from MINPACK.jl through the <code>fsolve</code> function, providing the Jacobian. Let us solve the problem and retrieve the initial costate solution.</p><pre><code class="language-julia hljs"># resolution of S(ξ) = 0
 indirect_sol = fsolve(nle!, jnle!, ξ, show_trace=true)
 
 # we retrieve the costate solution together with the times
-p0 = indirect_sol.x[1:3]
-t1 = indirect_sol.x[4]
-t2 = indirect_sol.x[5]
-t3 = indirect_sol.x[6]
-tf = indirect_sol.x[7]
+ξ = indirect_sol.x
+p0, t1, t2, t3, tf = ξ[1:3], ξ[4:end]...
 
-println(&quot;&quot;)
+println(&quot;MINPACK results:&quot;)
 println(&quot;p0 = &quot;, p0)
 println(&quot;t1 = &quot;, t1)
 println(&quot;t2 = &quot;, t2)
@@ -217,34 +215,107 @@ s = similar(p0, 7)
 shoot!(s, p0, t1, t2, t3, tf)
 println(&quot;\nNorm of the shooting function: ‖s‖ = &quot;, norm(s), &quot;\n&quot;)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Iter     f(x) inf-norm    Step 2-norm      Step time
 ------   --------------   --------------   --------------
-     1     3.242784e+00     0.000000e+00         0.303447
-     2     4.672585e-01     2.618905e-03        75.356839
-     3     7.884030e-01     1.047562e-02         0.045324
-     4     2.492423e-01     2.245549e-02         0.023535
-     5     8.942007e-02     6.390871e-04         0.023134
-     6     8.435809e-02     1.032502e-03         0.022861
-     7     2.615330e-02     1.985801e-03         0.023269
-     8     3.869050e-03     2.128666e-04         0.023209
-     9     2.711822e-03     3.473928e-08         0.027421
-    10     4.672197e-03     2.028838e-07         0.022770
-    11     2.558166e-04     9.506587e-07         0.022858
-    12     2.555473e-05     1.734439e-09         0.022645
-    13     8.061548e-06     9.889646e-12         0.022685
-    14     2.032992e-05     3.955858e-11         0.026741
-    15     5.606576e-07     1.545561e-11         0.022749
-    16     5.728684e-07     6.689721e-15         0.022419
-    17     3.532517e-07     2.611449e-15         0.022363
-    18     2.694151e-07     3.338345e-16         0.026740
-    19     2.450645e-09     3.362623e-15         0.022276
-    20     1.602000e-10     5.541741e-19         0.022489
+     1     3.242784e+00     0.000000e+00         0.291723
+     2     4.672585e-01     2.618905e-03        75.099705
+     3     7.884030e-01     1.047562e-02         0.046023
+     4     2.492423e-01     2.245549e-02         0.024255
+     5     8.942007e-02     6.390871e-04         0.023934
+     6     8.435809e-02     1.032502e-03         0.023564
+     7     2.615330e-02     1.985801e-03         0.023851
+     8     3.869050e-03     2.128666e-04         0.023795
+     9     2.711822e-03     3.473928e-08         0.028345
+    10     4.672197e-03     2.028838e-07         0.023592
+    11     2.558166e-04     9.506587e-07         0.024012
+    12     2.555473e-05     1.734439e-09         0.023850
+    13     8.061570e-06     9.889605e-12         0.027976
+    14     2.032998e-05     3.955842e-11         0.023463
+    15     5.606448e-07     1.545552e-11         0.023256
+    16     5.728787e-07     6.691035e-15         0.023315
+    17     3.532512e-07     2.611762e-15         0.028544
+    18     2.694114e-07     3.338601e-16         0.023359
+    19     2.428953e-09     3.362765e-15         0.023816
+    20     1.427651e-10     5.432495e-19         0.024542
+MINPACK results:
+p0 = [3.9457646586732578, 0.15039559623542198, 0.053712712942074935]
+t1 = 0.02350968403946156
+t2 = 0.059737380907012985
+t3 = 0.10157134842402529
+tf = 0.20204744057214977
 
-p0 = [3.9457646586775654, 0.150395596235691, 0.053712712942204574]
-t1 = 0.02350968403937708
-t2 = 0.05973738090718043
-t3 = 0.1015713484239823
-tf = 0.20204744057219184
+Norm of the shooting function: ‖s‖ = 1.487184644676261e-10</code></pre><h3 id="NonlinearSolve.jl"><a class="docs-heading-anchor" href="#NonlinearSolve.jl">NonlinearSolve.jl</a><a id="NonlinearSolve.jl-1"></a><a class="docs-heading-anchor-permalink" href="#NonlinearSolve.jl" title="Permalink"></a></h3><p>Alternatively, we can use the <a href="https://docs.sciml.ai/NonlinearSolve">NonlinearSolve.jl</a> package to solve the shooting equation. The code is similar, but we use the <code>solve</code> function instead of <code>fsolve</code>. Let us define the problem.</p><pre><code class="language-julia hljs">nle!(s, ξ, λ) = shoot!(s, ξ[1:3], ξ[4], ξ[5], ξ[6], ξ[7])
+prob = NonlinearProblem(nle!, ξ)</code></pre><p>Now, let us solve the problem and retrieve the initial costate and times.</p><pre><code class="language-julia hljs"># resolution of S(ξ) = 0
+sol = solve(prob; show_trace=Val(true))
 
-Norm of the shooting function: ‖s‖ = 1.6529116602456573e-10</code></pre><h2 id="tutorial-goddard-plot"><a class="docs-heading-anchor" href="#tutorial-goddard-plot">Plot of the solution</a><a id="tutorial-goddard-plot-1"></a><a class="docs-heading-anchor-permalink" href="#tutorial-goddard-plot" title="Permalink"></a></h2><p>We plot the solution of the indirect solution (in red) over the solution of the direct method  (in blue).</p><pre><code class="language-julia hljs">f = f1 * (t1, fs) * (t2, fb) * (t3, f0) # concatenation of the flows
+# we retrieve the costate solution together with the times
+ξ = sol.u
+p0, t1, t2, t3, tf = ξ[1:3], ξ[4:end]...
+
+println(&quot;\nNonlinearSolve results:&quot;)
+println(&quot;p0 = &quot;, p0)
+println(&quot;t1 = &quot;, t1)
+println(&quot;t2 = &quot;, t2)
+println(&quot;t3 = &quot;, t3)
+println(&quot;tf = &quot;, tf)
+
+# Norm of the shooting function at solution
+s = similar(p0, 7)
+shoot!(s, p0, t1, t2, t3, tf)
+println(&quot;\nNorm of the shooting function: ‖s‖ = &quot;, norm(s), &quot;\n&quot;)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">
+Algorithm: NewtonRaphson(
+    descent = NewtonDescent(),
+    autodiff = AutoForwardDiff(),
+    vjp_autodiff = AutoReverseDiff(
+        compile = false
+    ),
+    jvp_autodiff = AutoForwardDiff(),
+    concrete_jac = Val{false}()
+)
+
+----    	-------------       	-----------
+Iter    	f(u) inf-norm       	Step 2-norm
+----    	-------------       	-----------
+0       	1.42765133e-10      	0.00000000e+00
+1       	2.36166642e-12      	1.85954387e-11
+2       	2.42339482e-12      	9.48142536e-13
+3       	2.80220291e-13      	1.10948190e-12
+Final   	2.80220291e-13
+----------------------
+
+NonlinearSolve results:
+p0 = [3.9457646586894604, 0.15039559623165866, 0.053712712939703984]
+t1 = 0.023509684041884568
+t2 = 0.059737380899867645
+t3 = 0.1015713484243153
+tf = 0.20204744057100144
+
+Norm of the shooting function: ‖s‖ = 3.173518531923747e-13</code></pre><h3 id="Benchmarking"><a class="docs-heading-anchor" href="#Benchmarking">Benchmarking</a><a id="Benchmarking-1"></a><a class="docs-heading-anchor-permalink" href="#Benchmarking" title="Permalink"></a></h3><p>The results found for by the two solvers are extremely close, so now, lets benchmark these two resolutions to compare their performances.</p><pre><code class="language-julia hljs">@benchmark fsolve(nle!, jnle!, ξ; tol=1e-8, show_trace=false) #MINPACK</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">BenchmarkTools.Trial: 23 samples with 1 evaluation per sample.
+ Range <span class="sgr90">(</span><span class="sgr36"><span class="sgr1">min</span></span> … <span class="sgr35">max</span><span class="sgr90">):  </span><span class="sgr36"><span class="sgr1">197.687 ms</span></span> … <span class="sgr35">327.588 ms</span>  <span class="sgr90">┊</span> GC <span class="sgr90">(</span>min … max<span class="sgr90">): </span>11.49% … 2.47%
+ Time  <span class="sgr90">(</span><span class="sgr34"><span class="sgr1">median</span></span><span class="sgr90">):     </span><span class="sgr34"><span class="sgr1">219.982 ms               </span></span><span class="sgr90">┊</span> GC <span class="sgr90">(</span>median<span class="sgr90">):    </span>17.81%
+ Time  <span class="sgr90">(</span><span class="sgr32"><span class="sgr1">mean</span></span> ± <span class="sgr32">σ</span><span class="sgr90">):   </span><span class="sgr32"><span class="sgr1">226.816 ms</span></span> ± <span class="sgr32"> 27.717 ms</span>  <span class="sgr90">┊</span> GC <span class="sgr90">(</span>mean ± σ<span class="sgr90">):  </span>16.27% ± 4.59%
+
+          ▂█<span class="sgr34">▂</span>   <span class="sgr32"> </span>                                                
+  ▅▁▁▁▁▁▁███<span class="sgr34">█</span>███<span class="sgr32">▁</span>▅▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▅▁▁▁▁▁▁▁▁▁▁▁▁▁▁▅ ▁
+  198 ms<span class="sgr90">           Histogram: frequency by time</span>          328 ms <span class="sgr1">&lt;</span>
+
+ Memory estimate<span class="sgr90">: </span><span class="sgr33">652.04 MiB</span>, allocs estimate<span class="sgr90">: </span><span class="sgr33">295551</span>.</code></pre><pre><code class="language-julia hljs">@benchmark solve(prob; abstol=1e-8, reltol=1e-8, show_trace=Val(false)) # NonlinearSolve</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">BenchmarkTools.Trial: 12 samples with 1 evaluation per sample.
+ Range <span class="sgr90">(</span><span class="sgr36"><span class="sgr1">min</span></span> … <span class="sgr35">max</span><span class="sgr90">):  </span><span class="sgr36"><span class="sgr1">405.684 ms</span></span> … <span class="sgr35">580.519 ms</span>  <span class="sgr90">┊</span> GC <span class="sgr90">(</span>min … max<span class="sgr90">): </span>15.83% … 3.40%
+ Time  <span class="sgr90">(</span><span class="sgr34"><span class="sgr1">median</span></span><span class="sgr90">):     </span><span class="sgr34"><span class="sgr1">426.525 ms               </span></span><span class="sgr90">┊</span> GC <span class="sgr90">(</span>median<span class="sgr90">):    </span>19.19%
+ Time  <span class="sgr90">(</span><span class="sgr32"><span class="sgr1">mean</span></span> ± <span class="sgr32">σ</span><span class="sgr90">):   </span><span class="sgr32"><span class="sgr1">438.424 ms</span></span> ± <span class="sgr32"> 45.307 ms</span>  <span class="sgr90">┊</span> GC <span class="sgr90">(</span>mean ± σ<span class="sgr90">):  </span>17.29% ± 4.65%
+
+        █<span class="sgr34">▄</span>▁  <span class="sgr32"> </span>                                                   
+  ▆▁▁▁▁▁█<span class="sgr34">█</span>█▁▆<span class="sgr32">▁</span>▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▆ ▁
+  406 ms<span class="sgr90">           Histogram: frequency by time</span>          581 ms <span class="sgr1">&lt;</span>
+
+ Memory estimate<span class="sgr90">: </span><span class="sgr33">1.27 GiB</span>, allocs estimate<span class="sgr90">: </span><span class="sgr33">591053</span>.</code></pre><p>According to the NonlinearSolve documentation, for small nonlinear systems, it could be faster to use the <a href="https://docs.sciml.ai/NonlinearSolve/stable/tutorials/code_optimization/"><code>SimpleNewtonRaphson()</code> descent algorithm</a>. </p><pre><code class="language-julia hljs">@benchmark solve(prob, SimpleNewtonRaphson(); abstol=1e-8, reltol=1e-8, show_trace=Val(false)) # NonlinearSolve</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">BenchmarkTools.Trial: 25 samples with 1 evaluation per sample.
+ Range <span class="sgr90">(</span><span class="sgr36"><span class="sgr1">min</span></span> … <span class="sgr35">max</span><span class="sgr90">):  </span><span class="sgr36"><span class="sgr1">173.405 ms</span></span> … <span class="sgr35">274.178 ms</span>  <span class="sgr90">┊</span> GC <span class="sgr90">(</span>min … max<span class="sgr90">): </span>12.12% … 4.43%
+ Time  <span class="sgr90">(</span><span class="sgr34"><span class="sgr1">median</span></span><span class="sgr90">):     </span><span class="sgr34"><span class="sgr1">195.926 ms               </span></span><span class="sgr90">┊</span> GC <span class="sgr90">(</span>median<span class="sgr90">):    </span>19.35%
+ Time  <span class="sgr90">(</span><span class="sgr32"><span class="sgr1">mean</span></span> ± <span class="sgr32">σ</span><span class="sgr90">):   </span><span class="sgr32"><span class="sgr1">201.222 ms</span></span> ± <span class="sgr32"> 22.660 ms</span>  <span class="sgr90">┊</span> GC <span class="sgr90">(</span>mean ± σ<span class="sgr90">):  </span>18.00% ± 4.99%
+
+            ███<span class="sgr34"> </span>▃▃▃<span class="sgr32"> </span>                                             
+  ▇▁▁▁▇▁▇▁▁▁███<span class="sgr34">▇</span>███<span class="sgr32">▇</span>▇▇▁▁▁▁▇▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▇▁▁▇ ▁
+  173 ms<span class="sgr90">           Histogram: frequency by time</span>          274 ms <span class="sgr1">&lt;</span>
+
+ Memory estimate<span class="sgr90">: </span><span class="sgr33">584.54 MiB</span>, allocs estimate<span class="sgr90">: </span><span class="sgr33">199796</span>.</code></pre><p>MINPACK.jl (fsolve) is much faster than NonlinearSolve.jl (solve) on this problem. It also uses less memory. Both methods have a similar GC overhead, but MINPACK.jl is overall more efficient here.</p><h2 id="tutorial-goddard-plot"><a class="docs-heading-anchor" href="#tutorial-goddard-plot">Plot of the solution</a><a id="tutorial-goddard-plot-1"></a><a class="docs-heading-anchor-permalink" href="#tutorial-goddard-plot" title="Permalink"></a></h2><p>We plot the solution of the indirect solution (in red) over the solution of the direct method (in blue).</p><pre><code class="language-julia hljs">f = f1 * (t1, fs) * (t2, fb) * (t3, f0) # concatenation of the flows
 flow_sol = f((t0, tf), x0, p0)          # compute the solution: state, costate, control...
 
-plot!(plt, flow_sol, label=&quot;indirect&quot;)</code></pre><img src="tutorial-goddard-d257568c.svg" alt="Example block output"/><h2 id="References"><a class="docs-heading-anchor" href="#References">References</a><a id="References-1"></a><a class="docs-heading-anchor-permalink" href="#References" title="Permalink"></a></h2><section class="footnotes is-size-7"><ul><li class="footnote" id="footnote-1"><a class="tag is-link" href="#citeref-1">1</a>R.H. Goddard. A Method of Reaching Extreme Altitudes, volume 71(2) of Smithsonian Miscellaneous Collections. Smithsonian institution, City of Washington, 1919.</li><li class="footnote" id="footnote-2"><a class="tag is-link" href="#citeref-2">2</a>H. Seywald and E.M. Cliff. Goddard problem in presence of a dynamic pressure limit. Journal of Guidance, Control, and Dynamics, 16(4):776–781, 1993.</li></ul></section></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="tutorial-iss.html">« Indirect simple shooting</a><a class="docs-footer-nextpage" href="tutorial-lqr.html">Linear–quadratic regulator »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.14.1 on <span class="colophon-date" title="Sunday 13 July 2025 11:33">Sunday 13 July 2025</span>. Using Julia version 1.11.6.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+plot!(plt, flow_sol, label=&quot;indirect&quot;)</code></pre><img src="tutorial-goddard-6347e68d.svg" alt="Example block output"/><h2 id="References"><a class="docs-heading-anchor" href="#References">References</a><a id="References-1"></a><a class="docs-heading-anchor-permalink" href="#References" title="Permalink"></a></h2><section class="footnotes is-size-7"><ul><li class="footnote" id="footnote-1"><a class="tag is-link" href="#citeref-1">1</a>R.H. Goddard. A Method of Reaching Extreme Altitudes, volume 71(2) of Smithsonian Miscellaneous Collections. Smithsonian institution, City of Washington, 1919.</li><li class="footnote" id="footnote-2"><a class="tag is-link" href="#citeref-2">2</a>H. Seywald and E.M. Cliff. Goddard problem in presence of a dynamic pressure limit. Journal of Guidance, Control, and Dynamics, 16(4):776–781, 1993.</li></ul></section></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="tutorial-iss.html">« Indirect simple shooting</a><a class="docs-footer-nextpage" href="tutorial-lqr.html">Linear–quadratic regulator »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.14.1 on <span class="colophon-date" title="Monday 21 July 2025 22:20">Monday 21 July 2025</span>. Using Julia version 1.11.6.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
