@@ -10,10 +10,7 @@ Draft = false
 <img src="./assets/Goddard_and_Rocket.jpg" style="float: left; margin: auto 10px;" width="200px">
 ```
 
-For this example, we consider the well-known Goddard problem[^1] [^2] which models the ascent of a rocket
-through the atmosphere, and we restrict here ourselves to vertical (one dimensional) trajectories. The state variables
-are the altitude $r$, speed $v$ and mass $m$ of the rocket during the flight, for a total dimension of 3. The rocket is
-subject to gravity $g$, thrust $u$ and drag force $D$ (function of speed and altitude). The final time $t_f$ is free, and the objective is to reach a maximal altitude with a bounded fuel consumption.
+For this example, we consider the well-known Goddard problem[^1] [^2] which models the ascent of a rocket through the atmosphere, and we restrict here ourselves to vertical (one dimensional) trajectories. The state variables are the altitude $r$, speed $v$ and mass $m$ of the rocket during the flight, for a total dimension of 3. The rocket is subject to gravity $g$, thrust $u$ and drag force $D$ (function of speed and altitude). The final time $t_f$ is free, and the objective is to reach a maximal altitude with a bounded fuel consumption.
 
 We thus want to solve the optimal control problem in Mayer form
 
@@ -29,19 +26,14 @@ subject to the controlled dynamics
     \dot{m} = -u,
 ```
 
-and subject to the control constraint $u(t) \in [0,1]$ and the state constraint
-$v(t) \leq v_{\max}$. The initial state is fixed while only the final mass is prescribed.
+and subject to the control constraint $u(t) \in [0,1]$ and the state constraint $v(t) \leq v_{\max}$. The initial state is fixed while only the final mass is prescribed.
 
 !!! note "Nota bene"
 
     The Hamiltonian is affine with respect to the control, so singular arcs may occur,
     as well as constrained arcs due to the path constraint on the velocity (see below).
 
-We import the [OptimalControl.jl](https://control-toolbox.org/OptimalControl.jl) package to define the optimal control problem and
-[NLPModelsIpopt.jl](https://jso.dev/NLPModelsIpopt.jl) to solve it. 
-We import the [Plots.jl](https://docs.juliaplots.org) package to plot the solution. 
-The [OrdinaryDiffEq.jl](https://docs.sciml.ai/OrdinaryDiffEq) package is used to 
-define the shooting function for the indirect method and the [MINPACK.jl](https://github.com/sglyon/MINPACK.jl) package permits to solve the shooting equation.
+We import the [OptimalControl.jl](https://control-toolbox.org/OptimalControl.jl) package to define the optimal control problem and [NLPModelsIpopt.jl](https://jso.dev/NLPModelsIpopt.jl) to solve it. We import the [Plots.jl](https://docs.juliaplots.org) package to plot the solution. The [OrdinaryDiffEq.jl](https://docs.sciml.ai/OrdinaryDiffEq) package is used to define the shooting function for the indirect method and the [MINPACK.jl](https://github.com/sglyon/MINPACK.jl) package permits to solve the shooting equation.
 
 ```@example main-goddard
 using BenchmarkTools
@@ -119,10 +111,7 @@ plt = plot(direct_sol, label="direct", size=(800, 800))
 
 ## [Structure of the solution](@id tutorial-goddard-structure)
 
-We first determine visually the structure of the optimal solution which is composed of a
-bang arc with maximal control, followed by a singular arc, then by a boundary arc and the final
-arc is with zero control. Note that the switching function vanishes along the singular and
-boundary arcs.
+We first determine visually the structure of the optimal solution which is composed of a bang arc with maximal control, followed by a singular arc, then by a boundary arc and the final arc is with zero control. Note that the switching function vanishes along the singular and boundary arcs.
 
 ```@example main-goddard
 t = time_grid(direct_sol)   # the time grid as a vector
@@ -134,20 +123,14 @@ H1 = Lift(F1)           # H1(x, p) = p' * F1(x)
 φ(t) = H1(x(t), p(t))   # switching function
 g(x) = vmax - x[2]      # state constraint v ≤ vmax
 
-u_plot  = plot(t, u,     label = "u(t)")
-H1_plot = plot(t, φ,     label = "H₁(x(t), p(t))")
-g_plot  = plot(t, g ∘ x, label = "g(x(t))")
+u_plot  = plot(t, u,     linewidth=2, label = "u(t)")
+H1_plot = plot(t, φ,     linewidth=2, label = "H₁(x(t), p(t))")
+g_plot  = plot(t, g ∘ x, linewidth=2, label = "g(x(t))")
 
-plot(u_plot, H1_plot, g_plot, layout=(3,1), size=(500, 500))
+plot(u_plot, H1_plot, g_plot, layout=(3,1), size=(600, 600))
 ```
 
-We are now in position to solve the problem by an indirect shooting method. We first define
-the four control laws in feedback form and their associated flows. For this we need to
-compute some Lie derivatives,
-namely [Poisson brackets](https://en.wikipedia.org/wiki/Poisson_bracket) of Hamiltonians
-(themselves obtained as lifts to the cotangent bundle of vector fields), or
-derivatives of functions along a vector field. For instance, the control along the
-*minimal order* singular arcs is obtained as the quotient
+We are now in position to solve the problem by an indirect shooting method. We first define the four control laws in feedback form and their associated flows. For this we need to compute some Lie derivatives, namely [Poisson brackets](https://en.wikipedia.org/wiki/Poisson_bracket) of Hamiltonians (themselves obtained as lifts to the cotangent bundle of vector fields), or derivatives of functions along a vector field. For instance, the control along the *minimal order* singular arcs is obtained as the quotient
 
 ```math
 u_s = -\frac{H_{001}}{H_{101}}
@@ -185,8 +168,7 @@ as well as the associated multiplier for the *order one* state constraint on the
 
 !!! note "Poisson bracket and Lie derivative"
 
-    The Poisson bracket $\{H,G\}$ is also given by the Lie derivative of $G$ along the
-    Hamiltonian vector field $X_H = (\nabla_p H, -\nabla_x H)$ of $H$, that is
+    The Poisson bracket $\{H,G\}$ is also given by the Lie derivative of $G$ along the Hamiltonian vector field $X_H = (\nabla_p H, -\nabla_x H)$ of $H$, that is
 
     ```math
         \{H,G\} = X_H \cdot G
@@ -220,8 +202,7 @@ nothing # hide
 
 ## Shooting function
 
-Then, we define the shooting function according to the optimal structure we have determined,
-that is a concatenation of four arcs.
+Then, we define the shooting function according to the optimal structure we have determined, that is a concatenation of four arcs.
 
 ```@example main-goddard
 x0 = [r0, v0, m0] # initial state
@@ -233,12 +214,12 @@ function shoot!(s, p0, t1, t2, t3, tf)
     x3, p3 = fb(t2, x2, p2, t3)
     xf, pf = f0(t3, x3, p3, tf)
 
-    s[1] = xf[3] - mf                             # final mass constraint
-    s[2:3] = pf[1:2] - [1, 0]                     # transversality conditions
-    s[4] = H1(x1, p1)                             # H1 = H01 = 0
-    s[5] = H01(x1, p1)                            # at the entrance of the singular arc
-    s[6] = g(x2)                                  # g = 0 when entering the boundary arc
-    s[7] = H0(xf, pf)                             # since tf is free
+    s[1] = xf[3] - mf               # final mass constraint
+    s[2:3] = pf[1:2] - [1, 0]       # transversality conditions
+    s[4] = H1(x1, p1)               # H1 = H01 = 0
+    s[5] = H01(x1, p1)              # at the entrance of the singular arc
+    s[6] = g(x2)                    # g = 0 when entering the boundary arc
+    s[7] = H0(xf, pf)               # since tf is free
 
 end
 nothing # hide
@@ -246,9 +227,7 @@ nothing # hide
 
 ## Initial guess
 
-To solve the problem by an indirect shooting method, we then need a good initial guess,
-that is a good approximation of the initial costate, the three switching times and the
-final time.
+To solve the problem by an indirect shooting method, we then need a good initial guess, that is a good approximation of the initial costate, the three switching times and the final time.
 
 ```@example main-goddard
 η = 1e-3
@@ -283,13 +262,9 @@ We aggregate the data to define the initial guess vector.
 
 ### MINPACK.jl
 
-We can use [NonlinearSolve.jl](https://docs.sciml.ai/NonlinearSolve) package or, instead, the 
-[MINPACK.jl](https://github.com/sglyon/MINPACK.jl) package to solve 
-the shooting equation. To compute the Jacobian of the shooting function we use the 
-[DifferentiationInterface.jl](https://juliadiff.org/DifferentiationInterface.jl/DifferentiationInterface) package with 
-[ForwardDiff.jl](https://juliadiff.org/ForwardDiff.jl) backend.
+We can use the [MINPACK.jl](https://github.com/sglyon/MINPACK.jl) package to solve the shooting equation. To compute the Jacobian of the shooting function we use the [DifferentiationInterface.jl](https://juliadiff.org/DifferentiationInterface.jl/DifferentiationInterface) package with [ForwardDiff.jl](https://juliadiff.org/ForwardDiff.jl) backend.
 
-```@setup main
+```@setup main-goddard
 using NonlinearSolve  # interface to NLE solvers
 struct MYSOL
     x::Vector{Float64}
@@ -320,29 +295,24 @@ Let us define the problem to solve.
 
 ```@example main-goddard
 # auxiliary function with aggregated inputs
-nle!  = ( s, ξ) -> shoot!(s, ξ[1:3], ξ[4], ξ[5], ξ[6], ξ[7])
+nle!(s, ξ) = shoot!(s, ξ[1:3], ξ[4], ξ[5], ξ[6], ξ[7])
 
 # Jacobian of the (auxiliary) shooting function
-jnle! = (js, ξ) -> jacobian!(nle!, similar(ξ), js, backend, ξ)
+jnle!(js, ξ) = jacobian!(nle!, similar(ξ), js, backend, ξ)
 nothing # hide
 ```
 
-We are now in position to solve the problem with the `hybrj` solver from MINPACK.jl through the `fsolve` 
-function, providing the Jacobian.
-Let us solve the problem and retrieve the initial costate solution.
+We are now in position to solve the problem with the `hybrj` solver from MINPACK.jl through the `fsolve` function, providing the Jacobian. Let us solve the problem and retrieve the initial costate solution.
 
 ```@example main-goddard
 # resolution of S(ξ) = 0
 indirect_sol = fsolve(nle!, jnle!, ξ, show_trace=true)
 
 # we retrieve the costate solution together with the times
-p0 = indirect_sol.x[1:3]
-t1 = indirect_sol.x[4]
-t2 = indirect_sol.x[5]
-t3 = indirect_sol.x[6]
-tf = indirect_sol.x[7]
+ξ = indirect_sol.x
+p0, t1, t2, t3, tf = ξ[1:3], ξ[4:end]...
 
-println("")
+println("MINPACK results:")
 println("p0 = ", p0)
 println("t1 = ", t1)
 println("t2 = ", t2)
@@ -355,50 +325,62 @@ shoot!(s, p0, t1, t2, t3, tf)
 println("\nNorm of the shooting function: ‖s‖ = ", norm(s), "\n")
 ```
 
-# Comparision with NonlinearSolve.jl
+### NonlinearSolve.jl
+
+Alternatively, we can use the [NonlinearSolve.jl](https://docs.sciml.ai/NonlinearSolve) package to solve the shooting equation. The code is similar, but we use the `solve` function instead of `fsolve`. Let us define the problem.
 
 ```@example main-goddard
-# NonlinearSolve resolution
-nle_new!(s, ξ, p) = shoot!(s, ξ[1:3], ξ[4], ξ[5], ξ[6], ξ[7])
-prob_nls = NonlinearProblem(nle_new!, ξ)
-sol_nls = solve(prob_nls; show_trace=Val(true))
+nle!(s, ξ, λ) = shoot!(s, ξ[1:3], ξ[4], ξ[5], ξ[6], ξ[7])
+prob = NonlinearProblem(nle!, ξ)
+nothing # hide
+```
 
-ξ_nls = sol_nls.u
-p0_nls = ξ_nls[1:3]
-t1 = ξ_nls[4]
-t2 = ξ_nls[5]
-t3 = ξ_nls[6]
-tf = ξ_nls[7]
+Now, let us solve the problem and retrieve the initial costate and times.
 
-println("\nNonlinearSolve results :")
-println("p0 = ", p0_nls)
+```@example main-goddard
+# resolution of S(ξ) = 0
+sol = solve(prob; show_trace=Val(true))
+
+# we retrieve the costate solution together with the times
+ξ = sol.u
+p0, t1, t2, t3, tf = ξ[1:3], ξ[4:end]...
+
+println("\nNonlinearSolve results:")
+println("p0 = ", p0)
 println("t1 = ", t1)
 println("t2 = ", t2)
 println("t3 = ", t3)
 println("tf = ", tf)
 
-s = similar(p0_nls, 7)
-shoot!(s, p0_nls, t1, t2, t3, tf)
-
+# Norm of the shooting function at solution
+s = similar(p0, 7)
+shoot!(s, p0, t1, t2, t3, tf)
 println("\nNorm of the shooting function: ‖s‖ = ", norm(s), "\n")
 ```
 
-The results found for the different parameters are extremely close so now, lets benchmark these two resolution to compare their performances.
+### Benchmarking
+
+The results found for by the two solvers are extremely close, so now, lets benchmark these two resolutions to compare their performances.
 
 ```@example main-goddard
-@benchmark fsolve(nle!, jnle!, ξ, show_trace=false) #MINPACK
+@benchmark fsolve(nle!, jnle!, ξ; tol=1e-8, show_trace=false) #MINPACK
 ```
 
 ```@example main-goddard
-@benchmark solve(prob_nls; show_trace=Val(false)) #NonlinearSolve
+@benchmark solve(prob; abstol=1e-8, reltol=1e-8, show_trace=Val(false)) # NonlinearSolve
 ```
 
-The MINPACK (fsolve) method is much faster than NonlinearSolve (solve) on this problem. It also uses less memory (1.95 GiB vs 6.10 GiB). Both methods have a similar GC overhead (~24–25%), but MINPACK is overall more efficient here.
+According to the NonlinearSolve documentation, for small nonlinear systems, it could be faster to use the [`SimpleNewtonRaphson()` descent algorithm](https://docs.sciml.ai/NonlinearSolve/stable/tutorials/code_optimization/). 
+
+```@example main-goddard
+@benchmark solve(prob, SimpleNewtonRaphson(); abstol=1e-8, reltol=1e-8, show_trace=Val(false)) # NonlinearSolve
+```
+
+MINPACK.jl (fsolve) is much faster than NonlinearSolve.jl (solve) on this problem. It also uses less memory. Both methods have a similar GC overhead, but MINPACK.jl is overall more efficient here.
 
 ## [Plot of the solution](@id tutorial-goddard-plot)
 
-We plot the solution of the indirect solution (in red) over the solution of the direct method 
-(in blue).
+We plot the solution of the indirect solution (in red) over the solution of the direct method (in blue).
 
 ```@example main-goddard
 f = f1 * (t1, fs) * (t2, fb) * (t3, f0) # concatenation of the flows
