@@ -1,14 +1,19 @@
 using Documenter
 using OptimalControl
 
-mkpath("./docs/src/assets")
-cp("./docs/Manifest.toml", "./docs/src/assets/Manifest.toml"; force=true)
-cp("./docs/Project.toml", "./docs/src/assets/Project.toml"; force=true)
+# For reproducibility
+mkpath(joinpath(@__DIR__, "src", "assets"))
+cp(joinpath(@__DIR__, "Manifest.toml"), joinpath(@__DIR__, "src", "assets", "Manifest.toml"), force = true)
+cp(joinpath(@__DIR__, "Project.toml"), joinpath(@__DIR__, "src", "assets", "Project.toml"), force = true)
 
 repo_url = "github.com/control-toolbox/Tutorials.jl"
 
 makedocs(;
     draft=false, # if draft is true, then the julia code from .md is not executed
+    # to disable the draft mode in a specific markdown file, use the following:
+    # ```@meta
+    # Draft = false
+    # ```
     warnonly=[:cross_references, :autodocs_block],
     sitename="Tutorials",
     format=Documenter.HTML(;
