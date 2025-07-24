@@ -3,6 +3,83 @@ In this tutorial, we will explore an example for constraints at intermediate tim
 We want to showcase use cases where we have some intermediate times with constraints associated to each one:
 
 
+## General Problem Formulation
+
+The optimal control problem is defined as:
+```math
+\min_{q,u} \int_{t_0}^{t_f} f_0(x(t), u(t)) dt 
+```
+
+Subject to the dynamic constraint:
+```math
+\dot{x}(t) = f(x(t), u(t)), \quad u(t) \in U
+```
+
+With boundary conditions:
+```math
+c_s(x(t_s)) = 0, \quad s = 0, ..., N
+```
+
+## Step-by-Step Derivation
+
+### Step 1: Time Discretization
+With discretization points:
+```math
+\text{avec} \quad t_0 < ... < t_k < ... < t_f = t_N
+```
+
+For N = 2, we define:
+```math
+ q_1(s) = x(t) \quad \text{pour } t \in [t_0, t_1]
+ q_2(s) = x(t_0^s) \quad \text{pour } s \in [t_1, t_2]
+
+```
+
+### Step 2: Discretized System
+
+
+Therefore:
+```math
+\Rightarrow  q_k(s) = x(\varphi_k(s)) \quad \text{for } s \in [0,1] \text{ and with } \varphi_k(s) = t_0 + (t_k - t_(k-1)s
+```
+
+Where:
+```math
+\varphi_1(s) = \varphi(t_0, t_1, s)
+```
+```math
+\varphi_2(s) = \varphi(t_1, t_2, s)
+```
+
+### Interpolation Functions
+The interpolation functions are defined as:
+```math
+\Rightarrow \psi(a,b,s) = a + (b-a)s
+```
+
+
+## Final Problem Definition
+
+**minimize:**
+```math
+\min_{q,v} \sum_{k=1}^{N} \Delta t_k \int_0^1 f_0(q_k(s), v_k(s)) ds 
+```
+
+**subject to:**
+```math
+q_k(s) = \Delta t_k  f(q_k(s), u_k(s)) ds \quad \forall s \in [0,1]
+```
+
+**with constraints:**
+```math
+c_s(q_1(0)) = 0
+```
+```math
+c_s(q_k(1)) = 0 \quad \forall k \in [0,N]
+```
+```math
+q_k(1) = q_{k+1}(0) \quad \forall k \in [0,N-1]
+```
 ## Example to modelize a trein passing through multiple stations 
 
 Necessary imports:
