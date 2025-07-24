@@ -1,5 +1,6 @@
 using Documenter
 using OptimalControl
+using DocumenterInterLinks
 
 # For reproducibility
 mkpath(joinpath(@__DIR__, "src", "assets"))
@@ -14,10 +15,18 @@ cp(
     force=true,
 )
 
+links = InterLinks(
+    "OptimalControl" => (
+        "https://control-toolbox.org/OptimalControl.jl/stable/",
+        "https://control-toolbox.org/OptimalControl.jl/stable/objects.inv",
+        joinpath(@__DIR__, "inventories", "OptimalControl.toml"),
+    ),
+)
+
 repo_url = "github.com/control-toolbox/Tutorials.jl"
 
 makedocs(;
-    draft=false, # if draft is true, then the julia code from .md is not executed
+    draft=true, # if draft is true, then the julia code from .md is not executed
     # to disable the draft mode in a specific markdown file, use the following:
     # ```@meta
     # Draft = false

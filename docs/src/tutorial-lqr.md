@@ -92,9 +92,9 @@ plot(px1, px2, pu, layout=(1, 3), size=(800, 300), leftmargin=5mm, bottommargin=
 
     We can observe that $x(t_f)$ converges to the origin as $t_f$ increases.
 
-## Limitations: using matrix formulation
+## Known issue
 
-The following definition will lead to an error when solving the problem:
+The following definition will lead to an error when solving the problem. This is a [known issue](@extref OptimalControl manual-abstract-known-issues).
 
 ```@repl main-lqr
 
