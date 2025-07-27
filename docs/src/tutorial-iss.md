@@ -2,10 +2,7 @@
 
 In this tutorial we present the indirect simple shooting method on a simple example.
 
-Let us start by importing the necessary packages.
-We import the [OptimalControl.jl](https://control-toolbox.org/OptimalControl.jl) package to define the optimal control problem. 
-We import the [Plots.jl](https://docs.juliaplots.org) package to plot the solution. 
-The [OrdinaryDiffEq.jl](https://docs.sciml.ai/OrdinaryDiffEq) package is used to define the shooting function for the indirect method and the [MINPACK.jl](https://github.com/sglyon/MINPACK.jl) package permits to solve the shooting equation.
+Let us start by importing the necessary packages. We import the [OptimalControl.jl](https://control-toolbox.org/OptimalControl.jl) package to define the optimal control problem.  We import the [Plots.jl](https://docs.juliaplots.org) package to plot the solution.  The [OrdinaryDiffEq.jl](https://docs.sciml.ai/OrdinaryDiffEq) package is used to define the shooting function for the indirect method and the [MINPACK.jl](https://github.com/sglyon/MINPACK.jl) package permits to solve the shooting equation.
 
 
 ```@example main-iss
@@ -159,9 +156,9 @@ nothing # hide
 
 ### MINPACK.jl
 
-We can use [NonlinearSolve.jl](https://docs.sciml.ai/NonlinearSolve) package or, instead, [MINPACK.jl](https://github.com/sglyon/MINPACK.jl) to solve the shooting equation. To compute the Jacobian of the shooting function we use [DifferentiationInterface.jl](https://juliadiff.org/DifferentiationInterface.jl/DifferentiationInterface) with [ForwardDiff.jl](https://juliadiff.org/ForwardDiff.jl) backend.
+We can use the [MINPACK.jl](https://github.com/sglyon/MINPACK.jl) to solve the shooting equation. To compute the Jacobian of the shooting function we use [DifferentiationInterface.jl](https://juliadiff.org/DifferentiationInterface.jl/DifferentiationInterface) with [ForwardDiff.jl](https://juliadiff.org/ForwardDiff.jl) backend.
 
-```@setup main
+```@setup main-iss
 using MINPACK
 function fsolve(f, j, x; kwargs...)
     try
@@ -190,8 +187,7 @@ jnle!(js, ξ) = jacobian!(nle!, similar(ξ), js, backend, ξ)  # Jacobian of nle
 nothing # hide
 ```
 
-We are now in position to solve the problem with the `hybrj` solver from MINPACK.jl through the `fsolve` function, providing the Jacobian.
-Let us solve the problem and retrieve the initial costate solution.
+We are now in position to solve the problem with the `hybrj` solver from MINPACK.jl through the `fsolve` function, providing the Jacobian. Let us solve the problem and retrieve the initial costate solution.
 
 ```@example main-iss
 sol = fsolve(nle!, jnle!, ξ; show_trace=true)    # resolution of S(p0) = 0
@@ -224,18 +220,17 @@ println("shoot: |S(p0)| = ", abs(S(p0_sol)), "\n")
 Let us benchmark the methods to solve the shooting equation.
 
 ```@example main-iss
-@benchmark fsolve(nle!, jnle!, ξ; show_trace=false) # MINPACK
+@benchmark fsolve(nle!, jnle!, ξ; tol=1e-8, show_trace=false) # MINPACK
 ```
 
 ```@example main-iss
-@benchmark solve(prob; show_trace=Val(false)) # NonlinearSolve
+@benchmark solve(prob; abstol=1e-8, reltol=1e-8, show_trace=Val(false)) # NonlinearSolve
 ```
 
-According to the NonlinearSolve documentation, for small nonlinear systems, it could be faster to use the 
-[`SimpleNewtonRaphson()` descent algorithm](https://docs.sciml.ai/NonlinearSolve/stable/tutorials/code_optimization/). 
+According to the NonlinearSolve documentation, for small nonlinear systems, it could be faster to use the [`SimpleNewtonRaphson()` descent algorithm](https://docs.sciml.ai/NonlinearSolve/stable/tutorials/code_optimization/). 
 
 ```@example main-iss
-@benchmark solve(prob, SimpleNewtonRaphson(); show_trace=Val(false)) # NonlinearSolve
+@benchmark solve(prob, SimpleNewtonRaphson(); abstol=1e-8, reltol=1e-8, show_trace=Val(false)) # NonlinearSolve
 ```
 
 ## Plot of the solution
