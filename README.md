@@ -22,7 +22,7 @@
 [blue-url]: https://github.com/JuliaDiff/BlueStyle
 
 This repo is part of the [control-toolbox ecosystem](https://github.com/control-toolbox).
-The control-toolbox ecosystem gathers Julia packages for mathematical control and applications. The root package is [OptimalControl.jl](https://github.com/control-toolbox/OptimalControl.jl) which aims to provide tools to model and solve optimal control problems with ordinary differential equations by direct and indirect methods.
+The control-toolbox ecosystem gathers Julia packages for mathematical control and applications. The root package is [OptimalControl.jl](https://github.com/control-toolbox/OptimalControl.jl) which aims to provide tools to model and solve optimal control problems with ordinary differential equations by direct and indirect methods, both on CPU and GPU.
 
 [![doc OptimalControl.jl](https://img.shields.io/badge/Documentation-OptimalControl.jl-blue)](http://control-toolbox.org/OptimalControl.jl)
 
@@ -47,4 +47,4 @@ You can find first good issues (if any 🙂) [here][first-good-issue-url]. You m
 If you want to ask a question, feel free to start a discussion [here](https://github.com/orgs/control-toolbox/discussions). This forum is for general discussion about this repository and the [control-toolbox organization](https://github.com/control-toolbox).
 
 >[!NOTE]
-> If you want to add an application or a package to the control-toolbox ecosystem, please follow this [set up tutorial](https://github.com/control-toolbox/Tutorials.jl/discussions/9).
+> If you want to add an application or a package to the control-toolbox ecosystem, please follow this [set up tutorial](https://github.com/orgs/control-toolbox/discussions/65).
