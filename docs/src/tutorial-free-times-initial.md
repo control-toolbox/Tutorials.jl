@@ -155,12 +155,12 @@ The **shooting function** encodes:
 
 ```@example initial_time
 function shoot!(s, p0, t1, t0)
-    x1, p1 = f_pos(t0, x0, p0, t1)
-    x2, p2 = f_neg(t1, x1, p1, tf)
+    x1, p1 = f_pos(t0, x0, p0, t1, t0)
+    x2, p2 = f_neg(t1, x1, p1, tf, t0)
 
-    s[1:2] = x2 - xf              # Final state match
-    s[3]   = H(x0, p0, u_pos) - 1 # Hamiltonian normalization
-    s[4]   = p1[2]                # Switching condition
+    s[1:2] = x2 - xf                    # Final state match
+    s[3]   = H(x0, p0, u_pos) - 1       # Hamiltonian normalization
+    s[4]   = p1[2]                      # Switching condition
 end
 nothing # hide
 ```
@@ -211,6 +211,6 @@ Compare with the direct solution:
 
 ```@example initial_time
 f = f_pos * (t1, f_neg)     # Concatenate bang-bang flow
-indirect_sol = f((t0, tf), x0, p0; saveat=range(t0, tf, 200))
+indirect_sol = f((t0, tf), x0, p0, t0; saveat=range(t0, tf, 200))
 plot!(plt, indirect_sol; label="indirect", color=:red, linestyle=:dash)
 ```
