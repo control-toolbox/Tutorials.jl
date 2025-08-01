@@ -115,6 +115,8 @@ stop_time_2 = 15.0  # seconds at station 2
 function phi(s, t_start, t_end)
     return t_start + (t_end - t_start) * s
 end
+nothing # hide
+
 ```
 Model defintion 
 ```@example main-cit
@@ -130,6 +132,8 @@ function tram_dynamics(t, position, velocity, control)
     # Return [position', velocity']
     return [velocity, acceleration]
 end
+nothing # hide
+
 ```
 ```@example main-cit
 
@@ -206,6 +210,8 @@ end
     ∫(acc1(s)^2 + acc2(s)^2 + acc3(s)^2) → min
     
 end
+nothing # hide
+
 ```
 ```@example main-cit
 
