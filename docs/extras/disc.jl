@@ -90,10 +90,10 @@ for adnlp_backend in backends
     println("Testing backend: ", adnlp_backend)
 
     # Discretize the problem with a large grid size and Gauss-Legendre method
-    bt = @btimed direct_transcription(
+    docp = @btimed direct_transcription(
         $ocp; disc_method=:euler, grid_size=1000, adnlp_backend=($adnlp_backend)
     )
-    docp, nlp = bt.value
+    nlp = model(docp)
     prepa_time = bt.time
 
     # Get the number of non-zero elements

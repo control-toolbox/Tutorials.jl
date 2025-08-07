@@ -45,7 +45,8 @@ nothing # hide
 We discretize the problem.
 
 ```@example main-nlp
-docp, nlp = direct_transcription(ocp)
+docp = direct_transcription(ocp)
+nlp = model(docp)
 nothing # hide
 ```
 
@@ -83,7 +84,8 @@ nlp_sol = madnlp(nlp)
 An initial guess, including warm start, can be passed to [`direct_transcription`](https://control-toolbox.org/OptimalControl.jl/stable/dev-ctdirect.html#CTDirect.direct_transcription-Tuple{Model,%20Vararg{Any}}) the same way as for `solve`.
 
 ```@example main-nlp
-docp, nlp = direct_transcription(ocp; init=sol)
+docp = direct_transcription(ocp; init=sol)
+nlp = model(nlp)
 nothing # hide
 ```
 
