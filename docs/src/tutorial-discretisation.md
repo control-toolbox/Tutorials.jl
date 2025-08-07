@@ -106,7 +106,8 @@ println(data)
 # Plot the results
 x_style = (legend=:none,)
 p_style = (legend=:none,)
-styles = (state_style=x_style, costate_style=p_style)
+u_style = (legend=:topright,)
+styles = (state_style=x_style, costate_style=p_style, control_style=u_style)
 
 scheme, sol = solutions[1]
 plt = plot(sol; label=string(scheme), styles...)

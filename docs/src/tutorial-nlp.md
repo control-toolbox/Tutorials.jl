@@ -42,15 +42,21 @@ nothing # hide
 
 ## Discretization and NLP problem
 
-We discretize the problem.
+We discretize the problem with [`direct_transcription`](@extref CTDirect.direct_transcription):
 
 ```@example main-nlp
 docp = direct_transcription(ocp)
+nothing # hide
+```
+
+and get the NLP model with [`model`](@extref CTDirect.model):
+
+```@example main-nlp
 nlp = model(docp)
 nothing # hide
 ```
 
-The DOCP contains information related to the transcription, including a copy of the original OCP, and the NLP is the resulting discretized problem, in our case an `ADNLPModel`.
+The DOCP contains information related to the transcription, including a copy of the original OCP, and the NLP is the resulting discretized nonlinear programming problem, in our case an `ADNLPModel`.
 
 We can now use the solver of our choice to solve it.
 
@@ -64,12 +70,17 @@ nlp_sol = ipopt(nlp; print_level=5, mu_strategy="adaptive", tol=1e-8, sb="yes")
 nothing # hide
 ```
 
-Then we can rebuild and plot an optimal control problem solution (note that the multipliers are optional, but the OCP costate will not be retrieved if the multipliers are not provided).
+Then, we can build an optimal control problem solution with [`build_OCP_solution`](@extref CTDirect.build_OCP_solution-Tuple{Any}) (note that the multipliers are optional, but the OCP costate will not be retrieved if the multipliers are not provided) and plot it.
 
 ```@example main-nlp
-sol = build_OCP_solution(docp; primal=nlp_sol.solution, dual=nlp_sol.multipliers)
+sol = build_OCP_solution(docp; 
+    primal=nlp_sol.solution, 
+    dual=nlp_sol.multipliers, 
+    docp_solution=nlp_sol
+)
 plot(sol)
 ```
+
 ## Change the NLP solver
 
 Alternatively, we can use [MadNLP.jl](https://madnlp.github.io/MadNLP.jl) to solve anew the NLP problem:
@@ -81,17 +92,16 @@ nlp_sol = madnlp(nlp)
 
 ## Initial guess
 
-An initial guess, including warm start, can be passed to [`direct_transcription`](https://control-toolbox.org/OptimalControl.jl/stable/dev-ctdirect.html#CTDirect.direct_transcription-Tuple{Model,%20Vararg{Any}}) the same way as for `solve`.
+An initial guess, including warm start, can be passed to [`direct_transcription`](@extref CTDirect.direct_transcription) the same way as for `solve`.
 
 ```@example main-nlp
 docp = direct_transcription(ocp; init=sol)
-nlp = model(nlp)
 nothing # hide
 ```
 
-It can also be changed after the transcription is done, with  [`set_initial_guess`](https://control-toolbox.org/OptimalControl.jl/stable/dev-ctdirect.html#CTDirect.set_initial_guess-Tuple{CTDirect.DOCP,%20Any,%20Any}).
+It can also be changed after the transcription is done, with  [`set_initial_guess`](@extref CTDirect.set_initial_guess).
 
 ```@example main-nlp
-set_initial_guess(docp, nlp, sol)
+set_initial_guess(docp, sol)
 nothing # hide
 ```

@@ -318,6 +318,7 @@ nothing # hide
 
 ```@raw html
 </details>
+</br>
 ```
 
 ```@example main-iss
