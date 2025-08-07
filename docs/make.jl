@@ -9,6 +9,11 @@ links = InterLinks(
         "https://control-toolbox.org/CTDirect.jl/stable/objects.inv",
         joinpath(@__DIR__, "inventories", "CTDirect.toml"),
     ),
+    "OptimalControl" => (
+        "https://control-toolbox.org/OptimalControl.jl/stable/",
+        "https://control-toolbox.org/OptimalControl.jl/stable/objects.inv",
+        joinpath(@__DIR__, "inventories", "OptimalControl.toml"),
+    ),
 )
 
 # For reproducibility

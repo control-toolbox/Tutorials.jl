@@ -94,7 +94,7 @@ plot(px1, px2, pu, layout=(1, 3), size=(800, 300), leftmargin=5mm, bottommargin=
 
 ## Known issues
 
-The following definition will lead to an error when solving the problem. See [Reverse over forward AD issues with ADNLP](https://github.com/control-toolbox/OptimalControl.jl/issues/481).
+The following definition will lead to an error when solving the problem. This is a [known issue](@extref OptimalControl manual-abstract-known-issues).
 
 ```@repl main-lqr
 
