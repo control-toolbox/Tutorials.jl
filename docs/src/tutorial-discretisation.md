@@ -147,11 +147,12 @@ backends = [:optimized, :manual]
 for adnlp_backend in backends
 
     # Discretize the problem with a large grid size and Gauss-Legendre method
-    docp = @btimed direct_transcription($ocp; 
+    bt = @btimed direct_transcription($ocp; 
         disc_method=:gauss_legendre_3, 
         grid_size=1000, 
         adnlp_backend=$adnlp_backend,
     )
+    docp = bt.value
     nlp = model(docp)
     prepa_time = bt.time
 
