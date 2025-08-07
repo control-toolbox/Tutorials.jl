@@ -106,7 +106,8 @@ println(data)
 # Plot the results
 x_style = (legend=:none,)
 p_style = (legend=:none,)
-styles = (state_style=x_style, costate_style=p_style)
+u_style = (legend=:topright,)
+styles = (state_style=x_style, costate_style=p_style, control_style=u_style)
 
 scheme, sol = solutions[1]
 plt = plot(sol; label=string(scheme), styles...)
@@ -152,7 +153,8 @@ for adnlp_backend in backends
         grid_size=1000, 
         adnlp_backend=$adnlp_backend,
     )
-    docp, nlp = bt.value
+    docp = bt.value
+    nlp = model(docp)
     prepa_time = bt.time
 
     # Get the number of non-zero elements

@@ -1,5 +1,20 @@
 using Documenter
+using DocumenterInterLinks
 using OptimalControl
+
+#
+links = InterLinks(
+    "CTDirect" => (
+        "https://control-toolbox.org/CTDirect.jl/stable/",
+        "https://control-toolbox.org/CTDirect.jl/stable/objects.inv",
+        joinpath(@__DIR__, "inventories", "CTDirect.toml"),
+    ),
+    "OptimalControl" => (
+        "https://control-toolbox.org/OptimalControl.jl/stable/",
+        "https://control-toolbox.org/OptimalControl.jl/stable/objects.inv",
+        joinpath(@__DIR__, "inventories", "OptimalControl.toml"),
+    ),
+)
 
 # For reproducibility
 mkpath(joinpath(@__DIR__, "src", "assets"))
@@ -46,6 +61,7 @@ makedocs(;
             "Model Predictive Control" => "tutorial-mpc.md",
         ],
     ],
+    plugins=[links],
 )
 
 deploydocs(; repo=repo_url * ".git", devbranch="main")
