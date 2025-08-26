@@ -34,9 +34,11 @@ repo_url = "github.com/control-toolbox/Tutorials.jl"
 makedocs(;
     draft=false, # if draft is true, then the julia code from .md is not executed
     # to disable the draft mode in a specific markdown file, use the following:
-    # ```@meta
-    # Draft = false
-    # ```
+#=
+```@meta
+Draft = false
+```
+=#
     warnonly=[:cross_references, :autodocs_block],
     sitename="Tutorials",
     format=Documenter.HTML(;
