@@ -11,6 +11,4 @@ The Tutorials.jl package is part of the [control-toolbox ecosystem](https://gith
 
 <!-- INCLUDE_ABOUT -->
 
-<!-- INCLUDE_INSTALL -->
-
 <!-- INCLUDE_CONTRIBUTING -->
