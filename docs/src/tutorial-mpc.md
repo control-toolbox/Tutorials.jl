@@ -1,3 +1,6 @@
+```@meta
+Draft = false
+```
 # Navigation problem, MPC approach
 
 We consider a ship in a constant current $w=(w_x,w_y)$, where $\|w\|<1$. 
