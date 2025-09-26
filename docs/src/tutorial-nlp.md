@@ -49,10 +49,10 @@ docp = direct_transcription(ocp)
 nothing # hide
 ```
 
-and get the NLP model with [`model`](@extref CTDirect.model):
+and get the NLP model with [`nlp_model`](@extref CTDirect.nlp_model):
 
 ```@example main-nlp
-nlp = model(docp)
+nlp = nlp_model(docp)
 nothing # hide
 ```
 

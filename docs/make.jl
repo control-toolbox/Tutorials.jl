@@ -39,7 +39,7 @@ Draft = false
 ```
 =#
 makedocs(;
-    draft=true,
+    draft=false,
     warnonly=[:cross_references, :autodocs_block],
     sitename="Tutorials",
     format=Documenter.HTML(;

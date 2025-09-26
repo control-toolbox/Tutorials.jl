@@ -93,7 +93,7 @@ for adnlp_backend in backends
     docp = @btimed direct_transcription(
         $ocp; disc_method=:euler, grid_size=1000, adnlp_backend=($adnlp_backend)
     )
-    nlp = model(docp)
+    nlp = nlp_model(docp)
     prepa_time = bt.time
 
     # Get the number of non-zero elements

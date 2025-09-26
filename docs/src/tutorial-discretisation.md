@@ -154,7 +154,7 @@ for adnlp_backend in backends
         adnlp_backend=$adnlp_backend,
     )
     docp = bt.value
-    nlp = model(docp)
+    nlp = nlp_model(docp)
     prepa_time = bt.time
 
     # Get the number of non-zero elements
