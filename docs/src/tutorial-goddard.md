@@ -1,6 +1,3 @@
-```@meta
-Draft = true
-```
 # [Direct and indirect methods for the Goddard problem](@id tutorial-goddard)
 
 ## Introduction

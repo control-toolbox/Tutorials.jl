@@ -1,6 +1,3 @@
-```@meta
-Draft = false
-```
 # Navigation problem, MPC approach
 
 We consider a ship in a constant current $w=(w_x,w_y)$, where $\|w\|<1$. 
@@ -146,15 +143,13 @@ function solve(t0, x0, y0, θ0, xf, yf, θf, w;
         u ∈ R, control
 
         -1 ≤ u(t) ≤ 1
-
-        -2 ≤ x(t) ≤ 6
+        -2 ≤ x(t) ≤ 4.25
         -2 ≤ y(t) ≤ 8
-        -2π ≤ x(t) ≤ 2π
 
         q(t0) == [x0, y0, θ0]
         q(tf) == [xf, yf, θf]
 
-        q̇(t) == [w[1]+cos(θ(t)), 
+        q̇(t) == [ w[1]+cos(θ(t)), 
                   w[2]+sin(θ(t)), 
                   u(t)]
 
@@ -403,40 +398,5 @@ plot(plt_q, plt_u;
     leftmargin=5mm, 
     bottommargin=5mm,
     plot_title="Simulation with Current Model"
-)
-```
-
-## Limitations
-
-If you use a discretization method other than `:euler`, the solver may converge to a local solution that is not globally optimal.
-
-```@example main-mpc
-# Resolution
-t, x, y, θ, u, tf, iter, cons = solve(t0, x0, y0, θ0, xf, yf, θf, current(x0, y0); 
-    display=false, disc_method=:gauss_legendre_3);
-
-println("Iterations: ", iter)
-println("Constraints violation: ", cons)
-println("tf: ", tf)
-```
-
-```@example main-mpc
-# Displaying the trajectory
-plt_q = plot(xlims=(-2, 6), ylims=(-1, 8), aspect_ratio=1, xlabel="x", ylabel="y")
-plot_state!(plt_q, x0, y0, θ0; color=2)
-plot_state!(plt_q, xf, yf, θf; color=2)
-plot_current!(plt_q; current=(x, y) -> current(x0, y0))
-plot_trajectory!(plt_q, t, x, y, θ)
-
-# Displaying the control
-plt_u = plot(t, u; color=1, legend=false, linewidth=2, xlabel="t", ylabel="u")
-
-# Final display
-plot(plt_q, plt_u; 
-    layout=(1, 2), 
-    size=(1200, 600),
-    leftmargin=5mm, 
-    bottommargin=5mm,
-    plot_title="Constant Current Simulation"
 )
 ```
