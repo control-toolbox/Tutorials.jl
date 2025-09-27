@@ -67,7 +67,7 @@ ocp = @def begin # definition of the optimal control problem
 
     ẋ(t) == F0(x(t)) + u(t) * F1(x(t))
 
-    r(tf) → max
+    -r(tf) → min
 
 end
 
@@ -95,7 +95,7 @@ nothing # hide
 We then solve it
 
 ```@example main-goddard
-direct_sol = solve(ocp; grid_size=100)
+direct_sol = solve(ocp; grid_size=250)
 nothing # hide
 ```
 

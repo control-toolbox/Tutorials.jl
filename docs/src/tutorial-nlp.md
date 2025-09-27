@@ -49,10 +49,10 @@ docp = direct_transcription(ocp)
 nothing # hide
 ```
 
-and get the NLP model with [`model`](@extref CTDirect.model):
+and get the NLP model with [`nlp_model`](@extref CTDirect.nlp_model):
 
 ```@example main-nlp
-nlp = model(docp)
+nlp = nlp_model(docp)
 nothing # hide
 ```
 
@@ -73,11 +73,7 @@ nothing # hide
 Then, we can build an optimal control problem solution with [`build_OCP_solution`](@extref CTDirect.build_OCP_solution-Tuple{Any}) (note that the multipliers are optional, but the OCP costate will not be retrieved if the multipliers are not provided) and plot it.
 
 ```@example main-nlp
-sol = build_OCP_solution(docp; 
-    primal=nlp_sol.solution, 
-    dual=nlp_sol.multipliers, 
-    docp_solution=nlp_sol
-)
+sol = build_OCP_solution(docp, nlp_sol)
 plot(sol)
 ```
 
@@ -87,7 +83,7 @@ Alternatively, we can use [MadNLP.jl](https://madnlp.github.io/MadNLP.jl) to sol
 
 ```@example main-nlp
 using MadNLP
-nlp_sol = madnlp(nlp)
+nlp_sol = madnlp(nlp; print_level=MadNLP.ERROR)
 ```
 
 ## Initial guess
