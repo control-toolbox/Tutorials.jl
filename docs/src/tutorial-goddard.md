@@ -67,7 +67,7 @@ ocp = @def begin # definition of the optimal control problem
 
     ẋ(t) == F0(x(t)) + u(t) * F1(x(t))
 
-    r(tf) → max
+    -r(tf) → min
 
 end
 
