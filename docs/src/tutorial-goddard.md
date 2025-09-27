@@ -95,7 +95,7 @@ nothing # hide
 We then solve it
 
 ```@example main-goddard
-direct_sol = solve(ocp; grid_size=250)
+direct_sol = solve(ocp; grid_size=200)
 nothing # hide
 ```
 
