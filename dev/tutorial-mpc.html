@@ -69,7 +69,7 @@ plt = plot(
 plot_state!(plt, x0, y0, θ0; color=2)
 plot_state!(plt, xf, yf, θf; color=2)
 annotate!([(x0, y0, (&quot;q₀&quot;, 12, :top)), (xf, yf, (&quot;qf&quot;, 12, :bottom))])
-plot_current!(plt)</code></pre><img src="tutorial-mpc-eb4b8176.svg" alt="Example block output"/><pre><code class="language-julia hljs">function plot_trajectory!(plt, t, x, y, θ; N=5) # N: number of points where we will display θ
+plot_current!(plt)</code></pre><img src="tutorial-mpc-892c97ad.svg" alt="Example block output"/><pre><code class="language-julia hljs">function plot_trajectory!(plt, t, x, y, θ; N=5) # N: number of points where we will display θ
 
     # trajectory
     plot!(plt, x.(t), y.(t), legend=false, color=1, linewidth=2, z_order=:front)
@@ -164,7 +164,7 @@ println(&quot;Iterations: &quot;, iter)
 println(&quot;Constraints violation: &quot;, cons)
 println(&quot;tf: &quot;, tf)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Iterations: 37
 Constraints violation: 7.126799150825036e-10
-tf: 9.969251026605559</code></pre><pre><code class="language-julia hljs"># Displaying the trajectory
+tf: 9.96925102660556</code></pre><pre><code class="language-julia hljs"># Displaying the trajectory
 plt_q = plot(xlims=(-2, 6), ylims=(-1, 8), aspect_ratio=1, xlabel=&quot;x&quot;, ylabel=&quot;y&quot;)
 plot_state!(plt_q, x0, y0, θ0; color=2)
 plot_state!(plt_q, xf, yf, θf; color=2)
@@ -181,7 +181,7 @@ plot(plt_q, plt_u;
     leftmargin=5mm,
     bottommargin=5mm,
     plot_title=&quot;Constant Current Simulation&quot;
-)</code></pre><img src="tutorial-mpc-1ad7f6cb.svg" alt="Example block output"/><h2 id="Simulation-of-the-Real-System"><a class="docs-heading-anchor" href="#Simulation-of-the-Real-System">Simulation of the Real System</a><a id="Simulation-of-the-Real-System-1"></a><a class="docs-heading-anchor-permalink" href="#Simulation-of-the-Real-System" title="Permalink"></a></h2><p>In the previous simulation, we assumed that the current is constant. However, from a practical standpoint, the current depends on the position <span>$(x, y)$</span>. Given a current model, provided by the function <code>current</code>, we can simulate the actual trajectory of the ship, as long as we have the initial condition and the control over time.</p><pre><code class="language-julia hljs">function realistic_trajectory(tf, t0, x0, y0, θ0, u, current; abstol=1e-12, reltol=1e-12, saveat=[])
+)</code></pre><img src="tutorial-mpc-c23f8e54.svg" alt="Example block output"/><h2 id="Simulation-of-the-Real-System"><a class="docs-heading-anchor" href="#Simulation-of-the-Real-System">Simulation of the Real System</a><a id="Simulation-of-the-Real-System-1"></a><a class="docs-heading-anchor-permalink" href="#Simulation-of-the-Real-System" title="Permalink"></a></h2><p>In the previous simulation, we assumed that the current is constant. However, from a practical standpoint, the current depends on the position <span>$(x, y)$</span>. Given a current model, provided by the function <code>current</code>, we can simulate the actual trajectory of the ship, as long as we have the initial condition and the control over time.</p><pre><code class="language-julia hljs">function realistic_trajectory(tf, t0, x0, y0, θ0, u, current; abstol=1e-12, reltol=1e-12, saveat=[])
 
     function rhs!(dq, q, dummy, t)
         x, y, θ = q
@@ -224,7 +224,7 @@ plot(plt_q, plt_u;
     leftmargin=5mm,
     bottommargin=5mm,
     plot_title=&quot;Simulation with Current Model&quot;
-)</code></pre><img src="tutorial-mpc-cc953026.svg" alt="Example block output"/><h2 id="MPC-Approach"><a class="docs-heading-anchor" href="#MPC-Approach">MPC Approach</a><a id="MPC-Approach-1"></a><a class="docs-heading-anchor-permalink" href="#MPC-Approach" title="Permalink"></a></h2><p>In practice, we do not have the actual current data for the entire trajectory in advance, which is why we will regularly recalculate the optimal control. The idea is to update the optimal control at regular time intervals, taking into account the current at the position where the ship is located. We are therefore led to solve a number of problems with constant current, with this being updated regularly. This is an introduction to the so-called Model Predictive Control (MPC) methods.</p><pre><code class="language-julia hljs">function MPC(t0, x0, y0, θ0, xf, yf, θf, current)
+)</code></pre><img src="tutorial-mpc-ba9b8591.svg" alt="Example block output"/><h2 id="MPC-Approach"><a class="docs-heading-anchor" href="#MPC-Approach">MPC Approach</a><a id="MPC-Approach-1"></a><a class="docs-heading-anchor-permalink" href="#MPC-Approach" title="Permalink"></a></h2><p>In practice, we do not have the actual current data for the entire trajectory in advance, which is why we will regularly recalculate the optimal control. The idea is to update the optimal control at regular time intervals, taking into account the current at the position where the ship is located. We are therefore led to solve a number of problems with constant current, with this being updated regularly. This is an introduction to the so-called Model Predictive Control (MPC) methods.</p><pre><code class="language-julia hljs">function MPC(t0, x0, y0, θ0, xf, yf, θf, current)
 
     Nmax = 20   # maximum number of iterations for the MPC method
     ε = 1e-1    # radius on the final condition to stop calculations
@@ -296,16 +296,16 @@ data = MPC(t0, x0, y0, θ0, xf, yf, θf, current)</code></pre><pre class="docume
      2      6.6190          57    2.1574e-11   11.5842
      3      6.8118          20    1.1545e-09   12.1924
      4      6.8057          87    4.0917e-10   12.4936
-     5      6.8369          29    5.2070e-10   12.6760
-     6      6.9041          27    9.9782e-11   12.8107
-     7      7.0071          63    2.8818e-10   12.9111
-     8      7.1405          24    3.6642e-10   12.9903
-     9      6.6825          41    2.4706e-11   13.3845
+     5      6.8369          29    5.2071e-10   12.6760
+     6      6.9041          27    9.9783e-11   12.8107
+     7      7.0071          60    5.4451e-10   12.9111
+     8      7.1405          24    3.5916e-10   12.9903
+     9      6.6825          41    1.1336e-11   13.3845
     10      5.5860          38    1.5091e-02   13.3741
-    11      3.9737          62    1.2698e-02   13.3546
-    12      2.1132          30    7.8360e-11   13.3118
-    13      0.4197         164    2.3183e-05   13.2949
-    14      0.0313          96    1.0292e-04   13.3051</code></pre><h2 id="Display"><a class="docs-heading-anchor" href="#Display">Display</a><a id="Display-1"></a><a class="docs-heading-anchor-permalink" href="#Display" title="Permalink"></a></h2><pre><code class="language-julia hljs"># Trajectory
+    11      3.9737          78    1.2698e-02   13.3546
+    12      2.1132          30    2.1120e-10   13.3118
+    13      0.4197         311    2.3189e-05   13.2949
+    14      0.0313         133    1.0309e-04   13.3051</code></pre><h2 id="Display"><a class="docs-heading-anchor" href="#Display">Display</a><a id="Display-1"></a><a class="docs-heading-anchor-permalink" href="#Display" title="Permalink"></a></h2><pre><code class="language-julia hljs"># Trajectory
 plt_q = plot(xlims=(-2, 6), ylims=(-1, 8), aspect_ratio=1, xlabel=&quot;x&quot;, ylabel=&quot;y&quot;)
 
 # Final condition
@@ -346,4 +346,4 @@ plot(plt_q, plt_u;
     leftmargin=5mm,
     bottommargin=5mm,
     plot_title=&quot;Simulation with Current Model&quot;
-)</code></pre><img src="tutorial-mpc-99d9a8ab.svg" alt="Example block output"/></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="tutorial-mam.html">« Minimal action</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.14.1 on <span class="colophon-date" title="Saturday 27 September 2025 21:04">Saturday 27 September 2025</span>. Using Julia version 1.11.7.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+)</code></pre><img src="tutorial-mpc-12b5b08b.svg" alt="Example block output"/></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="tutorial-mam.html">« Minimal action</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.14.1 on <span class="colophon-date" title="Sunday 28 September 2025 10:34">Sunday 28 September 2025</span>. Using Julia version 1.11.7.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
