@@ -127,9 +127,9 @@ Number of inequality constraint evaluations          = 0
 Number of equality constraint Jacobian evaluations   = 32
 Number of inequality constraint Jacobian evaluations = 0
 Number of Lagrangian Hessian evaluations             = 31
-Total seconds in IPOPT                               = 2.374
+Total seconds in IPOPT                               = 2.346
 
-EXIT: Optimal Solution Found.</code></pre><p>and plot the solution</p><pre><code class="language-julia hljs">plt = plot(direct_sol, label=&quot;direct&quot;, size=(800, 800))</code></pre><img src="tutorial-goddard-bbfa22be.svg" alt="Example block output"/><h2 id="tutorial-goddard-structure"><a class="docs-heading-anchor" href="#tutorial-goddard-structure">Structure of the solution</a><a id="tutorial-goddard-structure-1"></a><a class="docs-heading-anchor-permalink" href="#tutorial-goddard-structure" title="Permalink"></a></h2><p>We first determine visually the structure of the optimal solution which is composed of a bang arc with maximal control, followed by a singular arc, then by a boundary arc and the final arc is with zero control. Note that the switching function vanishes along the singular and boundary arcs.</p><pre><code class="language-julia hljs">t = time_grid(direct_sol)   # the time grid as a vector
+EXIT: Optimal Solution Found.</code></pre><p>and plot the solution</p><pre><code class="language-julia hljs">plt = plot(direct_sol, label=&quot;direct&quot;, size=(800, 800))</code></pre><img src="tutorial-goddard-c0bcbeec.svg" alt="Example block output"/><h2 id="tutorial-goddard-structure"><a class="docs-heading-anchor" href="#tutorial-goddard-structure">Structure of the solution</a><a id="tutorial-goddard-structure-1"></a><a class="docs-heading-anchor-permalink" href="#tutorial-goddard-structure" title="Permalink"></a></h2><p>We first determine visually the structure of the optimal solution which is composed of a bang arc with maximal control, followed by a singular arc, then by a boundary arc and the final arc is with zero control. Note that the switching function vanishes along the singular and boundary arcs.</p><pre><code class="language-julia hljs">t = time_grid(direct_sol)   # the time grid as a vector
 x = state(direct_sol)       # the state as a function of time
 u = control(direct_sol)     # the control as a function of time
 p = costate(direct_sol)     # the costate as a function of time
@@ -142,7 +142,7 @@ u_plot  = plot(t, u,     linewidth=2, label = &quot;u(t)&quot;)
 H1_plot = plot(t, φ,     linewidth=2, label = &quot;H₁(x(t), p(t))&quot;)
 g_plot  = plot(t, g ∘ x, linewidth=2, label = &quot;g(x(t))&quot;)
 
-plot(u_plot, H1_plot, g_plot, layout=(3,1), size=(600, 600))</code></pre><img src="tutorial-goddard-27dbd524.svg" alt="Example block output"/><p>We are now in position to solve the problem by an indirect shooting method. We first define the four control laws in feedback form and their associated flows. For this we need to compute some Lie derivatives, namely <a href="https://en.wikipedia.org/wiki/Poisson_bracket">Poisson brackets</a> of Hamiltonians (themselves obtained as lifts to the cotangent bundle of vector fields), or derivatives of functions along a vector field. For instance, the control along the <em>minimal order</em> singular arcs is obtained as the quotient</p><p class="math-container">\[u_s = -\frac{H_{001}}{H_{101}}\]</p><p>of length three Poisson brackets:</p><p class="math-container">\[H_{001} = \{H_0,\{H_0,H_1\}\}, \quad H_{101} = \{H_1,\{H_0,H_1\}\}\]</p><p>where, for two Hamiltonians <span>$H$</span> and <span>$G$</span>,</p><p class="math-container">\[\{H,G\} := (\nabla_p H|\nabla_x G) - (\nabla_x H|\nabla_p G).\]</p><p>While the Lie derivative of a function <span>$f$</span> <em>wrt.</em> a vector field <span>$X$</span> is simply obtained as</p><p class="math-container">\[(X \cdot f)(x) := f&#39;(x) \cdot X(x),\]</p><p>and is used to the compute the control along the boundary arc,</p><p class="math-container">\[u_b(x) = -(F_0 \cdot g)(x) / (F_1 \cdot g)(x),\]</p><p>as well as the associated multiplier for the <em>order one</em> state constraint on the velocity:</p><p class="math-container">\[\mu(x, p) = H_{01}(x, p) / (F_1 \cdot g)(x).\]</p><div class="admonition is-info" id="Poisson-bracket-and-Lie-derivative-1dba42dec39fe2e1"><header class="admonition-header">Poisson bracket and Lie derivative<a class="admonition-anchor" href="#Poisson-bracket-and-Lie-derivative-1dba42dec39fe2e1" title="Permalink"></a></header><div class="admonition-body"><p>The Poisson bracket <span>$\{H,G\}$</span> is also given by the Lie derivative of <span>$G$</span> along the Hamiltonian vector field <span>$X_H = (\nabla_p H, -\nabla_x H)$</span> of <span>$H$</span>, that is</p><p class="math-container">\[    \{H,G\} = X_H \cdot G\]</p><p>which is the reason why we use the <code>@Lie</code> macro to compute Poisson brackets below.</p></div></div><p>With the help of differential geometry primitives, these expressions are straightforwardly translated into Julia code:</p><pre><code class="language-julia hljs"># Controls
+plot(u_plot, H1_plot, g_plot, layout=(3,1), size=(600, 600))</code></pre><img src="tutorial-goddard-d89038f0.svg" alt="Example block output"/><p>We are now in position to solve the problem by an indirect shooting method. We first define the four control laws in feedback form and their associated flows. For this we need to compute some Lie derivatives, namely <a href="https://en.wikipedia.org/wiki/Poisson_bracket">Poisson brackets</a> of Hamiltonians (themselves obtained as lifts to the cotangent bundle of vector fields), or derivatives of functions along a vector field. For instance, the control along the <em>minimal order</em> singular arcs is obtained as the quotient</p><p class="math-container">\[u_s = -\frac{H_{001}}{H_{101}}\]</p><p>of length three Poisson brackets:</p><p class="math-container">\[H_{001} = \{H_0,\{H_0,H_1\}\}, \quad H_{101} = \{H_1,\{H_0,H_1\}\}\]</p><p>where, for two Hamiltonians <span>$H$</span> and <span>$G$</span>,</p><p class="math-container">\[\{H,G\} := (\nabla_p H|\nabla_x G) - (\nabla_x H|\nabla_p G).\]</p><p>While the Lie derivative of a function <span>$f$</span> <em>wrt.</em> a vector field <span>$X$</span> is simply obtained as</p><p class="math-container">\[(X \cdot f)(x) := f&#39;(x) \cdot X(x),\]</p><p>and is used to the compute the control along the boundary arc,</p><p class="math-container">\[u_b(x) = -(F_0 \cdot g)(x) / (F_1 \cdot g)(x),\]</p><p>as well as the associated multiplier for the <em>order one</em> state constraint on the velocity:</p><p class="math-container">\[\mu(x, p) = H_{01}(x, p) / (F_1 \cdot g)(x).\]</p><div class="admonition is-info" id="Poisson-bracket-and-Lie-derivative-1dba42dec39fe2e1"><header class="admonition-header">Poisson bracket and Lie derivative<a class="admonition-anchor" href="#Poisson-bracket-and-Lie-derivative-1dba42dec39fe2e1" title="Permalink"></a></header><div class="admonition-body"><p>The Poisson bracket <span>$\{H,G\}$</span> is also given by the Lie derivative of <span>$G$</span> along the Hamiltonian vector field <span>$X_H = (\nabla_p H, -\nabla_x H)$</span> of <span>$H$</span>, that is</p><p class="math-container">\[    \{H,G\} = X_H \cdot G\]</p><p>which is the reason why we use the <code>@Lie</code> macro to compute Poisson brackets below.</p></div></div><p>With the help of differential geometry primitives, these expressions are straightforwardly translated into Julia code:</p><pre><code class="language-julia hljs"># Controls
 const u0 = 0                            # off control
 const u1 = 1                            # bang control
 
@@ -200,7 +200,7 @@ t2 = 0.059784728938051694
 t3 = 0.10179561954316911
 tf = 0.201975435601526
 
-Norm of the shooting function: ‖s‖ = 1.89153053767089</code></pre><h2 id="Indirect-shooting"><a class="docs-heading-anchor" href="#Indirect-shooting">Indirect shooting</a><a id="Indirect-shooting-1"></a><a class="docs-heading-anchor-permalink" href="#Indirect-shooting" title="Permalink"></a></h2><p>We aggregate the data to define the initial guess vector.</p><pre><code class="language-julia hljs">ξ = [p0..., t1, t2, t3, tf] # initial guess</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">7-element Vector{Float64}:
+Norm of the shooting function: ‖s‖ = 1.89153053767089</code></pre><h2 id="Indirect-shooting"><a class="docs-heading-anchor" href="#Indirect-shooting">Indirect shooting</a><a id="Indirect-shooting-1"></a><a class="docs-heading-anchor-permalink" href="#Indirect-shooting" title="Permalink"></a></h2><p>We aggregate the data to define the initial guess vector.</p><pre><code class="language-julia hljs">ξ_guess = [p0..., t1, t2, t3, tf] # initial guess</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">7-element Vector{Float64}:
  3.9468316195476345
  0.1489103074249966
  0.05396551620088598
@@ -210,11 +210,11 @@ Norm of the shooting function: ‖s‖ = 1.89153053767089</code></pre><h2 id="In
  0.201975435601526</code></pre><h3 id="MINPACK.jl"><a class="docs-heading-anchor" href="#MINPACK.jl">MINPACK.jl</a><a id="MINPACK.jl-1"></a><a class="docs-heading-anchor-permalink" href="#MINPACK.jl" title="Permalink"></a></h3><p>We can use the <a href="https://github.com/sglyon/MINPACK.jl">MINPACK.jl</a> package to solve the shooting equation. To compute the Jacobian of the shooting function we use the <a href="https://juliadiff.org/DifferentiationInterface.jl/DifferentiationInterface">DifferentiationInterface.jl</a> package with <a href="https://juliadiff.org/ForwardDiff.jl">ForwardDiff.jl</a> backend.</p><pre><code class="language-julia hljs">using DifferentiationInterface
 import ForwardDiff
 backend = AutoForwardDiff()</code></pre><p>Let us define the problem to solve.</p><pre><code class="language-julia hljs"># auxiliary function with aggregated inputs
-nle!(s, ξ) = shoot!(s, ξ[1:3], ξ[4], ξ[5], ξ[6], ξ[7])
+shoot!(s, ξ) = shoot!(s, ξ[1:3], ξ[4], ξ[5], ξ[6], ξ[7])
 
 # Jacobian of the (auxiliary) shooting function
-jnle!(js, ξ) = jacobian!(nle!, similar(ξ), js, backend, ξ)</code></pre><p>We are now in position to solve the problem with the <code>hybrj</code> solver from MINPACK.jl through the <code>fsolve</code> function, providing the Jacobian. Let us solve the problem and retrieve the initial costate solution.</p><pre><code class="language-julia hljs"># resolution of S(ξ) = 0
-indirect_sol = fsolve(nle!, jnle!, ξ, show_trace=true)
+jshoot!(js, ξ) = jacobian!(shoot!, similar(ξ), js, backend, ξ)</code></pre><p>We are now in position to solve the problem with the <code>hybrj</code> solver from MINPACK.jl through the <code>fsolve</code> function, providing the Jacobian. Let us solve the problem and retrieve the initial costate solution.</p><pre><code class="language-julia hljs"># resolution of S(ξ) = 0
+indirect_sol = fsolve(shoot!, jshoot!, ξ_guess, show_trace=true)
 
 # we retrieve the costate solution together with the times
 ξ = indirect_sol.x
@@ -232,21 +232,21 @@ s = similar(p0, 7)
 shoot!(s, p0, t1, t2, t3, tf)
 println(&quot;\nNorm of the shooting function: ‖s‖ = &quot;, norm(s), &quot;\n&quot;)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Iter     f(x) inf-norm    Step 2-norm      Step time
 ------   --------------   --------------   --------------
-     1     1.889076e+00     0.000000e+00         0.310746
-     2     6.350508e-02     3.864675e-03        76.059030
-     3     2.263138e-02     1.051893e-03         0.050050
-     4     8.512761e-03     7.573554e-04         0.027178
-     5     1.089271e-03     1.621993e-07         0.027374
-     6     1.731769e-03     6.487972e-07         0.031912
-     7     5.837735e-05     1.459778e-06         0.027072
-     8     7.127584e-05     6.305374e-08         0.026394
-     9     2.930423e-05     2.262040e-09         0.029789
-    10     5.289525e-07     8.272193e-11         0.026652
-    11     6.800537e-07     2.274797e-12         0.025702
-    12     6.249775e-08     4.748231e-14         0.029680
-    13     1.955008e-09     2.216391e-15         0.027466
-    14     1.653990e-09     3.439269e-17         0.026397
-    15     2.799487e-10     2.120811e-19         0.033055
+     1     1.889076e+00     0.000000e+00         0.267547
+     2     6.350508e-02     3.864675e-03        75.583660
+     3     2.263138e-02     1.051893e-03         0.053888
+     4     8.512761e-03     7.573554e-04         0.029029
+     5     1.089271e-03     1.621993e-07         0.027310
+     6     1.731769e-03     6.487972e-07         0.030517
+     7     5.837735e-05     1.459778e-06         0.026405
+     8     7.127584e-05     6.305374e-08         0.026050
+     9     2.930423e-05     2.262040e-09         0.029750
+    10     5.289525e-07     8.272193e-11         0.026931
+    11     6.800537e-07     2.274797e-12         0.026331
+    12     6.249775e-08     4.748231e-14         0.031243
+    13     1.955008e-09     2.216391e-15         0.026508
+    14     1.653990e-09     3.439269e-17         0.026576
+    15     2.799487e-10     2.120811e-19         0.030571
 MINPACK results:
 p0 = [3.945764658782372, 0.15039559623313814, 0.053712712940267554]
 t1 = 0.023509684043467996
@@ -254,8 +254,8 @@ t2 = 0.059737380895502214
 t3 = 0.10157134842357175
 tf = 0.20204744057153257
 
-Norm of the shooting function: ‖s‖ = 2.806026133827754e-10</code></pre><h3 id="NonlinearSolve.jl"><a class="docs-heading-anchor" href="#NonlinearSolve.jl">NonlinearSolve.jl</a><a id="NonlinearSolve.jl-1"></a><a class="docs-heading-anchor-permalink" href="#NonlinearSolve.jl" title="Permalink"></a></h3><p>Alternatively, we can use the <a href="https://docs.sciml.ai/NonlinearSolve">NonlinearSolve.jl</a> package to solve the shooting equation. The code is similar, but we use the <code>solve</code> function instead of <code>fsolve</code>. Let us define the problem.</p><pre><code class="language-julia hljs">nle!(s, ξ, λ) = shoot!(s, ξ[1:3], ξ[4], ξ[5], ξ[6], ξ[7])
-prob = NonlinearProblem(nle!, ξ)</code></pre><p>Now, let us solve the problem and retrieve the initial costate and times.</p><pre><code class="language-julia hljs"># resolution of S(ξ) = 0
+Norm of the shooting function: ‖s‖ = 2.806026133827754e-10</code></pre><h3 id="NonlinearSolve.jl"><a class="docs-heading-anchor" href="#NonlinearSolve.jl">NonlinearSolve.jl</a><a id="NonlinearSolve.jl-1"></a><a class="docs-heading-anchor-permalink" href="#NonlinearSolve.jl" title="Permalink"></a></h3><p>Alternatively, we can use the <a href="https://docs.sciml.ai/NonlinearSolve">NonlinearSolve.jl</a> package to solve the shooting equation. The code is similar, but we use the <code>solve</code> function instead of <code>fsolve</code>. Let us define the problem.</p><pre><code class="language-julia hljs">shoot!(s, ξ, λ) = shoot!(s, ξ[1:3], ξ[4], ξ[5], ξ[6], ξ[7])
+prob = NonlinearProblem(shoot!, ξ_guess)</code></pre><p>Now, let us solve the problem and retrieve the initial costate and times.</p><pre><code class="language-julia hljs"># resolution of S(ξ) = 0
 sol = solve(prob; show_trace=Val(true))
 
 # we retrieve the costate solution together with the times
@@ -286,58 +286,65 @@ Algorithm: NewtonRaphson(
 ----    	-------------       	-----------
 Iter    	f(u) inf-norm       	Step 2-norm
 ----    	-------------       	-----------
-0       	2.79948731e-10      	0.00000000e+00
-1       	9.31921207e-13      	9.27756239e-11
-2       	2.41862086e-12      	8.75747124e-13
-3       	2.80708790e-12      	4.57602928e-13
-4       	2.28239649e-12      	1.70561783e-13
-5       	6.05404615e-13      	2.28518213e-13
-6       	3.99236200e-13      	5.30109006e-13
-7       	2.95441449e-12      	6.21560019e-13
-8       	7.37299111e-13      	6.97798863e-13
-9       	1.01163522e-12      	2.58174013e-13
-10      	6.49258425e-13      	3.51969156e-13
-11      	3.04867243e-13      	6.82443109e-13
-12      	1.41164858e-12      	1.27720120e-13
-13      	1.66311409e-13      	5.59267552e-13
-Final   	1.66311409e-13
+0       	1.88907616e+00      	0.00000000e+00
+1       	6.35050789e-02      	6.21665070e-02
+2       	5.18764339e-03      	6.17289944e-02
+3       	4.50670873e-07      	6.84174864e-04
+4       	4.72311079e-12      	6.54262099e-08
+5       	7.30415728e-13      	6.06824069e-13
+6       	3.06532577e-13      	7.65303292e-13
+7       	8.83959572e-13      	4.28044027e-13
+8       	3.24407168e-13      	6.19707926e-14
+9       	7.24864613e-13      	4.21693185e-13
+10      	3.44280160e-13      	3.00746471e-13
+11      	9.36029032e-13      	2.83305329e-13
+12      	1.71673786e-12      	3.01997890e-13
+13      	9.81770221e-13      	3.83119254e-13
+14      	2.05457873e-12      	1.33989338e-13
+15      	1.84785520e-12      	1.42924398e-14
+16      	9.50128864e-13      	2.02172381e-13
+17      	1.34281475e-12      	6.14221970e-13
+18      	9.29478716e-13      	6.53045424e-13
+19      	6.51700915e-13      	8.74552815e-13
+20      	1.25122135e-13      	9.84958197e-13
+Final   	1.25122135e-13
 ----------------------
 
 NonlinearSolve results:
-p0 = [3.945764658689667, 0.1503955962316677, 0.05371271293970554]
-t1 = 0.023509684041884617
-t2 = 0.059737380899857674
-t3 = 0.10157134842431312
-tf = 0.20204744057099894
+p0 = [3.9457646586891744, 0.15039559623165552, 0.05371271293970545]
+t1 = 0.023509684041879215
+t2 = 0.059737380899876
+t3 = 0.10157134842432228
+tf = 0.20204744057100849
 
-Norm of the shooting function: ‖s‖ = 1.7874354678469828e-13</code></pre><h3 id="Benchmarking"><a class="docs-heading-anchor" href="#Benchmarking">Benchmarking</a><a id="Benchmarking-1"></a><a class="docs-heading-anchor-permalink" href="#Benchmarking" title="Permalink"></a></h3><p>The results found for by the two solvers are extremely close, so now, lets benchmark these two resolutions to compare their performances.</p><pre><code class="language-julia hljs">@benchmark fsolve(nle!, jnle!, ξ; tol=1e-8, show_trace=false) #MINPACK</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">BenchmarkTools.Trial: 21 samples with 1 evaluation per sample.
- Range <span class="sgr90">(</span><span class="sgr36"><span class="sgr1">min</span></span> … <span class="sgr35">max</span><span class="sgr90">):  </span><span class="sgr36"><span class="sgr1">224.306 ms</span></span> … <span class="sgr35">300.480 ms</span>  <span class="sgr90">┊</span> GC <span class="sgr90">(</span>min … max<span class="sgr90">): </span>15.55% … 3.83%
- Time  <span class="sgr90">(</span><span class="sgr34"><span class="sgr1">median</span></span><span class="sgr90">):     </span><span class="sgr34"><span class="sgr1">236.417 ms               </span></span><span class="sgr90">┊</span> GC <span class="sgr90">(</span>median<span class="sgr90">):    </span>17.16%
- Time  <span class="sgr90">(</span><span class="sgr32"><span class="sgr1">mean</span></span> ± <span class="sgr32">σ</span><span class="sgr90">):   </span><span class="sgr32"><span class="sgr1">239.865 ms</span></span> ± <span class="sgr32"> 16.353 ms</span>  <span class="sgr90">┊</span> GC <span class="sgr90">(</span>mean ± σ<span class="sgr90">):  </span>15.47% ± 4.22%
+Norm of the shooting function: ‖s‖ = 1.455748787884998e-13</code></pre><h3 id="Benchmarking"><a class="docs-heading-anchor" href="#Benchmarking">Benchmarking</a><a id="Benchmarking-1"></a><a class="docs-heading-anchor-permalink" href="#Benchmarking" title="Permalink"></a></h3><p>The results found for by the two solvers are extremely close, so now, lets benchmark these two resolutions to compare their performances.</p><pre><code class="language-julia hljs">@benchmark fsolve(shoot!, jshoot!, ξ_guess; tol=1e-8, show_trace=false) #MINPACK</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">BenchmarkTools.Trial: 9 samples with 1 evaluation per sample.
+ Range <span class="sgr90">(</span><span class="sgr36"><span class="sgr1">min</span></span> … <span class="sgr35">max</span><span class="sgr90">):  </span><span class="sgr36"><span class="sgr1">576.924 ms</span></span> … <span class="sgr35">684.521 ms</span>  <span class="sgr90">┊</span> GC <span class="sgr90">(</span>min … max<span class="sgr90">): </span>17.37% … 4.68%
+ Time  <span class="sgr90">(</span><span class="sgr34"><span class="sgr1">median</span></span><span class="sgr90">):     </span><span class="sgr34"><span class="sgr1">588.566 ms               </span></span><span class="sgr90">┊</span> GC <span class="sgr90">(</span>median<span class="sgr90">):    </span>17.82%
+ Time  <span class="sgr90">(</span><span class="sgr32"><span class="sgr1">mean</span></span> ± <span class="sgr32">σ</span><span class="sgr90">):   </span><span class="sgr32"><span class="sgr1">599.183 ms</span></span> ± <span class="sgr32"> 32.942 ms</span>  <span class="sgr90">┊</span> GC <span class="sgr90">(</span>mean ± σ<span class="sgr90">):  </span>16.29% ± 4.45%
 
-        █ ▁<span class="sgr34">█</span>▁ <span class="sgr32"> </span>▁                                                 
-  ▆▆▁▁▁▁█▆█<span class="sgr34">█</span>█▆<span class="sgr32">▁</span>█▆▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▆▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▆ ▁
-  224 ms<span class="sgr90">           Histogram: frequency by time</span>          300 ms <span class="sgr1">&lt;</span>
+  ▁▁ ▁  <span class="sgr34">█</span>   ▁ █<span class="sgr32"> </span>                                              ▁  
+  ██▁█▁▁<span class="sgr34">█</span>▁▁▁█▁█<span class="sgr32">▁</span>▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁█ ▁
+  577 ms<span class="sgr90">           Histogram: frequency by time</span>          685 ms <span class="sgr1">&lt;</span>
 
- Memory estimate<span class="sgr90">: </span><span class="sgr33">652.93 MiB</span>, allocs estimate<span class="sgr90">: </span><span class="sgr33">314904</span>.</code></pre><pre><code class="language-julia hljs">@benchmark solve(prob; abstol=1e-8, reltol=1e-8, show_trace=Val(false)) # NonlinearSolve</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">BenchmarkTools.Trial: 11 samples with 1 evaluation per sample.
- Range <span class="sgr90">(</span><span class="sgr36"><span class="sgr1">min</span></span> … <span class="sgr35">max</span><span class="sgr90">):  </span><span class="sgr36"><span class="sgr1">467.883 ms</span></span> … <span class="sgr35">560.719 ms</span>  <span class="sgr90">┊</span> GC <span class="sgr90">(</span>min … max<span class="sgr90">): </span>18.32% … 3.06%
- Time  <span class="sgr90">(</span><span class="sgr34"><span class="sgr1">median</span></span><span class="sgr90">):     </span><span class="sgr34"><span class="sgr1">485.146 ms               </span></span><span class="sgr90">┊</span> GC <span class="sgr90">(</span>median<span class="sgr90">):    </span>18.03%
- Time  <span class="sgr90">(</span><span class="sgr32"><span class="sgr1">mean</span></span> ± <span class="sgr32">σ</span><span class="sgr90">):   </span><span class="sgr32"><span class="sgr1">495.070 ms</span></span> ± <span class="sgr32"> 28.795 ms</span>  <span class="sgr90">┊</span> GC <span class="sgr90">(</span>mean ± σ<span class="sgr90">):  </span>17.30% ± 5.08%
+ Memory estimate<span class="sgr90">: </span><span class="sgr33">1.51 GiB</span>, allocs estimate<span class="sgr90">: </span><span class="sgr33">1647598</span>.</code></pre><pre><code class="language-julia hljs">@benchmark solve(prob; abstol=1e-8, reltol=1e-8, show_trace=Val(false)) # NonlinearSolve</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">BenchmarkTools.Trial: 5 samples with 1 evaluation per sample.
+ Range <span class="sgr90">(</span><span class="sgr36"><span class="sgr1">min</span></span> … <span class="sgr35">max</span><span class="sgr90">):  </span><span class="sgr36"><span class="sgr1">1.024 s</span></span> … <span class="sgr35">  1.174 s</span>  <span class="sgr90">┊</span> GC <span class="sgr90">(</span>min … max<span class="sgr90">): </span>17.25% … 9.89%
+ Time  <span class="sgr90">(</span><span class="sgr34"><span class="sgr1">median</span></span><span class="sgr90">):     </span><span class="sgr34"><span class="sgr1">1.031 s              </span></span><span class="sgr90">┊</span> GC <span class="sgr90">(</span>median<span class="sgr90">):    </span>17.14%
+ Time  <span class="sgr90">(</span><span class="sgr32"><span class="sgr1">mean</span></span> ± <span class="sgr32">σ</span><span class="sgr90">):   </span><span class="sgr32"><span class="sgr1">1.065 s</span></span> ± <span class="sgr32">63.813 ms</span>  <span class="sgr90">┊</span> GC <span class="sgr90">(</span>mean ± σ<span class="sgr90">):  </span>15.63% ± 3.30%
 
-  ██  ███<span class="sgr34"> </span>   █   █  <span class="sgr32"> </span>█            █     █                     █  
-  ██▁▁███<span class="sgr34">▁</span>▁▁▁█▁▁▁█▁▁<span class="sgr32">▁</span>█▁▁▁▁▁▁▁▁▁▁▁▁█▁▁▁▁▁█▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁█ ▁
-  468 ms<span class="sgr90">           Histogram: frequency by time</span>          561 ms <span class="sgr1">&lt;</span>
+  <span class="sgr34">█</span> ▁             <span class="sgr32"> </span> ▁                                     ▁  
+  <span class="sgr34">█</span>▁█▁▁▁▁▁▁▁▁▁▁▁▁▁<span class="sgr32">▁</span>▁█▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁█ ▁
+  1.02 s<span class="sgr90">         Histogram: frequency by time</span>        1.17 s <span class="sgr1">&lt;</span>
 
- Memory estimate<span class="sgr90">: </span><span class="sgr33">1.28 GiB</span>, allocs estimate<span class="sgr90">: </span><span class="sgr33">629751</span>.</code></pre><p>According to the NonlinearSolve documentation, for small nonlinear systems, it could be faster to use the <a href="https://docs.sciml.ai/NonlinearSolve/stable/tutorials/code_optimization/"><code>SimpleNewtonRaphson()</code> descent algorithm</a>. </p><pre><code class="language-julia hljs">@benchmark solve(prob, SimpleNewtonRaphson(); abstol=1e-8, reltol=1e-8, show_trace=Val(false)) # NonlinearSolve</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">BenchmarkTools.Trial: 25 samples with 1 evaluation per sample.
- Range <span class="sgr90">(</span><span class="sgr36"><span class="sgr1">min</span></span> … <span class="sgr35">max</span><span class="sgr90">):  </span><span class="sgr36"><span class="sgr1">184.118 ms</span></span> … <span class="sgr35">279.985 ms</span>  <span class="sgr90">┊</span> GC <span class="sgr90">(</span>min … max<span class="sgr90">): </span>12.00% … 3.63%
- Time  <span class="sgr90">(</span><span class="sgr34"><span class="sgr1">median</span></span><span class="sgr90">):     </span><span class="sgr34"><span class="sgr1">204.948 ms               </span></span><span class="sgr90">┊</span> GC <span class="sgr90">(</span>median<span class="sgr90">):    </span>17.14%
- Time  <span class="sgr90">(</span><span class="sgr32"><span class="sgr1">mean</span></span> ± <span class="sgr32">σ</span><span class="sgr90">):   </span><span class="sgr32"><span class="sgr1">207.249 ms</span></span> ± <span class="sgr32"> 18.721 ms</span>  <span class="sgr90">┊</span> GC <span class="sgr90">(</span>mean ± σ<span class="sgr90">):  </span>15.70% ± 4.26%
+ Memory estimate<span class="sgr90">: </span><span class="sgr33">3.02 GiB</span>, allocs estimate<span class="sgr90">: </span><span class="sgr33">1271604</span>.</code></pre><p>According to the NonlinearSolve documentation, for small nonlinear systems, it could be faster to use the <a href="https://docs.sciml.ai/NonlinearSolve/stable/tutorials/code_optimization/"><code>SimpleNewtonRaphson()</code> descent algorithm</a>. </p><pre><code class="language-julia hljs">@benchmark solve(prob, SimpleNewtonRaphson(); abstol=1e-8, reltol=1e-8, show_trace=Val(false)) # NonlinearSolve</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">BenchmarkTools.Trial: 5 samples with 1 evaluation per sample.
+ Range <span class="sgr90">(</span><span class="sgr36"><span class="sgr1">min</span></span> … <span class="sgr35">max</span><span class="sgr90">):  </span><span class="sgr36"><span class="sgr1">1.003 s</span></span> … <span class="sgr35">  1.111 s</span>  <span class="sgr90">┊</span> GC <span class="sgr90">(</span>min … max<span class="sgr90">): </span>17.18% … 9.49%
+ Time  <span class="sgr90">(</span><span class="sgr34"><span class="sgr1">median</span></span><span class="sgr90">):     </span><span class="sgr34"><span class="sgr1">1.069 s              </span></span><span class="sgr90">┊</span> GC <span class="sgr90">(</span>median<span class="sgr90">):    </span>19.72%
+ Time  <span class="sgr90">(</span><span class="sgr32"><span class="sgr1">mean</span></span> ± <span class="sgr32">σ</span><span class="sgr90">):   </span><span class="sgr32"><span class="sgr1">1.059 s</span></span> ± <span class="sgr32">39.807 ms</span>  <span class="sgr90">┊</span> GC <span class="sgr90">(</span>mean ± σ<span class="sgr90">):  </span>17.66% ± 4.86%
 
-        ▁ █ █<span class="sgr34"> </span> ▁ <span class="sgr32">█</span> ▁ ▁                                           
-  ▆▆▁▁▁▁█▁█▁█<span class="sgr34">▁</span>▁█▁<span class="sgr32">█</span>▁█▆█▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▆▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▆ ▁
-  184 ms<span class="sgr90">           Histogram: frequency by time</span>          280 ms <span class="sgr1">&lt;</span>
+  █                   <span class="sgr34">█</span>        <span class="sgr32"> </span>    ██                    █  
+  █▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁<span class="sgr34">█</span>▁▁▁▁▁▁▁▁<span class="sgr32">▁</span>▁▁▁▁██▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁█ ▁
+  1 s<span class="sgr90">            Histogram: frequency by time</span>        1.11 s <span class="sgr1">&lt;</span>
 
- Memory estimate<span class="sgr90">: </span><span class="sgr33">585.13 MiB</span>, allocs estimate<span class="sgr90">: </span><span class="sgr33">212698</span>.</code></pre><p>MINPACK.jl (fsolve) is much faster than NonlinearSolve.jl (solve) on this problem. It also uses less memory. Both methods have a similar GC overhead, but MINPACK.jl is overall more efficient here.</p><h2 id="tutorial-goddard-plot"><a class="docs-heading-anchor" href="#tutorial-goddard-plot">Plot of the solution</a><a id="tutorial-goddard-plot-1"></a><a class="docs-heading-anchor-permalink" href="#tutorial-goddard-plot" title="Permalink"></a></h2><p>We plot the solution of the indirect solution (in red) over the solution of the direct method (in blue).</p><pre><code class="language-julia hljs">f = f1 * (t1, fs) * (t2, fb) * (t3, f0) # concatenation of the flows
+ Memory estimate<span class="sgr90">: </span><span class="sgr33">2.87 GiB</span>, allocs estimate<span class="sgr90">: </span><span class="sgr33">1065652</span>.</code></pre><p>MINPACK.jl (fsolve) is much faster than NonlinearSolve.jl (solve) on this problem. It also uses less memory. Both methods have a similar GC overhead, but MINPACK.jl is overall more efficient here.</p><h2 id="tutorial-goddard-plot"><a class="docs-heading-anchor" href="#tutorial-goddard-plot">Plot of the solution</a><a id="tutorial-goddard-plot-1"></a><a class="docs-heading-anchor-permalink" href="#tutorial-goddard-plot" title="Permalink"></a></h2><p>We plot the solution of the indirect solution (in red) over the solution of the direct method (in blue).</p><pre><code class="language-julia hljs">f = f1 * (t1, fs) * (t2, fb) * (t3, f0) # concatenation of the flows
 flow_sol = f((t0, tf), x0, p0)          # compute the solution: state, costate, control...
 
-plot!(plt, flow_sol, label=&quot;indirect&quot;)</code></pre><img src="tutorial-goddard-6a4747d9.svg" alt="Example block output"/><h2 id="References"><a class="docs-heading-anchor" href="#References">References</a><a id="References-1"></a><a class="docs-heading-anchor-permalink" href="#References" title="Permalink"></a></h2><section class="footnotes is-size-7"><ul><li class="footnote" id="footnote-1"><a class="tag is-link" href="#citeref-1">1</a>R.H. Goddard. A Method of Reaching Extreme Altitudes, volume 71(2) of Smithsonian Miscellaneous Collections. Smithsonian institution, City of Washington, 1919.</li><li class="footnote" id="footnote-2"><a class="tag is-link" href="#citeref-2">2</a>H. Seywald and E.M. Cliff. Goddard problem in presence of a dynamic pressure limit. Journal of Guidance, Control, and Dynamics, 16(4):776–781, 1993.</li></ul></section></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="tutorial-iss.html">« Indirect simple shooting</a><a class="docs-footer-nextpage" href="tutorial-lqr.html">Linear–quadratic regulator »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.14.1 on <span class="colophon-date" title="Sunday 28 September 2025 10:34">Sunday 28 September 2025</span>. Using Julia version 1.11.7.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+plot!(plt, flow_sol; label=&quot;indirect&quot;, color=2)</code></pre><img src="tutorial-goddard-736a77df.svg" alt="Example block output"/><h2 id="References"><a class="docs-heading-anchor" href="#References">References</a><a id="References-1"></a><a class="docs-heading-anchor-permalink" href="#References" title="Permalink"></a></h2><section class="footnotes is-size-7"><ul><li class="footnote" id="footnote-1"><a class="tag is-link" href="#citeref-1">1</a>R.H. Goddard. A Method of Reaching Extreme Altitudes, volume 71(2) of Smithsonian Miscellaneous Collections. Smithsonian institution, City of Washington, 1919.</li><li class="footnote" id="footnote-2"><a class="tag is-link" href="#citeref-2">2</a>H. Seywald and E.M. Cliff. Goddard problem in presence of a dynamic pressure limit. Journal of Guidance, Control, and Dynamics, 16(4):776–781, 1993.</li></ul></section></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="tutorial-iss.html">« Indirect simple shooting</a><a class="docs-footer-nextpage" href="tutorial-lqr.html">Linear–quadratic regulator »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.14.1 on <span class="colophon-date" title="Monday 29 September 2025 12:37">Monday 29 September 2025</span>. Using Julia version 1.11.7.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
