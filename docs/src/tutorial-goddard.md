@@ -253,7 +253,7 @@ println("\nNorm of the shooting function: ‖s‖ = ", norm(s), "\n")
 We aggregate the data to define the initial guess vector.
 
 ```@example main-goddard
-ξ = [p0..., t1, t2, t3, tf] # initial guess
+ξ_guess = [p0..., t1, t2, t3, tf] # initial guess
 ```
 
 ### MINPACK.jl
@@ -291,10 +291,10 @@ Let us define the problem to solve.
 
 ```@example main-goddard
 # auxiliary function with aggregated inputs
-nle!(s, ξ) = shoot!(s, ξ[1:3], ξ[4], ξ[5], ξ[6], ξ[7])
+shoot!(s, ξ) = shoot!(s, ξ[1:3], ξ[4], ξ[5], ξ[6], ξ[7])
 
 # Jacobian of the (auxiliary) shooting function
-jnle!(js, ξ) = jacobian!(nle!, similar(ξ), js, backend, ξ)
+jshoot!(js, ξ) = jacobian!(shoot!, similar(ξ), js, backend, ξ)
 nothing # hide
 ```
 
@@ -302,7 +302,7 @@ We are now in position to solve the problem with the `hybrj` solver from MINPACK
 
 ```@example main-goddard
 # resolution of S(ξ) = 0
-indirect_sol = fsolve(nle!, jnle!, ξ, show_trace=true)
+indirect_sol = fsolve(shoot!, jshoot!, ξ_guess, show_trace=true)
 
 # we retrieve the costate solution together with the times
 ξ = indirect_sol.x
@@ -326,8 +326,8 @@ println("\nNorm of the shooting function: ‖s‖ = ", norm(s), "\n")
 Alternatively, we can use the [NonlinearSolve.jl](https://docs.sciml.ai/NonlinearSolve) package to solve the shooting equation. The code is similar, but we use the `solve` function instead of `fsolve`. Let us define the problem.
 
 ```@example main-goddard
-nle!(s, ξ, λ) = shoot!(s, ξ[1:3], ξ[4], ξ[5], ξ[6], ξ[7])
-prob = NonlinearProblem(nle!, ξ)
+shoot!(s, ξ, λ) = shoot!(s, ξ[1:3], ξ[4], ξ[5], ξ[6], ξ[7])
+prob = NonlinearProblem(shoot!, ξ_guess)
 nothing # hide
 ```
 
@@ -359,7 +359,7 @@ println("\nNorm of the shooting function: ‖s‖ = ", norm(s), "\n")
 The results found for by the two solvers are extremely close, so now, lets benchmark these two resolutions to compare their performances.
 
 ```@example main-goddard
-@benchmark fsolve(nle!, jnle!, ξ; tol=1e-8, show_trace=false) #MINPACK
+@benchmark fsolve(shoot!, jshoot!, ξ_guess; tol=1e-8, show_trace=false) #MINPACK
 ```
 
 ```@example main-goddard
@@ -382,7 +382,7 @@ We plot the solution of the indirect solution (in red) over the solution of the 
 f = f1 * (t1, fs) * (t2, fb) * (t3, f0) # concatenation of the flows
 flow_sol = f((t0, tf), x0, p0)          # compute the solution: state, costate, control...
 
-plot!(plt, flow_sol, label="indirect")
+plot!(plt, flow_sol; label="indirect", color=2)
 ```
 
 ## References
