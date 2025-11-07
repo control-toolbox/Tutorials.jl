@@ -18,7 +18,7 @@ using Plots.PlotMeasures
 using Printf
 
 t0 = 0.
-x0 = 0. 
+x0 = 0.
 y0 = 0.
 θ0 = π/7
 xf = 4.
@@ -55,21 +55,21 @@ end
 
 # Display the boundary conditions and the current in the augmented phase plane
 plt = plot(
-    xlims=(-2, 6), 
-    ylims=(-1, 8), 
-    size=(600, 600), 
-    aspect_ratio=1, 
-    xlabel=&quot;x&quot;, 
-    ylabel=&quot;y&quot;, 
+    xlims=(-2, 6),
+    ylims=(-1, 8),
+    size=(600, 600),
+    aspect_ratio=1,
+    xlabel=&quot;x&quot;,
+    ylabel=&quot;y&quot;,
     title=&quot;Boundary Conditions&quot;,
-    leftmargin=5mm, 
+    leftmargin=5mm,
     bottommargin=5mm,
 )
 
 plot_state!(plt, x0, y0, θ0; color=2)
 plot_state!(plt, xf, yf, θf; color=2)
 annotate!([(x0, y0, (&quot;q₀&quot;, 12, :top)), (xf, yf, (&quot;qf&quot;, 12, :bottom))])
-plot_current!(plt)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">&lt;&lt; @example-block not executed in draft mode &gt;&gt;</code></pre><pre><code class="language-julia hljs">function plot_trajectory!(plt, t, x, y, θ; N=5) # N: number of points where we will display θ
+plot_current!(plt)</code></pre><img src="tutorial-mpc-09ff4f72.svg" alt="Example block output"/><pre><code class="language-julia hljs">function plot_trajectory!(plt, t, x, y, θ; N=5) # N: number of points where we will display θ
 
     # trajectory
     plot!(plt, x.(t), y.(t), legend=false, color=1, linewidth=2, z_order=:front)
@@ -102,9 +102,8 @@ plot_current!(plt)</code></pre><pre class="documenter-example-output"><code clas
     end
 
     return plt
-    
-end
-nothing # hide</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">&lt;&lt; @example-block not executed in draft mode &gt;&gt;</code></pre><h2 id="OptimalControl-solver"><a class="docs-heading-anchor" href="#OptimalControl-solver">OptimalControl solver</a><a id="OptimalControl-solver-1"></a><a class="docs-heading-anchor-permalink" href="#OptimalControl-solver" title="Permalink"></a></h2><pre><code class="language-julia hljs">function solve(t0, x0, y0, θ0, xf, yf, θf, w; 
+
+end</code></pre><h2 id="OptimalControl-solver"><a class="docs-heading-anchor" href="#OptimalControl-solver">OptimalControl solver</a><a id="OptimalControl-solver-1"></a><a class="docs-heading-anchor-permalink" href="#OptimalControl-solver" title="Permalink"></a></h2><pre><code class="language-julia hljs">function solve(t0, x0, y0, θ0, xf, yf, θf, w;
     grid_size=300, tol=1e-8, max_iter=500, print_level=4, display=true, disc_method=:euler)
 
     # Definition of the problem
@@ -122,8 +121,8 @@ nothing # hide</code></pre><pre class="documenter-example-output"><code class="n
         q(t0) == [x0, y0, θ0]
         q(tf) == [xf, yf, θf]
 
-        q̇(t) == [ w[1]+cos(θ(t)), 
-                  w[2]+sin(θ(t)), 
+        q̇(t) == [ w[1]+cos(θ(t)),
+                  w[2]+sin(θ(t)),
                   u(t)]
 
         tf → min
@@ -137,13 +136,13 @@ nothing # hide</code></pre><pre class="documenter-example-output"><code class="n
     init = (state=x_init, control=u_init, variable=tf_init)
 
     # Resolution
-    sol = OptimalControl.solve(ocp; 
+    sol = OptimalControl.solve(ocp;
         init=init,
-        grid_size=grid_size, 
-        tol=tol, 
-        max_iter=max_iter, 
-        print_level=print_level, 
-        display=display, 
+        grid_size=grid_size,
+        tol=tol,
+        max_iter=max_iter,
+        print_level=print_level,
+        display=display,
         disc_method=disc_method,
     )
 
@@ -155,16 +154,17 @@ nothing # hide</code></pre><pre class="documenter-example-output"><code class="n
     θ = t -&gt; q(t)[3]
     u = control(sol)
     tf = variable(sol)
-    
+
     return t, x, y, θ, u, tf, iterations(sol), sol.solver_infos.constraints_violation
-    
-end
-nothing # hide</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">&lt;&lt; @example-block not executed in draft mode &gt;&gt;</code></pre><h2 id="First-resolution"><a class="docs-heading-anchor" href="#First-resolution">First resolution</a><a id="First-resolution-1"></a><a class="docs-heading-anchor-permalink" href="#First-resolution" title="Permalink"></a></h2><p>We consider a constant current and we solve a first time the problem.</p><pre><code class="language-julia hljs"># Resolution
+
+end</code></pre><h2 id="First-resolution"><a class="docs-heading-anchor" href="#First-resolution">First resolution</a><a id="First-resolution-1"></a><a class="docs-heading-anchor-permalink" href="#First-resolution" title="Permalink"></a></h2><p>We consider a constant current and we solve a first time the problem.</p><pre><code class="language-julia hljs"># Resolution
 t, x, y, θ, u, tf, iter, cons = solve(t0, x0, y0, θ0, xf, yf, θf, current(x0, y0); display=false);
 
 println(&quot;Iterations: &quot;, iter)
 println(&quot;Constraints violation: &quot;, cons)
-println(&quot;tf: &quot;, tf)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">&lt;&lt; @example-block not executed in draft mode &gt;&gt;</code></pre><pre><code class="language-julia hljs"># Displaying the trajectory
+println(&quot;tf: &quot;, tf)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Iterations: 37
+Constraints violation: 7.126799150825036e-10
+tf: 9.96925102660556</code></pre><pre><code class="language-julia hljs"># Displaying the trajectory
 plt_q = plot(xlims=(-2, 6), ylims=(-1, 8), aspect_ratio=1, xlabel=&quot;x&quot;, ylabel=&quot;y&quot;)
 plot_state!(plt_q, x0, y0, θ0; color=2)
 plot_state!(plt_q, xf, yf, θf; color=2)
@@ -175,14 +175,14 @@ plot_trajectory!(plt_q, t, x, y, θ)
 plt_u = plot(t, u; color=1, legend=false, linewidth=2, xlabel=&quot;t&quot;, ylabel=&quot;u&quot;)
 
 # Final display
-plot(plt_q, plt_u; 
-    layout=(1, 2), 
+plot(plt_q, plt_u;
+    layout=(1, 2),
     size=(1200, 600),
-    leftmargin=5mm, 
+    leftmargin=5mm,
     bottommargin=5mm,
     plot_title=&quot;Constant Current Simulation&quot;
-)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">&lt;&lt; @example-block not executed in draft mode &gt;&gt;</code></pre><h2 id="Simulation-of-the-Real-System"><a class="docs-heading-anchor" href="#Simulation-of-the-Real-System">Simulation of the Real System</a><a id="Simulation-of-the-Real-System-1"></a><a class="docs-heading-anchor-permalink" href="#Simulation-of-the-Real-System" title="Permalink"></a></h2><p>In the previous simulation, we assumed that the current is constant. However, from a practical standpoint, the current depends on the position <span>$(x, y)$</span>. Given a current model, provided by the function <code>current</code>, we can simulate the actual trajectory of the ship, as long as we have the initial condition and the control over time.</p><pre><code class="language-julia hljs">function realistic_trajectory(tf, t0, x0, y0, θ0, u, current; abstol=1e-12, reltol=1e-12, saveat=[])
-    
+)</code></pre><img src="tutorial-mpc-f51048a2.svg" alt="Example block output"/><h2 id="Simulation-of-the-Real-System"><a class="docs-heading-anchor" href="#Simulation-of-the-Real-System">Simulation of the Real System</a><a id="Simulation-of-the-Real-System-1"></a><a class="docs-heading-anchor-permalink" href="#Simulation-of-the-Real-System" title="Permalink"></a></h2><p>In the previous simulation, we assumed that the current is constant. However, from a practical standpoint, the current depends on the position <span>$(x, y)$</span>. Given a current model, provided by the function <code>current</code>, we can simulate the actual trajectory of the ship, as long as we have the initial condition and the control over time.</p><pre><code class="language-julia hljs">function realistic_trajectory(tf, t0, x0, y0, θ0, u, current; abstol=1e-12, reltol=1e-12, saveat=[])
+
     function rhs!(dq, q, dummy, t)
         x, y, θ = q
         w = current(x, y)
@@ -190,7 +190,7 @@ plot(plt_q, plt_u;
         dq[2] = w[2] + sin(θ)
         dq[3] = u(t)
     end
-    
+
     q0 = [x0, y0, θ0]
     tspan = (t0, tf)
     ode = ODEProblem(rhs!, q0, tspan)
@@ -202,9 +202,8 @@ plot(plt_q, plt_u;
     θ = t -&gt; sol(t)[3]
 
     return t, x, y, θ
-    
-end
-nothing # hide</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">&lt;&lt; @example-block not executed in draft mode &gt;&gt;</code></pre><pre><code class="language-julia hljs"># Realistic trajectory
+
+end</code></pre><pre><code class="language-julia hljs"># Realistic trajectory
 t, x, y, θ = realistic_trajectory(tf, t0, x0, y0, θ0, u, current)
 
 # Displaying the trajectory
@@ -219,13 +218,13 @@ plot_state!(plt_q, x(tf), y(tf), θ(tf); color=3)
 plt_u = plot(t, u; color=1, legend=false, linewidth=2, xlabel=&quot;t&quot;, ylabel=&quot;u&quot;)
 
 # Final display
-plot(plt_q, plt_u; 
-    layout=(1, 2), 
+plot(plt_q, plt_u;
+    layout=(1, 2),
     size=(1200, 600),
-    leftmargin=5mm, 
+    leftmargin=5mm,
     bottommargin=5mm,
     plot_title=&quot;Simulation with Current Model&quot;
-)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">&lt;&lt; @example-block not executed in draft mode &gt;&gt;</code></pre><h2 id="MPC-Approach"><a class="docs-heading-anchor" href="#MPC-Approach">MPC Approach</a><a id="MPC-Approach-1"></a><a class="docs-heading-anchor-permalink" href="#MPC-Approach" title="Permalink"></a></h2><p>In practice, we do not have the actual current data for the entire trajectory in advance, which is why we will regularly recalculate the optimal control. The idea is to update the optimal control at regular time intervals, taking into account the current at the position where the ship is located. We are therefore led to solve a number of problems with constant current, with this being updated regularly. This is an introduction to the so-called Model Predictive Control (MPC) methods.</p><pre><code class="language-julia hljs">function MPC(t0, x0, y0, θ0, xf, yf, θf, current)
+)</code></pre><img src="tutorial-mpc-ac55f459.svg" alt="Example block output"/><h2 id="MPC-Approach"><a class="docs-heading-anchor" href="#MPC-Approach">MPC Approach</a><a id="MPC-Approach-1"></a><a class="docs-heading-anchor-permalink" href="#MPC-Approach" title="Permalink"></a></h2><p>In practice, we do not have the actual current data for the entire trajectory in advance, which is why we will regularly recalculate the optimal control. The idea is to update the optimal control at regular time intervals, taking into account the current at the position where the ship is located. We are therefore led to solve a number of problems with constant current, with this being updated regularly. This is an introduction to the so-called Model Predictive Control (MPC) methods.</p><pre><code class="language-julia hljs">function MPC(t0, x0, y0, θ0, xf, yf, θf, current)
 
     Nmax = 20   # maximum number of iterations for the MPC method
     ε = 1e-1    # radius on the final condition to stop calculations
@@ -243,7 +242,7 @@ plot(plt_q, plt_u;
     stop = false
 
     while !stop
-        
+
         # Retrieve the current at the current position
         w = current(x1, y1)
 
@@ -291,8 +290,22 @@ plot(plt_q, plt_u;
     return data
 end
 
-data = MPC(t0, x0, y0, θ0, xf, yf, θf, current)
-nothing # hide</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">&lt;&lt; @example-block not executed in draft mode &gt;&gt;</code></pre><h2 id="Display"><a class="docs-heading-anchor" href="#Display">Display</a><a id="Display-1"></a><a class="docs-heading-anchor-permalink" href="#Display" title="Permalink"></a></h2><pre><code class="language-julia hljs"># Trajectory
+data = MPC(t0, x0, y0, θ0, xf, yf, θf, current)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">     N    Distance  Iterations   Constraints       tf
+------------------------------------------------------
+     1      7.1694          37    7.1268e-10    9.9693
+     2      6.6190          57    2.1574e-11   11.5842
+     3      6.8118          20    1.1545e-09   12.1924
+     4      6.8057          87    4.0917e-10   12.4936
+     5      6.8369          29    5.2071e-10   12.6760
+     6      6.9041          27    9.9784e-11   12.8107
+     7      7.0071          58    9.6764e-10   12.9111
+     8      7.1405          24    3.6366e-10   12.9903
+     9      6.6825          41    1.8570e-10   13.3845
+    10      5.5860          99    1.5091e-02   13.3741
+    11      3.9737         146    1.2698e-02   13.3546
+    12      2.1132          30    8.0870e-11   13.3118
+    13      0.4197          92    2.3176e-05   13.2949
+    14      0.0313         120    1.0303e-04   13.3051</code></pre><h2 id="Display"><a class="docs-heading-anchor" href="#Display">Display</a><a id="Display-1"></a><a class="docs-heading-anchor-permalink" href="#Display" title="Permalink"></a></h2><pre><code class="language-julia hljs"># Trajectory
 plt_q = plot(xlims=(-2, 6), ylims=(-1, 8), aspect_ratio=1, xlabel=&quot;x&quot;, ylabel=&quot;y&quot;)
 
 # Final condition
@@ -327,10 +340,10 @@ t, x, y, θ = realistic_trajectory(t2, t1, x1, y1, θ1, u, current)
 plot_state!(plt_q, x(tf), y(tf), θ(tf); color=3)
 
 #
-plot(plt_q, plt_u; 
-    layout=(1, 2), 
+plot(plt_q, plt_u;
+    layout=(1, 2),
     size=(1200, 600),
-    leftmargin=5mm, 
+    leftmargin=5mm,
     bottommargin=5mm,
     plot_title=&quot;Simulation with Current Model&quot;
-)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">&lt;&lt; @example-block not executed in draft mode &gt;&gt;</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="tutorial-mam.html">« Minimal action</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.15.0 on <span class="colophon-date" title="Friday 7 November 2025 22:30">Friday 7 November 2025</span>. Using Julia version 1.12.1.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+)</code></pre><img src="tutorial-mpc-8711a87a.svg" alt="Example block output"/></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="tutorial-mam.html">« Minimal action</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.15.0 on <span class="colophon-date" title="Friday 7 November 2025 22:32">Friday 7 November 2025</span>. Using Julia version 1.12.1.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
