@@ -1,4 +1,4 @@
-# [Optimal control problem with free final orbital time](@id tutorial-free-times-orbital)
+# [Free final orbital time](@id tutorial-free-times-orbital)
 
 ```@meta
 Draft = true

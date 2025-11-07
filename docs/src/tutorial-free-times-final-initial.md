@@ -1,18 +1,15 @@
-# [Optimal control problem with free initial and free final times](@id tutorial-free-times-final-initial)
+# [Free initial and final times](@id tutorial-free-times-final-initial)
 
 ```@meta
 Draft = false
 ```
 
-In this tutorial, we consider an optimal control problem with the initial time `t₀` and the final time `t_f` as free variables, that is there are parts of the variable to be optimized. The required packages for the tutorial are:
+In this tutorial, we consider an optimal control problem with the initial and final times as free variables, that is there are parts of the variable to be optimized. The required packages for the tutorial are:
 
 ```@example both_time
 using OptimalControl
 using NLPModelsIpopt
-using BenchmarkTools
-using DataFrames
 using Plots
-using Printf
 ```
 
 The problem we consider is the following:
@@ -21,7 +18,8 @@ The problem we consider is the following:
 
 @def ocp begin
 
-    v = (t0, tf) ∈ R², variable
+    v = (t0, tf) ∈ R², variable # the initial and final times are free variables
+
     t ∈ [t0, tf], time
     x ∈ R², state
     u ∈ R, control
@@ -48,10 +46,15 @@ We now solve the problem using a direct method.
 
 ```@example both_time
 sol = solve(ocp; grid_size=100)
+nothing # hide
+```
+
+```@example both_time
+sol # hide
 ```
 
 And plot the solution.
 
 ```@example both_time
-plot(sol; size=(800, 800))
+plot(sol)
 ```
