@@ -106,7 +106,7 @@ To find the maximum likelihood path, we also need to minimize the transient time
 ```@example main-mam
 objectives = []
 Ts = range(1,100,100)
-sol = solve(ocp(Ts[1]); display=false, init=init, grid_size=50)
+sol = solve(ocp(Ts[1]); display=false, init=init, grid_size=200)
 println(" Time   Objective     Iterations")
 for T=Ts
     global sol = solve(ocp(T); display=false, init=sol, grid_size=1000, tol=1e-8)
@@ -119,7 +119,7 @@ end
 T_min = Ts[argmin(objectives)]
 plt1 = scatter(Ts, log10.(objectives), xlabel="Time", label="Objective (log10)")
 vline!(plt1, [T_min], label="Minimum", z_order=:back)
-plt2 = scatter(Ts[20:100], log10.(objectives[20:100]), xlabel="Time", label="Objective (log10)")
+plt2 = scatter(Ts[40:100], log10.(objectives[40:100]), xlabel="Time", label="Objective (log10)")
 vline!(plt2, [T_min], label="Minimum", z_order=:back)
 plot(plt1, plt2, layout=(2,1), size=(800,800))
 ```
