@@ -1,8 +1,8 @@
-```@meta
-Draft = false
-```
-
 # [Optimal control problem with free initial time](@id tutorial-free-times-initial)
+
+```@meta
+Draft = true
+```
 
 In this tutorial, we explore a minimum-time optimal control problem where the **initial time $t_0$ is free** (but negative). We aim to determine the latest possible starting time for the system to still reach the goal at a fixed final time $t_f = 0$.
 

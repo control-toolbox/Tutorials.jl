@@ -1,8 +1,8 @@
+# [Optimal control problem with free final time](@id tutorial-free-times-final)
+
 ```@meta
 Draft = true
 ```
-
-# [Optimal control problem with free final time](@id tutorial-free-times-final)
 
 In this tutorial, we explore an optimal control problem with free final time `tf`.
 
@@ -83,7 +83,7 @@ plt = plot(sol; label="direct", size=(800, 800))
     <summary> Click to show/hide mathematical computations.</summary>
     ```
 
-    Here is the theorical part. The pseudo-Hamiltonian is:
+    Here is the theoretical part. The pseudo-Hamiltonian is:
 
     ```math
         H(x, p, u) = p_1 x_2 + p_2 u.
@@ -223,7 +223,8 @@ plt = plot(sol; label="direct", size=(800, 800))
     </details>
     ```
 
-Now we can compare the results found with the direct method whith the theoritical analysis:
+Now we can compare the results found with the direct method with the theoretical analysis:
+
 ```@example main-free-final
 tf = variable(sol)
 u = control(sol)

@@ -1,8 +1,8 @@
+# [Optimal control problem with free final orbital time](@id tutorial-free-times-orbital)
+
 ```@meta
 Draft = true
 ```
-
-# [Optimal control problem with free final orbital time](@id tutorial-free-times-orbital)
 
 ## A more concrete example about the change of orbit of a satellite:
 
@@ -16,6 +16,7 @@ using Printf
 using LinearAlgebra
 using NLsolve
 ```
+
 ## Definition of the problem
 
 ```@example orbit
