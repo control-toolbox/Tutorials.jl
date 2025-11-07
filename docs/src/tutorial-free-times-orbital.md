@@ -4,9 +4,9 @@
 Draft = true
 ```
 
-## A more concrete example about the change of orbit of a satellite:
+## A more concrete example about the change of orbit of a satellite
 
-## Here are the required packages for the tutorial:
+## Here are the required packages for the tutorial
 
 ```@example orbit
 using OptimalControl
@@ -55,7 +55,7 @@ end
 nothing # hide
 ```
 
-#  Direct resolution with minimal orbital time :
+## Direct resolution with minimal orbital time
 
 We now solve the problem using a direct method, with automatic treatment of the free initial time.
 
@@ -63,13 +63,14 @@ We now solve the problem using a direct method, with automatic treatment of the 
 ocp = min_orbit_tf()
 sol = solve(ocp;init=(variable=13.4,), grid_size=100)
 ```
+
 And plot the solution.
 
 ```@example orbit
 plot(sol; label="direct", size=(800, 800))
 ```
-# Indirect resolution with minimal orbital time :
 
+## Indirect resolution with minimal orbital time
 
 ## Hamiltonian and optimal control
 
@@ -106,7 +107,6 @@ end
 # Create flow using OptimalControl.jl
 flow = Flow(ocp, optimal_control)
 ```
-
 
 ## Shooting function
 
@@ -235,7 +235,9 @@ if ξ_solution !== nothing
     println("Final radius: $(sqrt(x_traj[end, 1]^2 + x_traj[end, 2]^2))")
 end
 ```
-# Visualisation of results
+
+## Visualization of results
+
 ```@raw html
 <details>
 <summary>Click to show/hide indirect method visualization code</summary>
@@ -276,6 +278,7 @@ if ξ_solution !== nothing
     plt  # This returns the plot for documentation
 end
 ```
+
 ```@raw html
 </details>
 ```

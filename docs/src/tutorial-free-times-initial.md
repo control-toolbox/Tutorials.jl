@@ -101,20 +101,25 @@ We assume one switch at $t_1$ with $p_2(t_1) = 0 \Leftrightarrow \beta = \alpha 
     If $p_2(t) = 0$ on a nontrivial interval, then $p \equiv 0$ and $p^0 = 0$, violating PMP.
 
 We integrate the system in two phases:
+
 - On $[t_0, t_1]$ with $u = 1$:  
   $x_2(t) = t - t_0$ and $x_1(t) = \frac{1}{2}(t - t_0)^2$.
 - At switch $t = t_1$:
+
   ```math
   x_2(t_1) = t_1 - t_0, \quad x_1(t_1) = \frac{(t_1 - t_0)^2}{2}
   ```
+
 - On $[t_1, 0]$ with $u = -1$:  
   $x_2(t) = x_2(t_1) - (t - t_1) = 2 t_1 - t_0 - t$.
   Integrating gives:
+
   ```math
   x_1(t) = x_1(t_1) + (2t_1 - t_0)(t - t_1) - \frac{t^2}{2} + \frac{t_1^2}{2}
   ```
 
 Final constraints:
+
 ```math
 x_2(0) = 0 \Rightarrow t_0 = 2 t_1, \quad x_1(0) = 1 \Rightarrow t_1 = -1
 ```
@@ -122,10 +127,12 @@ x_2(0) = 0 \Rightarrow t_0 = 2 t_1, \quad x_1(0) = 1 \Rightarrow t_1 = -1
 Therefore: $t_0 = -2$.
 
 To find $\alpha$ and $\beta$, use:
+
 - Switching: $\beta = \alpha (t_1-t_0) = \alpha$,
 - PMP: $H(x(t_0), p(t_0), u(t_0)) = -p^0 = \beta = 1$.
 
 So the full solution is:
+
 ```math
 p(t_0) = (1, 1), \quad t_1 = -1, \quad t_0 = -2.
 ```
@@ -148,10 +155,11 @@ nothing # hide
 ```
 
 The **shooting function** encodes:
-- continuity of state and costate,
-- satisfaction of boundary conditions,
-- switching condition ($p_2(t_1) = 0$),
-- pseudo-Hamiltonian condition at $t_0$.
+
+- Continuity of state and costate,
+- Satisfaction of boundary conditions,
+- Switching condition ($p_2(t_1) = 0$),
+- Pseudo-Hamiltonian condition at $t_0$.
 
 ```@example initial_time
 function shoot!(s, p0, t1, t0)

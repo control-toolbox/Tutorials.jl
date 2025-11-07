@@ -52,7 +52,7 @@ The variable `tf` is indeed the final time according to:
 t ∈ [t0, tf], time
 ```
 
-##  Direct resolution:
+## Direct resolution
 
 You may need to add this type of constrain in your problem definition :
 
@@ -242,7 +242,7 @@ The numerical results closely match the theoretical predictions: the final state
 The costate and Hamiltonian values at final time show a small deviation (≈ 0.01), likely due to numerical precision.
 Overall, the direct method confirms the theoretical analysis with excellent accuracy.
 
-We can analyse the influence of using different discretization sizes (`grid_size`), and observed the following results for the optimal $t_f$:
+We can analyze the influence of using different discretization sizes (`grid_size`), and observed the following results for the optimal $t_f$:
 
 ```@example main-free-final
 for N in [20, 50, 100, 200]
