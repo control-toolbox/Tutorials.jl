@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Final time · Tutorials</title><meta name="title" content="Final time · Tutorials"/><meta property="og:title" content="Final time · Tutorials"/><meta property="twitter:title" content="Final time · Tutorials"/><meta name="description" content="Documentation for Tutorials."/><meta property="og:description" content="Documentation for Tutorials."/><meta property="twitter:description" content="Documentation for Tutorials."/><script data-outdated-warner src="assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.050/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="assets/documenter.js"></script><script src="search_index.js"></script><script src="siteinfo.js"></script><script src="../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="assets/themes/catppuccin-mocha.css" data-theme-name="catppuccin-mocha"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="assets/themes/catppuccin-macchiato.css" data-theme-name="catppuccin-macchiato"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="assets/themes/catppuccin-frappe.css" data-theme-name="catppuccin-frappe"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="assets/themes/catppuccin-latte.css" data-theme-name="catppuccin-latte"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="assets/themeswap.js"></script><link href="https://control-toolbox.org/assets/css/documentation.css" rel="stylesheet" type="text/css"/><script src="https://control-toolbox.org/assets/js/documentation.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit"><a href="index.html">Tutorials</a></span></div><button class="docs-search-query input is-rounded is-small is-clickable my-2 mx-auto py-1 px-2" id="documenter-search-query">Search docs (Ctrl + /)</button><ul class="docs-menu"><li><a class="tocitem" href="index.html">Getting Started</a></li><li><span class="tocitem">Tutorials and Advanced Features</span><ul><li><a class="tocitem" href="tutorial-continuation.html">Discrete continuation</a></li><li><a class="tocitem" href="tutorial-discretisation.html">Discretisation methods</a></li><li><input class="collapse-toggle" id="menuitem-2-3" type="checkbox" checked/><label class="tocitem" for="menuitem-2-3"><span class="docs-label">Free times</span><i class="docs-chevron"></i></label><ul class="collapsed"><li class="is-active"><a class="tocitem" href="tutorial-free-times-final.html">Final time</a><ul class="internal"><li><a class="tocitem" href="#Definition-of-the-problem"><span>Definition of the problem</span></a></li><li><a class="tocitem" href="#Direct-resolution"><span>Direct resolution</span></a></li><li><a class="tocitem" href="#Verification-of-the-results"><span>Verification of the results</span></a></li><li><a class="tocitem" href="#Indirect-method"><span>Indirect method</span></a></li></ul></li><li><a class="tocitem" href="tutorial-free-times-initial.html">Initial time</a></li><li><a class="tocitem" href="tutorial-free-times-final-initial.html">Final and initial times</a></li></ul></li><li><a class="tocitem" href="tutorial-nlp.html">NLP manipulations</a></li><li><a class="tocitem" href="tutorial-iss.html">Indirect simple shooting</a></li><li><a class="tocitem" href="tutorial-goddard.html">Goddard: direct, indirect</a></li><li><a class="tocitem" href="tutorial-lqr.html">Linear–quadratic regulator</a></li><li><a class="tocitem" href="tutorial-mam.html">Minimal action</a></li><li><a class="tocitem" href="tutorial-mpc.html">Model Predictive Control</a></li></ul></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><a class="docs-sidebar-button docs-navbar-link fa-solid fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">Tutorials and Advanced Features</a></li><li><a class="is-disabled">Free times</a></li><li class="is-active"><a href="tutorial-free-times-final.html">Final time</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href="tutorial-free-times-final.html">Final time</a></li></ul></nav><div class="docs-right"><a class="docs-navbar-link" href="https://github.com/control-toolbox/Tutorials.jl" title="View the repository on GitHub"><span class="docs-icon fa-brands"></span><span class="docs-label is-hidden-touch">GitHub</span></a><a class="docs-navbar-link" href="https://github.com/control-toolbox/Tutorials.jl/blob/main/docs/src/tutorial-free-times-final.md" title="Edit source on GitHub"><span class="docs-icon fa-solid"></span></a><a class="docs-settings-button docs-navbar-link fa-solid fa-gear" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-article-toggle-button fa-solid fa-chevron-up" id="documenter-article-toggle-button" href="javascript:;" title="Collapse all docstrings"></a></div></header><article class="content" id="documenter-page"><h1 id="tutorial-free-times-final"><a class="docs-heading-anchor" href="#tutorial-free-times-final">Optimal control problem with free final time</a><a id="tutorial-free-times-final-1"></a><a class="docs-heading-anchor-permalink" href="#tutorial-free-times-final" title="Permalink"></a></h1><p>In this tutorial, we study an <strong>optimal control problem with a free final time</strong> <code>tf</code>. The following packages are required:</p><pre><code class="language-julia hljs">using LinearAlgebra: norm
+using NLPModelsIpopt
+using NonlinearSolve
+using OptimalControl
+using OrdinaryDiffEq
+using Plots
+using Printf</code></pre><h2 id="Definition-of-the-problem"><a class="docs-heading-anchor" href="#Definition-of-the-problem">Definition of the problem</a><a id="Definition-of-the-problem-1"></a><a class="docs-heading-anchor-permalink" href="#Definition-of-the-problem" title="Permalink"></a></h2><p>We consider the following setup:</p><pre><code class="language-julia hljs">t0 = 0       # Initial time
+x0 = [0, 0]  # Initial state
+xf = [1, 0]  # Desired final state
+
+@def ocp begin
+
+    tf ∈ R, variable           # Final time is free (a decision variable)
+    t ∈ [t0, tf], time         # Time interval depends on tf
+    x ∈ R², state              # State vector x = [x₁, x₂]
+    u ∈ R, control             # Scalar control
+
+    # Control and time constraints
+    -1 ≤ u(t) ≤ 1
+    0.05 ≤ tf ≤ Inf            # Lower bound helps numerical convergence
+
+    # Boundary conditions
+    x(t0) == x0
+    x(tf) == xf
+
+    # Dynamics
+    ẋ(t) == [x₂(t), u(t)]
+
+    # Objective: minimize final time
+    tf → min
+end</code></pre><p>The <strong>free final time</strong> nature of the problem is explicitly stated by:</p><pre><code class="language-julia hljs">tf ∈ R, variable</code></pre><p>and the time definition</p><pre><code class="language-julia hljs">t ∈ [t0, tf], time</code></pre><p>indicates that the time horizon itself depends on the optimization variable <code>tf</code>.</p><h2 id="Direct-resolution"><a class="docs-heading-anchor" href="#Direct-resolution">Direct resolution</a><a id="Direct-resolution-1"></a><a class="docs-heading-anchor-permalink" href="#Direct-resolution" title="Permalink"></a></h2><p>To improve convergence of the direct solver, we constrain <code>tf</code> as follows:</p><pre><code class="language-julia hljs">0.05 ≤ tf ≤ Inf</code></pre><p>We then solve the optimal control problem with a direct method, using an automatic handling of the free final time:</p><pre><code class="language-julia hljs">sol = solve(ocp; grid_size=100)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">▫ This is OptimalControl version v1.1.6 running with: direct, adnlp, ipopt.
+
+▫ The optimal control problem is solved with CTDirect version v0.17.4.
+
+   ┌─ The NLP is modelled with ADNLPModels and solved with NLPModelsIpopt.
+   │
+   ├─ Number of time steps⋅: 100
+   └─ Discretisation scheme: midpoint
+
+▫ This is Ipopt version 3.14.19, running with linear solver MUMPS 5.8.1.
+
+Number of nonzeros in equality constraint Jacobian...:      904
+Number of nonzeros in inequality constraint Jacobian.:        0
+Number of nonzeros in Lagrangian Hessian.............:      201
+
+Total number of variables............................:      303
+                     variables with only lower bounds:        1
+                variables with lower and upper bounds:      100
+                     variables with only upper bounds:        0
+Total number of equality constraints.................:      204
+Total number of inequality constraints...............:        0
+        inequality constraints with only lower bounds:        0
+   inequality constraints with lower and upper bounds:        0
+        inequality constraints with only upper bounds:        0
+
+iter    objective    inf_pr   inf_du lg(mu)  ||d||  lg(rg) alpha_du alpha_pr  ls
+   0  1.0000000e-01 9.00e-01 0.00e+00   0.0 0.00e+00    -  0.00e+00 0.00e+00   0
+   1  3.5801080e-01 8.77e-01 1.22e+02   1.0 1.05e+01    -  3.05e-01 2.58e-02f  3
+   2  8.8421252e-01 8.25e-01 5.41e+02   0.4 9.70e+00    -  8.29e-02 5.87e-02h  2
+   3  1.4678934e+00 6.93e-01 1.76e+02   0.6 3.64e+00    -  1.00e+00 1.60e-01h  1
+   4  3.2773408e+00 7.30e-03 1.40e+02   0.5 1.81e+00    -  9.77e-01 1.00e+00f  1
+   5  2.8033485e+00 5.21e-04 1.71e+01  -1.0 4.74e-01    -  9.79e-01 1.00e+00h  1
+   6  2.6891402e+00 4.60e-05 9.92e-02  -2.2 1.14e-01   0.0 1.00e+00 1.00e+00h  1
+   7  2.2992781e+00 1.01e-03 1.33e-01  -2.9 3.90e-01    -  1.00e+00 1.00e+00f  1
+   8  2.0121466e+00 1.61e-03 2.23e-02  -3.3 5.60e-01    -  9.90e-01 1.00e+00h  1
+   9  2.0190855e+00 1.44e-04 2.22e-03  -3.7 6.95e-01    -  9.85e-01 9.08e-01h  1
+iter    objective    inf_pr   inf_du lg(mu)  ||d||  lg(rg) alpha_du alpha_pr  ls
+  10  2.0056026e+00 8.34e-05 6.84e-04  -5.3 8.80e-01    -  7.56e-01 7.58e-01h  1
+  11  2.0005424e+00 4.50e-05 1.99e-05  -5.3 8.89e-01    -  9.86e-01 1.00e+00h  1
+  12  2.0000009e+00 2.13e-07 3.71e-07 -11.0 3.65e-02    -  9.82e-01 1.00e+00h  1
+  13  2.0000000e+00 4.91e-12 5.80e-13 -11.0 5.49e-04    -  1.00e+00 1.00e+00h  1
+
+Number of Iterations....: 13
+
+                                   (scaled)                 (unscaled)
+Objective...............:   1.9999999910286173e+00    1.9999999910286173e+00
+Dual infeasibility......:   5.8015213681809998e-13    5.8015213681809998e-13
+Constraint violation....:   4.9146242631081805e-12    4.9146242631081805e-12
+Variable bound violation:   9.4892587121364613e-09    9.4892587121364613e-09
+Complementarity.........:   1.6476668104042548e-11    1.6476668104042548e-11
+Overall NLP error.......:   1.6476668104042548e-11    1.6476668104042548e-11
+
+
+Number of objective function evaluations             = 19
+Number of objective gradient evaluations             = 14
+Number of equality constraint evaluations            = 19
+Number of inequality constraint evaluations          = 0
+Number of equality constraint Jacobian evaluations   = 14
+Number of inequality constraint Jacobian evaluations = 0
+Number of Lagrangian Hessian evaluations             = 13
+Total seconds in IPOPT                               = 3.355
+
+EXIT: Optimal Solution Found.</code></pre><p>The solution can be visualized as:</p><pre><code class="language-julia hljs">plt = plot(sol; label=&quot;direct&quot;, size=(800, 600))</code></pre><img src="tutorial-free-times-final-01c25eed.svg" alt="Example block output"/><h2 id="Verification-of-the-results"><a class="docs-heading-anchor" href="#Verification-of-the-results">Verification of the results</a><a id="Verification-of-the-results-1"></a><a class="docs-heading-anchor-permalink" href="#Verification-of-the-results" title="Permalink"></a></h2><p>Using <strong>Pontryagin&#39;s Maximum Principle</strong>, we know that the optimal trajectory consists of <strong>two arcs</strong>: one with <span>$u=1$</span> and one with <span>$u=-1$</span>. Without further calculations, the optimal trajectory is:</p><p class="math-container">\[x_1(t) =
+\begin{cases}
+    \tfrac{1}{2}t^2, &amp; t \in [0,1),\\
+    -\tfrac{1}{2}t^2 + 2t - 1, &amp; t \in [1,2],
+\end{cases}
+\quad
+x_2(t) =
+\begin{cases}
+    t, &amp; t \in [0,1),\\
+    2-t, &amp; t \in [1,2].
+\end{cases}\]</p><p>The optimal control is:</p><p class="math-container">\[u(t) =
+\begin{cases}
+    1, &amp; t \in [0,1),\\
+-1, &amp; t \in [1,2].
+\end{cases}\]</p><p>And the costate, the switching time and the final time are:</p><p class="math-container">\[p_1(t)=1, \quad p_2(t)=1-t, \quad p^0=-1, \quad t_1 = 1, \quad t_f = 2.\]</p><p>We can now compare the direct numerical solution with this theoretical result:</p><pre><code class="language-julia hljs">tf = variable(sol)
+u = control(sol)
+p = costate(sol)
+x = state(sol)
+H(t) = p(t)[1]*x(t)[2] + p(t)[2]*u(t)
+
+@printf(&quot;tf = %.5f&quot;, tf); println(lpad(&quot;(expected 2)&quot;, 33))
+@printf(&quot;H(t0) = %.5f&quot;, H(t0)); println(lpad(&quot;(expected 1)&quot;, 30))
+@printf(&quot;H(tf) = %.5f&quot;, H(tf)); println(lpad(&quot;(expected 1)&quot;, 30))
+@printf(&quot;x(t0) = [%.5f, %.5f]&quot;, x(t0)[1], x(t0)[2]); println(lpad(&quot;(expected [0, 0])&quot;, 23))
+@printf(&quot;x(tf) = [%.5f, %.5f]&quot;, x(tf)[1], x(tf)[2]); println(lpad(&quot;(expected [1, 0])&quot;, 23))
+@printf(&quot;p(t0) = [%.5f, %.5f]&quot;, p(t0)[1], p(t0)[2]); println(lpad(&quot;(expected [1, 1])&quot;, 24))
+@printf(&quot;p(tf) = [%.5f, %.5f]&quot;, p(tf)[1], p(tf)[2]); println(lpad(&quot;(expected [1, -1])&quot;, 24))</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">tf = 2.00000                     (expected 2)
+H(t0) = 0.99568                  (expected 1)
+H(tf) = 1.00432                  (expected 1)
+x(t0) = [0.00000, -0.00000]      (expected [0, 0])
+x(tf) = [1.00000, 0.00000]      (expected [1, 0])
+p(t0) = [1.00000, 0.99568]       (expected [1, 1])
+p(tf) = [1.00000, -1.00432]      (expected [1, -1])</code></pre><p>The numerical results match the theoretical solution almost exactly.</p><h2 id="Indirect-method"><a class="docs-heading-anchor" href="#Indirect-method">Indirect method</a><a id="Indirect-method-1"></a><a class="docs-heading-anchor-permalink" href="#Indirect-method" title="Permalink"></a></h2><p>We now solve the same problem using an <strong>indirect method</strong> (shooting approach). We begin by defining the pseudo-Hamiltonian and the switching function.</p><pre><code class="language-julia hljs"># Pseudo-Hamiltonian
+H(x, p, u) = p[1]*x[2] + p[2]*u
+
+# Hamiltonian lift used to compute the switching function
+F1(x) = [0, 1]
+H1 = Lift(F1)</code></pre><p>Define the flows corresponding to the two control laws <span>$u=+1$</span> and <span>$u=-1$</span>:</p><pre><code class="language-julia hljs">const u_pos = 1
+const u_neg = -1
+
+# Each flow depends on tf since it is part of the optimization variables
+f_pos = Flow(ocp, (x, p, tf) -&gt; u_pos)
+f_neg = Flow(ocp, (x, p, tf) -&gt; u_neg)</code></pre><p>The <strong>shooting function</strong> enforces the final and switching conditions:</p><pre><code class="language-julia hljs">function shoot!(s, p0, t1, tf)
+    x_t0 = x0
+    p_t0 = p0
+
+    # Forward integration under u = +1, then u = -1
+    x_t1, p_t1 = f_pos(t0, x_t0, p_t0, t1)
+    x_tf, p_tf = f_neg(t1, x_t1, p_t1, tf)
+
+    u_tf = -1  # Final control
+
+    # Shooting conditions:
+    s[1:2] = x_tf - xf                # Terminal state must match xf
+    s[3]   = H(x_tf, p_tf, u_tf) - 1  # Transversality condition
+    s[4]   = H1(x_t1, p_t1)           # Switching condition φ(t₁)=0
+end</code></pre><p>To help the nonlinear solver converge, we build a good initial guess from the direct solution:</p><pre><code class="language-julia hljs">t = time_grid(sol)
+x = state(sol)
+p = costate(sol)
+φ(t) = H1(x(t), p(t))  # Switching function
+
+p0 = p(t0)
+t1 = t[argmin(abs.(φ.(t)))]
+tf = t[end]
+
+println(&quot;p0 = &quot;, p0)
+println(&quot;t1 = &quot;, t1)
+println(&quot;tf = &quot;, tf)
+
+# Evaluate the norm of the shooting function at initial guess
+s = zeros(4)
+shoot!(s, p0, t1, tf)
+println(&quot;\n‖s‖ (initial guess) = &quot;, norm(s), &quot;\n&quot;)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">p0 = [0.9999999955091624, 0.9956848379593445]
+t1 = 0.9999999955143086
+tf = 1.9999999910286173
+
+‖s‖ (initial guess) = 0.006102541639648192</code></pre><p>We can now solve the system using an <strong>indirect shooting method</strong>:</p><pre><code class="language-julia hljs"># Aggregated nonlinear system
+shoot!(s, ξ, λ) = shoot!(s, ξ[1:2], ξ[3], ξ[4])
+
+# Define the problem and initial guess
+ξ_guess = [p0..., t1, tf]
+prob = NonlinearProblem(shoot!, ξ_guess)
+
+# Solve the nonlinear system
+indirect_sol = solve(prob; show_trace=Val(true), abstol=1e-8, reltol=1e-8)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">
+Algorithm: NewtonRaphson(
+    descent = NewtonDescent(),
+    autodiff = AutoForwardDiff(),
+    vjp_autodiff = AutoReverseDiff(
+        compile = false
+    ),
+    jvp_autodiff = AutoForwardDiff(),
+    concrete_jac = Val{false}()
+)
+
+----    	-------------       	-----------
+Iter    	f(u) inf-norm       	Step 2-norm
+----    	-------------       	-----------
+0       	4.31515306e-03      	0.00000000e+00
+1       	7.34009524e-16      	4.31516204e-03
+Final   	7.34009524e-16
+----------------------</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">retcode: Success
+u: 4-element Vector{Float64}:
+ 1.0
+ 1.0
+ 1.0000000000000004
+ 2.0000000000000004</code></pre><p>Finally, we compare the indirect solution to the direct one:</p><pre><code class="language-julia hljs">p0 = indirect_sol.u[1:2]
+t1 = indirect_sol.u[3]
+tf = indirect_sol.u[4]
+
+# Reconstruct the full trajectory
+f = f_pos * (t1, f_neg)
+flow_sol = f((t0, tf), x0, p0; saveat=range(t0, tf, 200))
+
+# Plot comparison
+plot!(plt, flow_sol; label=&quot;indirect&quot;, color=2)</code></pre><img src="tutorial-free-times-final-c2b6e0c0.svg" alt="Example block output"/></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="tutorial-discretisation.html">« Discretisation methods</a><a class="docs-footer-nextpage" href="tutorial-free-times-initial.html">Initial time »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.15.0 on <span class="colophon-date" title="Saturday 8 November 2025 23:10">Saturday 8 November 2025</span>. Using Julia version 1.12.1.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
