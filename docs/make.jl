@@ -1,5 +1,20 @@
 using Documenter
+using DocumenterInterLinks
 using OptimalControl
+
+#
+links = InterLinks(
+    "CTDirect" => (
+        "https://control-toolbox.org/CTDirect.jl/stable/",
+        "https://control-toolbox.org/CTDirect.jl/stable/objects.inv",
+        joinpath(@__DIR__, "inventories", "CTDirect.toml"),
+    ),
+    "OptimalControl" => (
+        "https://control-toolbox.org/OptimalControl.jl/stable/",
+        "https://control-toolbox.org/OptimalControl.jl/stable/objects.inv",
+        joinpath(@__DIR__, "inventories", "OptimalControl.toml"),
+    ),
+)
 
 # For reproducibility
 mkpath(joinpath(@__DIR__, "src", "assets"))
@@ -16,12 +31,15 @@ cp(
 
 repo_url = "github.com/control-toolbox/Tutorials.jl"
 
+# if draft is true, then the julia code from .md is not executed # debug
+# to disable the draft mode in a specific markdown file, use the following:
+#=
+```@meta
+Draft = false
+```
+=#
 makedocs(;
-    draft=true, # if draft is true, then the julia code from .md is not executed
-    # to disable the draft mode in a specific markdown file, use the following:
-    # ```@meta
-    # Draft = false
-    # ```
+    draft=false,
     warnonly=[:cross_references, :autodocs_block],
     sitename="Tutorials",
     format=Documenter.HTML(;
@@ -42,7 +60,6 @@ makedocs(;
                 "Final time" => "tutorial-free-times-final.md",
                 "Initial time" => "tutorial-free-times-initial.md",
                 "Final and initial times" => "tutorial-free-times-final-initial.md",
-                "Orbital transfer min time" => "tutorial-free-times-orbital.md",
             ],
             "NLP manipulations" => "tutorial-nlp.md",
             "Indirect simple shooting" => "tutorial-iss.md",
@@ -52,6 +69,7 @@ makedocs(;
             "Model Predictive Control" => "tutorial-mpc.md",
         ],
     ],
+    plugins=[links],
 )
 
-deploydocs(; repo=repo_url * ".git", devbranch="main")
+deploydocs(; repo=repo_url * ".git", devbranch="main", push_preview=true)

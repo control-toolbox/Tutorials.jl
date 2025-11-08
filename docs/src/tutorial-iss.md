@@ -89,7 +89,7 @@ where $[t]~=  (x(t),p(t),u(x(t), p(t)))$.
 
 ## Shooting function
 
-To achive our goal, let us first introduce the pseudo-Hamiltonian vector field
+To achieve our goal, let us first introduce the pseudo-Hamiltonian vector field
 
 ```math
     \vec{H}(z,u) = \left( \nabla_p H(z,u), -\nabla_x H(z,u) \right), \quad z = (x,p),
@@ -318,6 +318,7 @@ nothing # hide
 
 ```@raw html
 </details>
+</br>
 ```
 
 ```@example main-iss

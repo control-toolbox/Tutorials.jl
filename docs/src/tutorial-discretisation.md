@@ -60,12 +60,12 @@ nothing # hide
 
 ## Discretisation schemes
 
-When calling `solve`, the option `disc_method=...` can be used to specify the discretization scheme. In addition to the default implicit `:trapeze` method (also known as Crank–Nicolson), other available options include the implicit `:midpoint` method, and Gauss–Legendre collocation schemes with 2 and 3 stages: `:gauss_legendre_2` and `:gauss_legendre_3`, of order 4 and 6 respectively. Note that higher-order methods typically result in larger NLP problems for the same number of time steps, and their accuracy also depends on the smoothness of the problem.
+When calling `solve`, the option `disc_method=...` can be used to specify the discretization scheme. In addition to the default implicit `:midpoint` method, other available options include the implicit `:trapeze` method (also known as Crank–Nicolson), and Gauss–Legendre collocation schemes with 2 and 3 stages: `:gauss_legendre_2` and `:gauss_legendre_3`, of order 4 and 6 respectively. Note that higher-order methods typically result in larger NLP problems for the same number of time steps, and their accuracy also depends on the smoothness of the problem.
 
-Let us first solve the problem with the default `:trapeze` method and display the solution.
+Let us first solve the problem with the default `:midpoint` method and display the solution.
 
 ```@example main-disc
-sol = solve(ocp; disc_method=:trapeze, display=false)
+sol = solve(ocp; disc_method=:midpoint, display=false)
 plot(sol; size=(800, 800))
 ```
 
@@ -106,7 +106,8 @@ println(data)
 # Plot the results
 x_style = (legend=:none,)
 p_style = (legend=:none,)
-styles = (state_style=x_style, costate_style=p_style)
+u_style = (legend=:topright,)
+styles = (state_style=x_style, costate_style=p_style, control_style=u_style)
 
 scheme, sol = solutions[1]
 plt = plot(sol; label=string(scheme), styles...)
@@ -152,7 +153,8 @@ for adnlp_backend in backends
         grid_size=1000, 
         adnlp_backend=$adnlp_backend,
     )
-    docp, nlp = bt.value
+    docp = bt.value
+    nlp = nlp_model(docp)
     prepa_time = bt.time
 
     # Get the number of non-zero elements
