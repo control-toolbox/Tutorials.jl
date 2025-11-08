@@ -39,7 +39,7 @@ Draft = false
 ```
 =#
 makedocs(;
-    draft=true,
+    draft=false,
     warnonly=[:cross_references, :autodocs_block],
     sitename="Tutorials",
     format=Documenter.HTML(;
@@ -60,7 +60,6 @@ makedocs(;
                 "Final time" => "tutorial-free-times-final.md",
                 "Initial time" => "tutorial-free-times-initial.md",
                 "Final and initial times" => "tutorial-free-times-final-initial.md",
-                "Orbital transfer min time" => "tutorial-free-times-orbital.md",
             ],
             "NLP manipulations" => "tutorial-nlp.md",
             "Indirect simple shooting" => "tutorial-iss.md",

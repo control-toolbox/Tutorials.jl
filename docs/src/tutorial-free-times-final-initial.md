@@ -1,9 +1,5 @@
 # [Free initial and final times](@id tutorial-free-times-final-initial)
 
-```@meta
-Draft = false
-```
-
 In this tutorial, we consider an optimal control problem with the initial and final times as free variables, that is there are parts of the variable to be optimized. The required packages for the tutorial are:
 
 ```@example both_time
