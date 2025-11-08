@@ -56,6 +56,11 @@ makedocs(;
         "Tutorials and Advanced Features" => [
             "Discrete continuation" => "tutorial-continuation.md",
             "Discretisation methods" => "tutorial-discretisation.md",
+            "Free times" => [
+                "Final time" => "tutorial-free-times-final.md",
+                "Initial time" => "tutorial-free-times-initial.md",
+                "Final and initial times" => "tutorial-free-times-final-initial.md",
+            ],
             "NLP manipulations" => "tutorial-nlp.md",
             "Indirect simple shooting" => "tutorial-iss.md",
             "Goddard: direct, indirect" => "tutorial-goddard.md",

@@ -10,3 +10,6 @@ on:
 jobs:
   call:
     uses: control-toolbox/CTActions/.github/workflows/ci.yml@main
+    with:
+      runners: '["ubuntu-latest"]'
+      versions: '["1.12"]'
