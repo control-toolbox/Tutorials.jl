@@ -18,6 +18,9 @@ Printf = "de0858da-6303-5e67-8744-51eddeeeb8d7"
 Suppressor = "fd094767-a336-5f1f-9728-57cf17d0bbfb"
 Tutorials = "cb10daa6-a5e5-4c25-a171-ae181b8ea3c9"
 
+[sources]
+Tutorials = {path = "/home/runner/work/Tutorials.jl/Tutorials.jl"}
+
 [compat]
 BenchmarkTools = "1"
 DataFrames = "1"
