@@ -17,7 +17,7 @@ using Printf
 using Plots
 ```
 
-The `init` parameter of the `solve` function allows providing an initial guess. See the [initial guess documentation](https://control-toolbox.org/OptimalControl.jl/stable/manual-initial-guess.html) for more details.
+The `init` parameter of the `solve` function allows providing an initial guess. See the [initial guess documentation](@extref OptimalControl manual-initial-guess) for more details.
 
 We write a function that returns the OCP for a given final time:
 
