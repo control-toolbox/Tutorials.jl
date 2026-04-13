@@ -58,9 +58,9 @@ function ocp(T)
         t ∈ [0, T], time
         x ∈ R², state
         u ∈ R², control
-        x(0) == [-1, 0]    # Starting point (left well)
-        x(T) == [1, 0]     # End point (right well)
-        ẋ(t) == u(t)       # Path dynamics
+        x(0) == [-1, 0]                      # Starting point (left well)
+        x(T) == [1, 0]                       # End point (right well)
+        ẋ(t) == u(t)                         # Path dynamics
         ∫( sum((u(t) - f(x(t))).^2) ) → min  # Minimize deviation from deterministic flow
     end
     return action
@@ -142,22 +142,27 @@ To find the maximum likelihood path, we also need to minimize the transient time
 # Continuation function to avoid global variables
 function continuation_mam(Ts; init_guess=init)
     objectives = Float64[]
+    iterations_list = Int[]
     current_sol = init_guess
     
-    println(" Time   Objective     Iterations")
     for T in Ts
         current_sol = solve(ocp(T); display=false, init=current_sol, grid_size=1000, tol=1e-8)
-        obj = objective(current_sol)
-        @printf("%6.2f  %9.6e  %d\n", T, obj, iterations(current_sol))
-        push!(objectives, obj)
+        push!(objectives, objective(current_sol))
+        push!(iterations_list, iterations(current_sol))
     end
     
-    return objectives, current_sol
+    return objectives, iterations_list, current_sol
 end
 
 # Perform continuation
 Ts = range(1, 100, 100)
-objectives, final_sol = continuation_mam(Ts)
+objectives, iters, final_sol = continuation_mam(Ts)
+
+# Display results
+println(" Time   Objective     Iterations")
+for i in eachindex(Ts)
+    @printf("%6.2f  %9.6e  %d\n", Ts[i], objectives[i], iters[i])
+end
 nothing # hide
 ```
 
@@ -178,9 +183,15 @@ Let us visualize the evolution of the objective function with respect to the tra
 ```@example main-mam
 plt1 = scatter(Ts, log10.(objectives), xlabel="Time", label="Objective (log10)")
 vline!(plt1, [T_min], label="Minimum at T=$(round(T_min, digits=1))", z_order=:back)
+plot(plt1, size=(800,400))
+```
+
+We now focus on the region around the minimum for a clearer view:
+
+```@example main-mam
 plt2 = scatter(Ts[40:100], log10.(objectives[40:100]), xlabel="Time", label="Objective (log10)")
 vline!(plt2, [T_min], label="Minimum", z_order=:back)
-plot(plt1, plt2, layout=(2,1), size=(800,800))
+plot(plt2, size=(800,400))
 ```
 
 !!! note "Interpretation"
