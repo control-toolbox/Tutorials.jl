@@ -3,7 +3,7 @@
 using OptimalControl
 using NLPModelsIpopt
 using Printf
-using Plots</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">&lt;&lt; @example-block not executed in draft mode &gt;&gt;</code></pre><p>The <code>init</code> parameter of the <code>solve</code> function allows providing an initial guess. See the <a href="https://control-toolbox.org/OptimalControl.jl/stable/manual-initial-guess.html">initial guess documentation</a> for more details.</p><p>We write a function that returns the OCP for a given final time:</p><pre><code class="language-julia hljs">function problem(T)
+using Plots</code></pre><p>The <code>init</code> parameter of the <code>solve</code> function allows providing an initial guess. See the <a href="https://control-toolbox.org/OptimalControl.jl/stable/manual-initial-guess.html">initial guess documentation</a> for more details.</p><p>We write a function that returns the OCP for a given final time:</p><pre><code class="language-julia hljs">function problem(T)
 
     ocp = @def begin
 
@@ -25,8 +25,7 @@ using Plots</code></pre><pre class="documenter-example-output"><code class="nohi
     end
 
     return ocp
-end
-nothing # hide</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">&lt;&lt; @example-block not executed in draft mode &gt;&gt;</code></pre><p>Then we perform the continuation with a simple <em>for</em> loop, using each solution to initialize the next problem. We wrap the continuation in a function to avoid global variables.</p><pre><code class="language-julia hljs">function continuation_parametric(T_range; init=nothing, scheme=:midpoint, grid_size=200)
+end</code></pre><p>Then we perform the continuation with a simple <em>for</em> loop, using each solution to initialize the next problem. We wrap the continuation in a function to avoid global variables.</p><pre><code class="language-julia hljs">function continuation_parametric(T_range; init=nothing, scheme=:midpoint, grid_size=200)
     data = DataFrame(T=Float64[], Objective=Float64[], Iterations=Int[])
     for T ∈ T_range
         ocp = problem(T)
@@ -39,7 +38,15 @@ nothing # hide</code></pre><pre class="documenter-example-output"><code class="n
 end
 
 data = continuation_parametric(range(1, 2, length=5))
-println(data)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">&lt;&lt; @example-block not executed in draft mode &gt;&gt;</code></pre><p>We can visualize the evolution of the objective and the number of iterations with respect to the final time.</p><pre><code class="language-julia hljs">plt_obj = plot(data.T, data.Objective;
+println(data)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">5×3 DataFrame
+ Row │ T        Objective  Iterations
+     │ Float64  Float64    Int64
+─────┼────────────────────────────────
+   1 │    1.0    12.0003            1
+   2 │    1.25    6.14415           1
+   3 │    1.5     3.55564           1
+   4 │    1.75    2.23912           1
+   5 │    2.0     1.50004           1</code></pre><p>We can visualize the evolution of the objective and the number of iterations with respect to the final time.</p><pre><code class="language-julia hljs">plt_obj = plot(data.T, data.Objective;
     seriestype=:scatter,
     title=&quot;Double integrator&quot;,
     label=&quot;Objective&quot;,
@@ -53,7 +60,7 @@ plt_iter = plot(data.T, data.Iterations;
     ylabel=&quot;Number of iterations&quot;)
 
 layout = grid(2, 1, heights=[0.5, 0.5])
-plot(plt_obj, plt_iter; layout=layout, size=(800, 600))</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">&lt;&lt; @example-block not executed in draft mode &gt;&gt;</code></pre><h2 id="Continuation-on-parameter"><a class="docs-heading-anchor" href="#Continuation-on-parameter">Continuation on parameter</a><a id="Continuation-on-parameter-1"></a><a class="docs-heading-anchor-permalink" href="#Continuation-on-parameter" title="Permalink"></a></h2><p>As a second example, we solve a Goddard problem with a decreasing maximum thrust. We define a function that returns the optimal control problem for a given value of <code>Tmax</code>, similar to the first example.</p><p>Let us first define the Goddard problem. Note that the formulation below illustrates all types of constraints, and the problem could be written more compactly.</p><pre><code class="language-julia hljs"># Parameters
+plot(plt_obj, plt_iter; layout=layout, size=(800, 600))</code></pre><img src="tutorial-continuation-68f41296.svg" alt="Example block output"/><h2 id="Continuation-on-parameter"><a class="docs-heading-anchor" href="#Continuation-on-parameter">Continuation on parameter</a><a id="Continuation-on-parameter-1"></a><a class="docs-heading-anchor-permalink" href="#Continuation-on-parameter" title="Permalink"></a></h2><p>As a second example, we solve a Goddard problem with a decreasing maximum thrust. We define a function that returns the optimal control problem for a given value of <code>Tmax</code>, similar to the first example.</p><p>Let us first define the Goddard problem. Note that the formulation below illustrates all types of constraints, and the problem could be written more compactly.</p><pre><code class="language-julia hljs"># Parameters
 r0 = 1
 v0 = 0
 m0 = 1
@@ -111,7 +118,7 @@ end
 
 # Solve the problem with a reference value of Tmax
 sol0 = solve(goddard_problem(Tmax_0); display=false, scheme=:midpoint, grid_size=200)
-@printf(&quot;Objective for reference solution: %.6f\n&quot;, objective(sol0))</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">&lt;&lt; @example-block not executed in draft mode &gt;&gt;</code></pre><p>Then, we perform the continuation on the maximal thrust. We wrap the continuation in a function that redefines the OCP at each step with the new <code>Tmax</code> value.</p><pre><code class="language-julia hljs">function continuation_goddard(Tmax_range; init=nothing, scheme=:midpoint, grid_size=200)
+@printf(&quot;Objective for reference solution: %.6f\n&quot;, objective(sol0))</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Objective for reference solution: 1.012373</code></pre><p>Then, we perform the continuation on the maximal thrust. We wrap the continuation in a function that redefines the OCP at each step with the new <code>Tmax</code> value.</p><pre><code class="language-julia hljs">function continuation_goddard(Tmax_range; init=nothing, scheme=:midpoint, grid_size=200)
     data = DataFrame(Tmax=Float64[], Objective=Float64[], Iterations=Int[])
     sols = Vector{Any}()
     sol = init
@@ -126,7 +133,19 @@ sol0 = solve(goddard_problem(Tmax_0); display=false, scheme=:midpoint, grid_size
 end
 
 data, sols = continuation_goddard(range(Tmax_0, Tmax_f, length=9); init=sol0)
-println(data)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">&lt;&lt; @example-block not executed in draft mode &gt;&gt;</code></pre><p>We plot now the objective with respect to the maximal thrust, as well as the solutions for <code>Tmax=3</code>, <code>Tmax=2</code>, and <code>Tmax=1</code>. The time is normalized for the solution plots to compare trajectories with different final times.</p><pre><code class="language-julia hljs">using Plots.PlotMeasures # for leftmargin
+println(data)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">9×3 DataFrame
+ Row │ Tmax     Objective  Iterations
+     │ Float64  Float64    Int64
+─────┼────────────────────────────────
+   1 │    3.0     1.01237          15
+   2 │    2.75    1.01222          14
+   3 │    2.5     1.01202          19
+   4 │    2.25    1.01173          19
+   5 │    2.0     1.01126          19
+   6 │    1.75    1.01048          20
+   7 │    1.5     1.00917          16
+   8 │    1.25    1.00708          16
+   9 │    1.0     1.00359          17</code></pre><p>We plot now the objective with respect to the maximal thrust, as well as the solutions for <code>Tmax=3</code>, <code>Tmax=2</code>, and <code>Tmax=1</code>. The time is normalized for the solution plots to compare trajectories with different final times.</p><pre><code class="language-julia hljs">using Plots.PlotMeasures # for leftmargin
 
 plt_obj = plot(data.Tmax, data.Objective;
     seriestype=:scatter,
@@ -146,8 +165,8 @@ Tmax_values = [1.0, 2.0, 3.0]
 indices = [argmin(abs.(data.Tmax .- T)) for T in Tmax_values]
 
 layout_metrics = grid(2, 1, heights=[0.5, 0.5])
-plot(plt_obj, plt_iter; layout=layout_metrics, size=(800, 600), leftmargin=5mm)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">&lt;&lt; @example-block not executed in draft mode &gt;&gt;</code></pre><p>We now plot the solutions for the selected <code>Tmax</code> values, using normalized time to compare trajectories with different final times.</p><pre><code class="language-julia hljs">plt_sol = plot()
+plot(plt_obj, plt_iter; layout=layout_metrics, size=(800, 600), leftmargin=5mm)</code></pre><img src="tutorial-continuation-a6e3a53d.svg" alt="Example block output"/><p>We now plot the solutions for the selected <code>Tmax</code> values, using normalized time to compare trajectories with different final times.</p><pre><code class="language-julia hljs">plt_sol = plot()
 for (i, idx) in enumerate(indices)
     plot!(plt_sol, sols[idx]; label=&quot;Tmax=$(round(data.Tmax[idx], digits=2))&quot;, time=:normalize, color=i)
 end
-plot(plt_sol; size=(800, 800), leftmargin=5mm)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">&lt;&lt; @example-block not executed in draft mode &gt;&gt;</code></pre><h2 id="Best-practices-and-limitations"><a class="docs-heading-anchor" href="#Best-practices-and-limitations">Best practices and limitations</a><a id="Best-practices-and-limitations-1"></a><a class="docs-heading-anchor-permalink" href="#Best-practices-and-limitations" title="Permalink"></a></h2><p>The examples above illustrate a basic discrete continuation method. Here are some important considerations:</p><ul><li><p><strong>Step size</strong>: The continuation step size should be chosen carefully. Too large a step may lead to convergence issues, while too small a step may be inefficient. Adaptive step size strategies can improve robustness but are not covered in this tutorial.</p></li><li><p><strong>Convergence monitoring</strong>: Always check that each solution converges successfully using <code>successful(sol)</code>. If a solution fails, consider reducing the step size or providing a better initial guess.</p></li><li><p><strong>Advanced methods</strong>: For more challenging problems, homotopic continuation methods with path following algorithms can be used. These methods adapt the continuation parameter automatically and can handle bifurcations. Such advanced techniques are beyond the scope of this tutorial.</p></li><li><p><strong>Alternative approaches</strong>: In some cases, it may be more efficient to directly parameterize the continuation parameter within the optimal control problem rather than solving a sequence of problems. OptimalControl plans to add this feature in a future release.</p></li></ul></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="index.html">« Getting Started</a><a class="docs-footer-nextpage" href="tutorial-discretisation.html">Discretisation methods »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.17.0 on <span class="colophon-date" title="Monday 13 April 2026 22:22">Monday 13 April 2026</span>. Using Julia version 1.12.6.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+plot(plt_sol; size=(800, 800), leftmargin=5mm)</code></pre><img src="tutorial-continuation-ccb8a406.svg" alt="Example block output"/><h2 id="Best-practices-and-limitations"><a class="docs-heading-anchor" href="#Best-practices-and-limitations">Best practices and limitations</a><a id="Best-practices-and-limitations-1"></a><a class="docs-heading-anchor-permalink" href="#Best-practices-and-limitations" title="Permalink"></a></h2><p>The examples above illustrate a basic discrete continuation method. Here are some important considerations:</p><ul><li><p><strong>Step size</strong>: The continuation step size should be chosen carefully. Too large a step may lead to convergence issues, while too small a step may be inefficient. Adaptive step size strategies can improve robustness but are not covered in this tutorial.</p></li><li><p><strong>Convergence monitoring</strong>: Always check that each solution converges successfully using <code>successful(sol)</code>. If a solution fails, consider reducing the step size or providing a better initial guess.</p></li><li><p><strong>Advanced methods</strong>: For more challenging problems, homotopic continuation methods with path following algorithms can be used. These methods adapt the continuation parameter automatically and can handle bifurcations. Such advanced techniques are beyond the scope of this tutorial.</p></li><li><p><strong>Alternative approaches</strong>: In some cases, it may be more efficient to directly parameterize the continuation parameter within the optimal control problem rather than solving a sequence of problems. OptimalControl plans to add this feature in a future release.</p></li></ul></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="index.html">« Getting Started</a><a class="docs-footer-nextpage" href="tutorial-discretisation.html">Discretisation methods »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.17.0 on <span class="colophon-date" title="Monday 13 April 2026 22:49">Monday 13 April 2026</span>. Using Julia version 1.12.6.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
