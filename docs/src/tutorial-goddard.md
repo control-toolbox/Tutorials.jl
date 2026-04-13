@@ -55,7 +55,7 @@ const m0 = 1      # initial mass
 const vmax = 0.1  # maximal authorized speed
 const mf = 0.6    # final mass to target
 
-ocp = @def begin # definition of the optimal control problem
+goddard = @def begin # definition of the optimal control problem
 
     tf ∈ R, variable
     t ∈ [t0, tf], time
@@ -98,7 +98,7 @@ nothing # hide
 We then solve it
 
 ```@example main-goddard
-direct_sol = solve(ocp; grid_size=250)
+direct_sol = solve(goddard; grid_size=250)
 nothing # hide
 ```
 
@@ -192,10 +192,10 @@ ub(x) = -(F0⋅g)(x) / (F1⋅g)(x)          # boundary control
 μ(x, p) = H01(x, p) / (F1⋅g)(x)         # multiplier associated to the state constraint g
 
 # Flows
-f0 = Flow(ocp, (x, p, tf) -> u0)
-f1 = Flow(ocp, (x, p, tf) -> u1)
-fs = Flow(ocp, (x, p, tf) -> us(x, p))
-fb = Flow(ocp, (x, p, tf) -> ub(x), (x, u, tf) -> g(x), (x, p, tf) -> μ(x, p))
+f0 = Flow(goddard, (x, p, tf) -> u0)
+f1 = Flow(goddard, (x, p, tf) -> u1)
+fs = Flow(goddard, (x, p, tf) -> us(x, p))
+fb = Flow(goddard, (x, p, tf) -> ub(x), (x, u, tf) -> g(x), (x, p, tf) -> μ(x, p))
 nothing # hide
 ```
 
