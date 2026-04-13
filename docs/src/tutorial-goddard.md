@@ -505,6 +505,44 @@ We now compare numerically the direct and indirect solutions. The comparison inc
 print_numerical_comparisons(direct_sol, indirect_sol)
 ```
 
+## Hamiltonian verification
+
+The Hamiltonian should be constant along the optimal trajectory and equal to zero since the final time is free. Let us verify this for both the direct and indirect solutions.
+
+```@example main-goddard
+# Hamiltonian function
+H(x, p, u) = H0(x, p) + u * H1(x, p)
+
+# Direct solution
+t_dir = time_grid(direct_sol)
+x_dir = state(direct_sol)
+u_dir = control(direct_sol)
+p_dir = costate(direct_sol)
+H_direct = [H(x_dir(ti), p_dir(ti), u_dir(ti)) for ti in t_dir]
+
+# Indirect solution
+t_ind = time_grid(indirect_sol)
+x_ind = state(indirect_sol)
+u_ind = control(indirect_sol)
+p_ind = costate(indirect_sol)
+H_indirect = [H(x_ind(ti), p_ind(ti), u_ind(ti)) for ti in t_ind]
+
+println("Direct method:")
+println("  H(t0) = ", H_direct[1])
+println("  H variation: max|H(t) - H(t0)| = ", maximum(abs.(H_direct .- H_direct[1])))
+
+println("\nIndirect method:")
+println("  H(t0) = ", H_indirect[1])
+println("  H variation: max|H(t) - H(t0)| = ", maximum(abs.(H_indirect .- H_indirect[1])))
+
+# Plot
+plot(t_dir, H_direct, label="Direct", linewidth=2)
+plot!(t_ind, H_indirect, label="Indirect", linewidth=2, linestyle=:dash)
+xlabel!("Time")
+ylabel!("H(t)")
+title!("Hamiltonian along the trajectory")
+```
+
 ## References
 
 [^1]: R.H. Goddard. A Method of Reaching Extreme Altitudes, volume 71(2) of Smithsonian Miscellaneous Collections. Smithsonian institution, City of Washington, 1919.
