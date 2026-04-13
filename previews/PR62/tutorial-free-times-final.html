@@ -29,14 +29,12 @@ xf = [1, 0]  # Desired final state
 
     # Objective: minimize final time
     tf → min
-end</code></pre><p>The <strong>free final time</strong> nature of the problem is explicitly stated by:</p><pre><code class="language-julia hljs">tf ∈ R, variable</code></pre><p>and the time definition</p><pre><code class="language-julia hljs">t ∈ [t0, tf], time</code></pre><p>indicates that the time horizon itself depends on the optimization variable <code>tf</code>.</p><h2 id="Direct-resolution"><a class="docs-heading-anchor" href="#Direct-resolution">Direct resolution</a><a id="Direct-resolution-1"></a><a class="docs-heading-anchor-permalink" href="#Direct-resolution" title="Permalink"></a></h2><p>To improve convergence of the direct solver, we constrain <code>tf</code> as follows:</p><pre><code class="language-julia hljs">0.05 ≤ tf ≤ Inf</code></pre><p>We then solve the optimal control problem with a direct method, using an automatic handling of the free final time:</p><pre><code class="language-julia hljs">sol = solve(ocp; grid_size=100)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">▫ This is OptimalControl version v1.1.6 running with: direct, adnlp, ipopt.
+end</code></pre><p>The <strong>free final time</strong> nature of the problem is explicitly stated by:</p><pre><code class="language-julia hljs">tf ∈ R, variable</code></pre><p>and the time definition</p><pre><code class="language-julia hljs">t ∈ [t0, tf], time</code></pre><p>indicates that the time horizon itself depends on the optimization variable <code>tf</code>.</p><h2 id="Direct-resolution"><a class="docs-heading-anchor" href="#Direct-resolution">Direct resolution</a><a id="Direct-resolution-1"></a><a class="docs-heading-anchor-permalink" href="#Direct-resolution" title="Permalink"></a></h2><p>To improve convergence of the direct solver, we constrain <code>tf</code> as follows:</p><pre><code class="language-julia hljs">0.05 ≤ tf ≤ Inf</code></pre><p>We then solve the optimal control problem with a direct method, using an automatic handling of the free final time:</p><pre><code class="language-julia hljs">sol = solve(ocp; grid_size=100)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">▫ This is OptimalControl 2.0.1, solving with: <span class="sgr36"><span class="sgr1">collocation</span></span> → <span class="sgr36"><span class="sgr1">adnlp</span></span> → <span class="sgr36"><span class="sgr1">ipopt</span></span> (<span class="sgr35"><span class="sgr1">cpu</span></span>)
 
-▫ The optimal control problem is solved with CTDirect version v0.17.4.
-
-   ┌─ The NLP is modelled with ADNLPModels and solved with NLPModelsIpopt.
-   │
-   ├─ Number of time steps⋅: 100
-   └─ Discretisation scheme: midpoint
+  📦 Configuration:
+   ├─ <span class="sgr1">Discretizer</span>: <span class="sgr36"><span class="sgr1">collocation</span></span> (grid_size = 100)
+   ├─ <span class="sgr1">Modeler</span>: <span class="sgr36"><span class="sgr1">adnlp</span></span>
+   └─ <span class="sgr1">Solver</span>: <span class="sgr36"><span class="sgr1">ipopt</span></span>
 
 ▫ This is Ipopt version 3.14.19, running with linear solver MUMPS 5.8.2.
 
@@ -69,17 +67,17 @@ iter    objective    inf_pr   inf_du lg(mu)  ||d||  lg(rg) alpha_du alpha_pr  ls
   10  2.0056026e+00 8.34e-05 6.84e-04  -5.3 8.80e-01    -  7.56e-01 7.58e-01h  1
   11  2.0005424e+00 4.50e-05 1.99e-05  -5.3 8.89e-01    -  9.86e-01 1.00e+00h  1
   12  2.0000009e+00 2.13e-07 3.71e-07 -11.0 3.65e-02    -  9.82e-01 1.00e+00h  1
-  13  2.0000000e+00 4.91e-12 5.80e-13 -11.0 5.49e-04    -  1.00e+00 1.00e+00h  1
+  13  2.0000000e+00 4.91e-12 5.81e-13 -11.0 5.49e-04    -  1.00e+00 1.00e+00h  1
 
 Number of Iterations....: 13
 
                                    (scaled)                 (unscaled)
 Objective...............:   1.9999999910286173e+00    1.9999999910286173e+00
-Dual infeasibility......:   5.8015213681809998e-13    5.8015213681809998e-13
+Dual infeasibility......:   5.8070724833041256e-13    5.8070724833041256e-13
 Constraint violation....:   4.9146242631081805e-12    4.9146242631081805e-12
 Variable bound violation:   9.4892587121364613e-09    9.4892587121364613e-09
-Complementarity.........:   1.6476668104042548e-11    1.6476668104042548e-11
-Overall NLP error.......:   1.6476668104042548e-11    1.6476668104042548e-11
+Complementarity.........:   1.6476668104039873e-11    1.6476668104039873e-11
+Overall NLP error.......:   1.6476668104039873e-11    1.6476668104039873e-11
 
 
 Number of objective function evaluations             = 19
@@ -89,9 +87,9 @@ Number of inequality constraint evaluations          = 0
 Number of equality constraint Jacobian evaluations   = 14
 Number of inequality constraint Jacobian evaluations = 0
 Number of Lagrangian Hessian evaluations             = 13
-Total seconds in IPOPT                               = 3.523
+Total seconds in IPOPT                               = 4.648
 
-EXIT: Optimal Solution Found.</code></pre><p>The solution can be visualized as:</p><pre><code class="language-julia hljs">plt = plot(sol; label=&quot;direct&quot;, size=(800, 600))</code></pre><img src="tutorial-free-times-final-f2bf3a9e.svg" alt="Example block output"/><h2 id="Verification-of-the-results"><a class="docs-heading-anchor" href="#Verification-of-the-results">Verification of the results</a><a id="Verification-of-the-results-1"></a><a class="docs-heading-anchor-permalink" href="#Verification-of-the-results" title="Permalink"></a></h2><p>Using <strong>Pontryagin&#39;s Maximum Principle</strong>, we know that the optimal trajectory consists of <strong>two arcs</strong>: one with <span>$u=1$</span> and one with <span>$u=-1$</span>. Without further calculations, the optimal trajectory is:</p><p class="math-container">\[x_1(t) =
+EXIT: Optimal Solution Found.</code></pre><p>The solution can be visualized as:</p><pre><code class="language-julia hljs">plt = plot(sol; label=&quot;direct&quot;, size=(800, 600))</code></pre><img src="tutorial-free-times-final-90a3bdbd.svg" alt="Example block output"/><h2 id="Verification-of-the-results"><a class="docs-heading-anchor" href="#Verification-of-the-results">Verification of the results</a><a id="Verification-of-the-results-1"></a><a class="docs-heading-anchor-permalink" href="#Verification-of-the-results" title="Permalink"></a></h2><p>Using <strong>Pontryagin&#39;s Maximum Principle</strong>, we know that the optimal trajectory consists of <strong>two arcs</strong>: one with <span>$u=1$</span> and one with <span>$u=-1$</span>. Without further calculations, the optimal trajectory is:</p><p class="math-container">\[x_1(t) =
 \begin{cases}
     \tfrac{1}{2}t^2, &amp; t \in [0,1),\\
     -\tfrac{1}{2}t^2 + 2t - 1, &amp; t \in [1,2],
@@ -119,11 +117,11 @@ H(t) = p(t)[1]*x(t)[2] + p(t)[2]*u(t)
 @printf(&quot;p(t0) = [%.5f, %.5f]&quot;, p(t0)[1], p(t0)[2]); println(lpad(&quot;(expected [1, 1])&quot;, 24))
 @printf(&quot;p(tf) = [%.5f, %.5f]&quot;, p(tf)[1], p(tf)[2]); println(lpad(&quot;(expected [1, -1])&quot;, 24))</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">tf = 2.00000                     (expected 2)
 H(t0) = 0.99568                  (expected 1)
-H(tf) = 1.00432                  (expected 1)
+H(tf) = 0.98432                  (expected 1)
 x(t0) = [0.00000, -0.00000]      (expected [0, 0])
-x(tf) = [1.00000, 0.00000]      (expected [1, 0])
+x(tf) = [1.00000, -0.00000]      (expected [1, 0])
 p(t0) = [1.00000, 0.99568]       (expected [1, 1])
-p(tf) = [1.00000, -1.00432]      (expected [1, -1])</code></pre><p>The numerical results match the theoretical solution almost exactly.</p><h2 id="Indirect-method"><a class="docs-heading-anchor" href="#Indirect-method">Indirect method</a><a id="Indirect-method-1"></a><a class="docs-heading-anchor-permalink" href="#Indirect-method" title="Permalink"></a></h2><p>We now solve the same problem using an <strong>indirect method</strong> (shooting approach). We begin by defining the pseudo-Hamiltonian and the switching function.</p><pre><code class="language-julia hljs"># Pseudo-Hamiltonian
+p(tf) = [1.00000, -0.98432]      (expected [1, -1])</code></pre><p>The numerical results match the theoretical solution almost exactly.</p><h2 id="Indirect-method"><a class="docs-heading-anchor" href="#Indirect-method">Indirect method</a><a id="Indirect-method-1"></a><a class="docs-heading-anchor-permalink" href="#Indirect-method" title="Permalink"></a></h2><p>We now solve the same problem using an <strong>indirect method</strong> (shooting approach). We begin by defining the pseudo-Hamiltonian and the switching function.</p><pre><code class="language-julia hljs"># Pseudo-Hamiltonian
 H(x, p, u) = p[1]*x[2] + p[2]*u
 
 # Hamiltonian lift used to compute the switching function
@@ -163,11 +161,11 @@ println(&quot;tf = &quot;, tf)
 # Evaluate the norm of the shooting function at initial guess
 s = zeros(4)
 shoot!(s, p0, t1, tf)
-println(&quot;\n‖s‖ (initial guess) = &quot;, norm(s), &quot;\n&quot;)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">p0 = [0.9999999955091624, 0.9956848379593445]
+println(&quot;\n‖s‖ (initial guess) = &quot;, norm(s), &quot;\n&quot;)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">p0 = [0.9999999955091625, 0.9956848379593418]
 t1 = 0.9999999955143086
 tf = 1.9999999910286173
 
-‖s‖ (initial guess) = 0.006102541639648192</code></pre><p>We can now solve the system using an <strong>indirect shooting method</strong>:</p><pre><code class="language-julia hljs"># Aggregated nonlinear system
+‖s‖ (initial guess) = 0.006102541639652266</code></pre><p>We can now solve the system using an <strong>indirect shooting method</strong>:</p><pre><code class="language-julia hljs"># Aggregated nonlinear system
 shoot!(s, ξ, _) = shoot!(s, ξ[1:2], ξ[3], ξ[4])
 
 # Define the problem and initial guess
@@ -189,13 +187,13 @@ Algorithm: NewtonRaphson(
 ----    	-------------       	-----------
 Iter    	f(u) inf-norm       	Step 2-norm
 ----    	-------------       	-----------
-0       	4.31515306e-03      	0.00000000e+00
+0       	4.31515306e-03      	2.00000763e+00
 1       	7.34009524e-16      	4.31516204e-03
 Final   	7.34009524e-16
 ----------------------</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">retcode: Success
 u: 4-element Vector{Float64}:
  1.0
- 1.0
+ 1.0000000000000002
  1.0000000000000004
  2.0000000000000004</code></pre><p>Finally, we compare the indirect solution to the direct one:</p><pre><code class="language-julia hljs">p0 = indirect_sol.u[1:2]
 t1 = indirect_sol.u[3]
@@ -206,4 +204,4 @@ f = f_pos * (t1, f_neg)
 flow_sol = f((t0, tf), x0, p0; saveat=range(t0, tf, 200))
 
 # Plot comparison
-plot!(plt, flow_sol; label=&quot;indirect&quot;, color=2)</code></pre><img src="tutorial-free-times-final-0eb5fdcc.svg" alt="Example block output"/></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="tutorial-discretisation.html">« Discretisation methods</a><a class="docs-footer-nextpage" href="tutorial-free-times-initial.html">Initial time »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.17.0 on <span class="colophon-date" title="Monday 13 April 2026 15:28">Monday 13 April 2026</span>. Using Julia version 1.12.6.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+plot!(plt, flow_sol; label=&quot;indirect&quot;, color=2)</code></pre><img src="tutorial-free-times-final-5476dd88.svg" alt="Example block output"/></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="tutorial-discretisation.html">« Discretisation methods</a><a class="docs-footer-nextpage" href="tutorial-free-times-initial.html">Initial time »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.17.0 on <span class="colophon-date" title="Monday 13 April 2026 15:56">Monday 13 April 2026</span>. Using Julia version 1.12.6.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
