@@ -1,19 +1,19 @@
 # [NLP and DOCP manipulations](@id tutorial-nlp)
 
 ```@meta
-Draft = false
+Draft = true
 CurrentModule =  OptimalControl
 ```
 
-We describe here some more advanced operations related to the discretized optimal control problem. When calling `solve(ocp)`, three steps are performed internally:
+We describe here low-level operations related to the discretized optimal control problem. The standard way to solve an OCP is to call `solve(ocp)`, available in three modes of increasing abstraction:
 
-1. The OCP is discretized into a DOCP (discretized optimal control problem)
-2. An NLP (nonlinear programming) model is built from the DOCP
-3. The NLP is solved, and a functional solution of the OCP is rebuilt from the NLP solution
+- **Descriptive mode**: `solve(ocp; grid_size=100, ...)` — highest level, uses symbols and plain values (see [basic usage](@extref OptimalControl manual-solve))
+- **Explicit mode**: `solve(ocp; discretizer=disc, modeler=mod, solver=sol)` — uses strategy instances as keyword arguments, missing components are filled in automatically (see [explicit mode](@extref OptimalControl manual-solve-explicit))
+- **Canonical mode**: `solve(ocp, init, disc, mod, solv)` — all components passed as positional arguments
 
-These steps can also be done manually, which gives you more control over the solving process. This is useful when you want to:
+This tutorial goes one level below the canonical mode and exposes its elementary steps manually. This is useful when you want to:
 
-- Use your own NLP solver
+- Use your own NLP solver directly
 - Access and inspect the NLP model
 - Benchmark different components separately
 - Fine-tune each step of the resolution
@@ -51,7 +51,7 @@ We now perform the resolution step by step, using OptimalControl strategy instan
 
 ### Step 1: Build the initial guess
 
-First, we build an initial guess for the problem. Here we pass `nothing` to use the default initialization.
+First, we build an initial guess for the problem. Here we pass `nothing` to use the default initialization. For more options (constant values, time-dependent functions, warm start from a previous solution), see the [initial guess documentation](@extref OptimalControl manual-initial-guess) and the `@init` macro.
 
 ```@example main-nlp
 init = build_initial_guess(ocp, nothing)
@@ -80,7 +80,7 @@ nlp = nlp_model(docp, init, modeler)
 nothing # hide
 ```
 
-The `nlp` is an `ADNLPModel` (from the NLPModels ecosystem) representing the discretized nonlinear programming problem.
+The `nlp` is an `ADNLPModel` (from the NLPModels ecosystem) representing the discretized nonlinear programming problem. The full list of options for each strategy (`Collocation`, `ADNLP`, etc.) is described in [Strategy options](@extref OptimalControl manual-solve-strategy-options).
 
 ### Step 4: Solve the NLP
 
@@ -114,6 +114,8 @@ nlp_sol_madnlp = madnlp(nlp; print_level=MadNLP.ERROR, tol=1e-8)
 nothing # hide
 ```
 
+Note that MadNLP can also be used via the OptimalControl wrapper `OptimalControl.MadNLP(...)`, just like `OptimalControl.Ipopt(...)` above. The full list of available solvers is given in the [explicit mode documentation](@extref OptimalControl manual-solve-explicit).
+
 ### Step 5: Build the OCP solution
 
 Finally, we build the optimal control solution from the NLP solution and plot it. Note that the multipliers from the NLP solver are used to compute the costate.
@@ -123,40 +125,28 @@ sol = ocp_solution(docp, nlp_sol, modeler)
 plot(sol)
 ```
 
-## All-in-one with explicit strategies
+## Canonical solve
 
-All the steps above can also be performed in a single `solve` call by passing the strategy instances explicitly:
+All the steps above are exactly what the canonical `solve` performs internally. They can be condensed into a single call:
 
 ```@example main-nlp
 sol = solve(ocp, init, discretizer, modeler, solver; display=false)
 plot(sol)
 ```
 
-This is the explicit mode of `solve`, which gives you full control over each component while keeping the interface simple. See the [explicit mode documentation](@extref OptimalControl manual-solve-explicit) for more details.
+This is the **canonical mode** of `solve` (Layer 3): all components are fully specified and passed as positional arguments — no defaults, no auto-completion. The two higher-level modes sit above this:
+
+- **Explicit mode** — pass strategy instances as keyword arguments; missing components are resolved automatically: `solve(ocp; discretizer=disc, modeler=mod, solver=sol)`. See [explicit mode](@extref OptimalControl manual-solve-explicit).
+- **Descriptive mode** — pass plain values and symbols; everything is built internally: `solve(ocp; grid_size=100, tol=1e-8)`. See [basic usage](@extref OptimalControl manual-solve).
 
 ## Initial guess and warm start
 
-An initial guess can be passed at different stages of the process.
+For a detailed presentation of all the ways to build an initial guess — constant values, time-dependent functions, warm start from a previous solution, or using the `@init` macro — see the [initial guess documentation](@extref OptimalControl manual-initial-guess).
 
-If you have a previous solution, you can use it to warm-start a new resolution:
+In the step-by-step approach, the initial guess is passed to `nlp_model` via `build_initial_guess`. In canonical mode, it is passed as a positional argument:
 
 ```@example main-nlp
-# Use the previous solution as initial guess
 init_warm = build_initial_guess(ocp, sol)
-
-# Discretize and solve with warm start
-docp_warm = discretize(ocp, discretizer)
-nlp_warm = nlp_model(docp_warm, init_warm, modeler)
-nlp_sol_warm = solve(nlp_warm, solver; display=false)
-sol_warm = ocp_solution(docp_warm, nlp_sol_warm, modeler)
-
-println("Iterations with warm start: ", iterations(sol_warm))
-println("Iterations without warm start: ", iterations(sol))
-```
-
-You can also pass the initial guess directly to `solve` in explicit mode:
-
-```@example main-nlp
-sol_warm2 = solve(ocp, init_warm, discretizer, modeler, solver; display=false)
-println("Objective value: ", objective(sol_warm2))
+sol_warm = solve(ocp, init_warm, discretizer, modeler, solver; display=false)
+println("Objective value: ", objective(sol_warm))
 ```

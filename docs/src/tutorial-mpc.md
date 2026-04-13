@@ -1,9 +1,5 @@
 # Navigation problem, MPC approach
 
-```@meta
-Draft = false
-```
-
 We consider a ship in a constant current $w=(w_x,w_y)$, where $\|w\|<1$. The [heading angle](https://en.wikipedia.org/wiki/Heading) is controlled, leading to the following differential equations:
 
 ```math
@@ -14,11 +10,11 @@ We consider a ship in a constant current $w=(w_x,w_y)$, where $\|w\|<1$. The [he
 \end{array}
 ```
 
-The state variables represent:
+The state and control variables represent:
 
-- $(x, y)$: the ship's position in the plane
-- $\theta$: the heading angle (direction of the ship's velocity relative to the x-axis)
-- $u$: the angular velocity (rate of change of the heading angle)
+- the ship's position in the plane $(x, y)$
+- the heading angle $\theta$ (direction of the ship's velocity relative to the x-axis)
+- the angular velocity $u$ (rate of change of the heading angle)
 
 The angular velocity is limited and normalized: $\|u(t)\| \leq 1$. There are boundary conditions at the initial time $t=0$ and at the final time $t=t_f$, on the position $(x,y)$ and on the angle $\theta$. The objective is to minimize the final time.
 
@@ -68,6 +64,7 @@ function current(x, y) # current as a function of position
     end
     return w
 end
+nothing # hide
 ```
 
 !!! note "Plotting utility functions"
@@ -77,58 +74,58 @@ end
     ```
 
     ```@example main-mpc
-function plot_state!(plt, x, y, θ; color=1)
-    plot!(plt, [x], [y], marker=:circle, legend=false, color=color, markerstrokecolor=color, markersize=5, z_order=:front)
-    quiver!(plt, [x], [y], quiver=([cos(θ)], [sin(θ)]), color=color, linewidth=2, z_order=:front)
-    return plt
-end
-
-function plot_current!(plt; current=current, N=10, scaling=1)
-    for x ∈ range(xlims(plt)..., N)
-        for y ∈ range(ylims(plt)..., N)
-            w = scaling*current(x, y)
-            quiver!(plt, [x], [y], quiver=([w[1]], [w[2]]), color=:black, linewidth=0.5, z_order=:back)
-        end
+    function plot_state!(plt, x, y, θ; color=1)
+        plot!(plt, [x], [y], marker=:circle, legend=false, color=color, markerstrokecolor=color, markersize=5, z_order=:front)
+        quiver!(plt, [x], [y], quiver=([cos(θ)], [sin(θ)]), color=color, linewidth=2, z_order=:front)
+        return plt
     end
-    return plt
-end
 
-function plot_trajectory!(plt, t, x, y, θ; N=5) # N: number of points where we will display θ
-
-    # trajectory
-    plot!(plt, x.(t), y.(t), legend=false, color=1, linewidth=2, z_order=:front)
-
-    if N > 0
-
-        # length of the path
-        s = 0
-        for i ∈ 2:length(t)
-            s += norm([x(t[i]), y(t[i])] - [x(t[i-1]), y(t[i-1])])
-        end
-
-        # interval of length
-        Δs = s/(N+1)
-        tis = []
-        s = 0
-        for i ∈ 2:length(t)
-            s += norm([x(t[i]), y(t[i])] - [x(t[i-1]), y(t[i-1])])
-            if s > Δs && length(tis) < N
-                push!(tis, t[i])
-                s = 0
+    function plot_current!(plt; current=current, N=10, scaling=1)
+        for x ∈ range(xlims(plt)..., N)
+            for y ∈ range(ylims(plt)..., N)
+                w = scaling*current(x, y)
+                quiver!(plt, [x], [y], quiver=([w[1]], [w[2]]), color=:black, linewidth=0.5, z_order=:back)
             end
         end
-
-        # display intermediate points
-        for ti ∈ tis
-            plot_state!(plt, x(ti), y(ti), θ(ti); color=1)
-        end
-
+        return plt
     end
 
-    return plt
-    
-end
-nothing # hide
+    function plot_trajectory!(plt, t, x, y, θ; N=5) # N: number of points where we will display θ
+
+        # trajectory
+        plot!(plt, x.(t), y.(t), legend=false, color=1, linewidth=2, z_order=:front)
+
+        if N > 0
+
+            # length of the path
+            s = 0
+            for i ∈ 2:length(t)
+                s += norm([x(t[i]), y(t[i])] - [x(t[i-1]), y(t[i-1])])
+            end
+
+            # interval of length
+            Δs = s/(N+1)
+            tis = []
+            s = 0
+            for i ∈ 2:length(t)
+                s += norm([x(t[i]), y(t[i])] - [x(t[i-1]), y(t[i-1])])
+                if s > Δs && length(tis) < N
+                    push!(tis, t[i])
+                    s = 0
+                end
+            end
+
+            # display intermediate points
+            for ti ∈ tis
+                plot_state!(plt, x(ti), y(ti), θ(ti); color=1)
+            end
+
+        end
+
+        return plt
+        
+    end
+    nothing # hide
     ```
 
     ```@raw html
@@ -270,32 +267,32 @@ In the previous simulation, we assumed that the current is constant. However, fr
     <details><summary>Click to unfold the simulation code.</summary>
     ```
 
-```@example main-mpc
-function realistic_trajectory(tf, t0, x0, y0, θ0, u, current; abstol=1e-12, reltol=1e-12, saveat=[])
-    
-    function rhs!(dq, q, dummy, t)
-        x, y, θ = q
-        w = current(x, y)
-        dq[1] = w[1] + cos(θ)
-        dq[2] = w[2] + sin(θ)
-        dq[3] = u(t)
+    ```@example main-mpc
+    function realistic_trajectory(tf, t0, x0, y0, θ0, u, current; abstol=1e-12, reltol=1e-12, saveat=[])
+        
+        function rhs!(dq, q, dummy, t)
+            x, y, θ = q
+            w = current(x, y)
+            dq[1] = w[1] + cos(θ)
+            dq[2] = w[2] + sin(θ)
+            dq[3] = u(t)
+        end
+        
+        q0 = [x0, y0, θ0]
+        tspan = (t0, tf)
+        ode = ODEProblem(rhs!, q0, tspan)
+        sol = OrdinaryDiffEq.solve(ode, Tsit5(), abstol=abstol, reltol=reltol, saveat=saveat)
+
+        t = sol.t
+        x = t -> sol(t)[1]
+        y = t -> sol(t)[2]
+        θ = t -> sol(t)[3]
+
+        return t, x, y, θ
+        
     end
-    
-    q0 = [x0, y0, θ0]
-    tspan = (t0, tf)
-    ode = ODEProblem(rhs!, q0, tspan)
-    sol = OrdinaryDiffEq.solve(ode, Tsit5(), abstol=abstol, reltol=reltol, saveat=saveat)
-
-    t = sol.t
-    x = t -> sol(t)[1]
-    y = t -> sol(t)[2]
-    θ = t -> sol(t)[3]
-
-    return t, x, y, θ
-    
-end
-nothing # hide
-```
+    nothing # hide
+    ```
 
     ```@raw html
     </details>
