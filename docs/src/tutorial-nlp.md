@@ -1,7 +1,7 @@
 # [NLP and DOCP manipulations](@id tutorial-nlp)
 
 ```@meta
-Draft = true
+Draft = false
 CurrentModule =  OptimalControl
 ```
 
@@ -91,6 +91,7 @@ We have two approaches to solve the NLP problem.
 We can create an OptimalControl solver strategy and use it to solve the NLP:
 
 ```@example main-nlp
+using NLPModelsIpopt
 solver = OptimalControl.Ipopt(print_level=5, tol=1e-8, mu_strategy="adaptive")
 nlp_sol = solve(nlp, solver; display=true)
 nothing # hide
