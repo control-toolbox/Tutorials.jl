@@ -430,18 +430,28 @@ plot!(plt, indirect_sol; label="indirect", color=2)
 
     function print_numerical_comparisons(direct_sol, indirect_sol)
 
-        # get relevant data from direct solution
+        # get time grids
         t_dir = time_grid(direct_sol)
-        x_dir = state(direct_sol).(t_dir)
-        u_dir = control(direct_sol).(t_dir)
+        t_ind = time_grid(indirect_sol)
+
+        # create common time grid (union of both grids)
+        t_common = unique(sort([t_dir..., t_ind...]))
+
+        # interpolate both solutions on common grid
+        x_dir_func = state(direct_sol)
+        u_dir_func = control(direct_sol)
+        x_ind_func = state(indirect_sol)
+        u_ind_func = control(indirect_sol)
+
+        x_dir = x_dir_func.(t_common)
+        u_dir = u_dir_func.(t_common)
+        x_ind = x_ind_func.(t_common)
+        u_ind = u_ind_func.(t_common)
+
         v_dir = variable(direct_sol)
         o_dir = objective(direct_sol)
         i_dir = iterations(direct_sol)
 
-        # get relevant data from indirect solution
-        t_ind = time_grid(indirect_sol)
-        x_ind = state(indirect_sol).(t_ind)
-        u_ind = control(indirect_sol).(t_ind)
         v_ind = variable(indirect_sol)
         o_ind = objective(indirect_sol)
 
@@ -457,20 +467,20 @@ plot!(plt, indirect_sol; label="indirect", color=2)
         # States
         println("├─  States (L2 Norms)")
         for i in eachindex(x_vars)
-            xi_dir = [x_dir[k][i] for k in eachindex(t_dir)]
-            xi_ind = [x_ind[k][i] for k in eachindex(t_ind)]
-            L2_ae = L2_norm(t_dir, xi_dir - xi_ind)
-            L2_re = L2_ae / (0.5 * (L2_norm(t_dir, xi_dir) + L2_norm(t_dir, xi_ind)))
+            xi_dir = [x_dir[k][i] for k in eachindex(t_common)]
+            xi_ind = [x_ind[k][i] for k in eachindex(t_common)]
+            L2_ae = L2_norm(t_common, xi_dir - xi_ind)
+            L2_re = L2_ae / (0.5 * (L2_norm(t_common, xi_dir) + L2_norm(t_common, xi_ind)))
             @printf("│     %-6s Abs: %.3e   Rel: %.3e\\n", x_vars[i], L2_ae, L2_re)
         end
 
         # Controls
         println("├─  Controls (L2 Norms)")
         for i in eachindex(u_vars)
-            ui_dir = [u_dir[k][i] for k in eachindex(t_dir)]
-            ui_ind = [u_ind[k][i] for k in eachindex(t_ind)]
-            L2_ae = L2_norm(t_dir, ui_dir - ui_ind)
-            L2_re = L2_ae / (0.5 * (L2_norm(t_dir, ui_dir) + L2_norm(t_dir, ui_ind)))
+            ui_dir = [u_dir[k][i] for k in eachindex(t_common)]
+            ui_ind = [u_ind[k][i] for k in eachindex(t_common)]
+            L2_ae = L2_norm(t_common, ui_dir - ui_ind)
+            L2_re = L2_ae / (0.5 * (L2_norm(t_common, ui_dir) + L2_norm(t_common, ui_ind)))
             @printf("│     %-6s Abs: %.3e   Rel: %.3e\\n", u_vars[i], L2_ae, L2_re)
         end
 
