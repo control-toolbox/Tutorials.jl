@@ -1,9 +1,5 @@
 # [Direct and indirect methods for the Goddard problem](@id tutorial-goddard)
 
-```@meta
-Draft = false
-```
-
 ## Introduction
 
 ```@raw html

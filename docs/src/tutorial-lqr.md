@@ -1,5 +1,9 @@
 # A simple Linear–quadratic regulator example
 
+```@meta
+Draft = false
+```
+
 ## Problem statement
 
 We consider the following Linear Quadratic Regulator (LQR) problem, which consists in minimizing
@@ -11,7 +15,7 @@ We consider the following Linear Quadratic Regulator (LQR) problem, which consis
 subject to the dynamics
 
 ```math
-    \dot x_1(t) = x_2(t), \quad \dot x_2(t) = -x_1(t) + u(t), \quad u(t) \in \R
+    \dot x_1(t) = x_2(t), \quad \dot x_2(t) = -x_1(t) + u(t), \quad u(t) \in \mathbb{R}
 ```
 
 and the initial condition
@@ -57,6 +61,46 @@ end
 nothing # hide
 ```
 
+!!! note "Matrix form alternative"
+
+    ```@raw html
+    <details><summary>Click to unfold and see the matrix form.</summary>
+    ```
+
+    The problem can also be written using matrix notation with the `backend=:default` option:
+
+    ```@example main-lqr
+    x0 = [ 0
+           1 ]
+    A  = [ 0 1
+          -1 0 ]
+    B  = [ 0
+           1 ]
+    Q  = [ 1 0
+           0 1 ]
+    R  = 1
+    tf = 3
+
+    ocp = @def begin
+        t ∈ [0, tf], time
+        x ∈ R², state
+        u ∈ R, control
+        x(0) == x0
+        ẋ(t) == A * x(t) + B * u(t)
+        0.5∫( x(t)' * Q * x(t) + u(t)' * R * u(t) ) → min
+    end
+
+    solve(ocp; backend=:default, display=false)
+    ```
+
+    !!! warning "Known issue"
+
+        Not using `backend=:default` with the ADNLPModels modeler (the default one) for the matrix form will lead to an error. This is a [known issue](@extref OptimalControl manual-abstract-known-issues).
+
+    ```@raw html
+    </details>
+    ```
+
 ## Solving the problem for different final times
 
 We solve the problem for $t_f \in \{3, 5, 30\}$.
@@ -69,6 +113,13 @@ for tf ∈ tfs
     solution = solve(lqr(tf), display=false)
     push!(solutions, solution)
 end
+
+# Display costs and final states
+for i ∈ eachindex(solutions)
+    x_func = state(solutions[i])
+    obj = objective(solutions[i])
+    println("tf = $(tfs[i]): cost = ", obj, ", x(tf) = ", x_func(tfs[i]))
+end
 nothing # hide
 ```
 
@@ -77,9 +128,9 @@ nothing # hide
 We plot the state and control variables using normalized time $s = (t - t_0)/(t_f - t_0)$:
 
 ```@example main-lqr
-plt = plot(solutions[1], :state, :control; time=:normalize, label="tf = $(tfs[1])")
-for (tf, sol) ∈ zip(tfs[2:end], solutions[2:end])
-    plot!(plt, sol, :state, :control; time=:normalize, label="tf = $tf")
+plt = plot()
+for i ∈ eachindex(solutions)
+    plot!(plt, solutions[i], :state, :control; time=:normalize, label="tf = $(tfs[i])")
 end
 
 px1 = plot(plt[1], legend=false, xlabel="s", ylabel="x₁")
@@ -90,38 +141,4 @@ plot(px1, px2, pu, layout=(1, 3), size=(800, 300), leftmargin=5mm, bottommargin=
 
 !!! note "Nota bene"
 
-    We can observe that $x(t_f)$ converges to the origin as $t_f$ increases.
-
-## Known issues
-
-The following definition will lead to an error when solving the problem. This is a [known issue](@extref OptimalControl manual-abstract-known-issues).
-
-```@repl main-lqr
-
-x0 = [ 0
-       1 ]
-
-A = [  0 1
-      -1 0 ]
-
-B = [ 0
-      1 ]
-
-Q = [ 1 0
-      0 1 ]
-
-R = 1
-
-tf = 3
-
-ocp = @def begin
-    t ∈ [0, tf], time
-    x ∈ R², state
-    u ∈ R, control
-    x(0) == x0
-    ẋ(t) == A * x(t) + B * u(t)
-    0.5∫( x(t)' * Q * x(t) + u(t)' * R * u(t) ) → min
-end
-
-solve(ocp)
-```
+    We can observe that $x(t_f)$ converges to the origin as $t_f$ increases. This illustrates a fundamental property of the LQR problem: as the horizon extends, the optimal solution approaches the steady-state infinite-horizon LQR regulator, which drives the state to the origin with minimal cost.
