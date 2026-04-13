@@ -548,7 +548,11 @@ println("  H variation: max|H(t) - H(t0)| = ", maximum(abs.(H_direct .- H_direct
 println("\nIndirect method:")
 println("  H(t0) = ", H_indirect[1])
 println("  H variation: max|H(t) - H(t0)| = ", maximum(abs.(H_indirect .- H_indirect[1])))
+```
 
+We can also plot the Hamiltonian along the trajectory to verify its constancy visually.
+
+```@example main-goddard
 # Plot
 plot(t_dir, H_direct, label="Direct", linewidth=2)
 plot!(t_ind, H_indirect, label="Indirect", linewidth=2, linestyle=:dash)
