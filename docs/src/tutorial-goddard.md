@@ -277,7 +277,7 @@ function fsolve(f, j, x; kwargs...)
         println(e)
         println("hybrj not supported. Replaced by NonlinearSolve even if it is not visible on the doc.")
         nle! = (s, ξ, λ) -> f(s, ξ)
-        prob = NonlinearProblem(nle!, ξ)
+        prob = NonlinearProblem(nle!, x)
         sol = solve(prob; abstol=1e-8, reltol=1e-8, show_trace=Val(true))
         return MYSOL(sol.u)
     end
