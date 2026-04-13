@@ -1,5 +1,9 @@
 # [Direct and indirect methods for the Goddard problem](@id tutorial-goddard)
 
+```@meta
+Draft = false
+```
+
 ## Introduction
 
 ```@raw html
@@ -32,7 +36,6 @@ and subject to the control constraint $u(t) \in [0,1]$ and the state constraint 
 We import the [OptimalControl.jl](https://control-toolbox.org/OptimalControl.jl) package to define the optimal control problem and [NLPModelsIpopt.jl](https://jso.dev/NLPModelsIpopt.jl) to solve it. We import the [Plots.jl](https://docs.juliaplots.org) package to plot the solution. The [OrdinaryDiffEq.jl](https://docs.sciml.ai/OrdinaryDiffEq) package is used to define the shooting function for the indirect method and the [MINPACK.jl](https://github.com/sglyon/MINPACK.jl) package permits to solve the shooting equation.
 
 ```@example main-goddard
-using BenchmarkTools
 using OptimalControl  # to define the optimal control problem and more
 using NLPModelsIpopt  # to solve the problem via a direct method
 using OrdinaryDiffEq  # to get the Flow function from OptimalControl
@@ -107,7 +110,7 @@ plt = plot(direct_sol, label="direct", size=(800, 800))
 
 ## [Structure of the solution](@id tutorial-goddard-structure)
 
-We first determine visually the structure of the optimal solution which is composed of a bang arc with maximal control, followed by a singular arc, then by a boundary arc and the final arc is with zero control. Note that the switching function vanishes along the singular and boundary arcs.
+We first determine visually the structure of the optimal solution which is composed of a bang arc with maximal control, followed by a singular arc, then by a boundary arc and the final arc is with zero control. In summary, the structure is: **bang** ($u=1$) → **singular** → **boundary** ($v=v_{\max}$) → **off** ($u=0$). Note that the switching function vanishes along the singular and boundary arcs.
 
 ```@example main-goddard
 t = time_grid(direct_sol)   # the time grid as a vector
@@ -126,7 +129,7 @@ g_plot  = plot(t, g ∘ x, linewidth=2, label = "g(x(t))")
 plot(u_plot, H1_plot, g_plot, layout=(3,1), size=(600, 600))
 ```
 
-We are now in position to solve the problem by an indirect shooting method. We first define the four control laws in feedback form and their associated flows. For this we need to compute some Lie derivatives, namely [Poisson brackets](https://en.wikipedia.org/wiki/Poisson_bracket) of Hamiltonians (themselves obtained as lifts to the cotangent bundle of vector fields), or derivatives of functions along a vector field. For instance, the control along the *minimal order* singular arcs is obtained as the quotient
+We are now in position to solve the problem by an indirect shooting method. For an introduction to the indirect simple shooting method, see the [Indirect simple shooting](@ref tutorial-indirect-simple-shooting) tutorial. We first define the four control laws in feedback form and their associated flows. For this we need to compute some Lie derivatives, namely [Poisson brackets](https://en.wikipedia.org/wiki/Poisson_bracket) of Hamiltonians (themselves obtained as lifts to the cotangent bundle of vector fields), or derivatives of functions along a vector field. For instance, the control along the *minimal order* singular arcs is obtained as the quotient
 
 ```math
 u_s = -\frac{H_{001}}{H_{101}}
@@ -172,7 +175,7 @@ as well as the associated multiplier for the *order one* state constraint on the
 
     which is the reason why we use the `@Lie` macro to compute Poisson brackets below.
 
-With the help of differential geometry primitives, these expressions are straightforwardly translated into Julia code:
+With the help of differential geometry primitives, these expressions are straightforwardly translated into Julia code. For more details on the differential geometry tools, see [Differential geometry tools](@extref OptimalControl manual-differential-geometry). For a simpler example involving a minimal order singular arc, see [Singular control](@extref OptimalControl example-singular-control).
 
 ```@example main-goddard
 # Controls
@@ -198,7 +201,7 @@ nothing # hide
 
 ## Shooting function
 
-Then, we define the shooting function according to the optimal structure we have determined, that is a concatenation of four arcs.
+Then, we define the shooting function according to the optimal structure we have determined, that is a concatenation of four arcs. The shooting function has 7 unknowns (3 components of the initial costate `p0` and 4 times: `t1`, `t2`, `t3`, `tf`) and 7 equations.
 
 ```@example main-goddard
 x0 = [r0, v0, m0] # initial state
@@ -211,7 +214,8 @@ function shoot!(s, p0, t1, t2, t3, tf)
     xf, pf = f0(t3, x3, p3, tf)
 
     s[1] = xf[3] - mf               # final mass constraint
-    s[2:3] = pf[1:2] - [1, 0]       # transversality conditions
+    s[2:3] = pf[1:2] - [1, 0]       # transversality conditions: r(tf) and v(tf) are free
+                                    # objective is -r(tf) → p_r(tf) = 1, and v(tf) free → p_v(tf) = 0
     s[4] = H1(x1, p1)               # H1 = H01 = 0
     s[5] = H01(x1, p1)              # at the entrance of the singular arc
     s[6] = g(x2)                    # g = 0 when entering the boundary arc
@@ -302,10 +306,10 @@ We are now in position to solve the problem with the `hybrj` solver from MINPACK
 
 ```@example main-goddard
 # resolution of S(ξ) = 0
-indirect_sol = fsolve(shoot!, jshoot!, ξ_guess, show_trace=true)
+minpack_sol = fsolve(shoot!, jshoot!, ξ_guess, show_trace=true)
 
 # we retrieve the costate solution together with the times
-ξ = indirect_sol.x
+ξ = minpack_sol.x
 p0, t1, t2, t3, tf = ξ[1:3], ξ[4:end]...
 
 println("MINPACK results:")
@@ -319,6 +323,7 @@ println("tf = ", tf)
 s = similar(p0, 7)
 shoot!(s, p0, t1, t2, t3, tf)
 println("\nNorm of the shooting function: ‖s‖ = ", norm(s), "\n")
+@assert norm(s) < 1e-6 "Indirect shooting failed for MINPACK"
 ```
 
 ### NonlinearSolve.jl
@@ -335,10 +340,10 @@ Now, let us solve the problem and retrieve the initial costate and times.
 
 ```@example main-goddard
 # resolution of S(ξ) = 0
-sol = solve(prob; show_trace=Val(true))
+sciml_sol = solve(prob; show_trace=Val(true))
 
 # we retrieve the costate solution together with the times
-ξ = sol.u
+ξ = sciml_sol.u
 p0, t1, t2, t3, tf = ξ[1:3], ξ[4:end]...
 
 println("\nNonlinearSolve results:")
@@ -352,11 +357,31 @@ println("tf = ", tf)
 s = similar(p0, 7)
 shoot!(s, p0, t1, t2, t3, tf)
 println("\nNorm of the shooting function: ‖s‖ = ", norm(s), "\n")
+@assert norm(s) < 1e-6 "Indirect shooting failed for NonlinearSolve"
+```
+
+### Comparison of the two solvers
+
+Let us compare the results obtained by the two solvers.
+
+```@example main-goddard
+ξ_minpack = minpack_sol.x
+ξ_sciml = sciml_sol.u
+
+println("Comparison of the two solvers:")
+println("MINPACK solution: ξ = ", ξ_minpack)
+println("SciML solution:   ξ = ", ξ_sciml)
+println("Difference:       Δξ = ", ξ_minpack - ξ_sciml)
+println("Relative error:   ‖Δξ‖/‖ξ‖ = ", norm(ξ_minpack - ξ_sciml) / norm(ξ_minpack))
 ```
 
 ### Benchmarking
 
 The results found for by the two solvers are extremely close, so now, lets benchmark these two resolutions to compare their performances.
+
+```@example main-goddard
+using BenchmarkTools
+```
 
 ```@example main-goddard
 @benchmark fsolve(shoot!, jshoot!, ξ_guess; tol=1e-8, show_trace=false) #MINPACK
@@ -372,7 +397,7 @@ According to the NonlinearSolve documentation, for small nonlinear systems, it c
 @benchmark solve(prob, SimpleNewtonRaphson(); abstol=1e-8, reltol=1e-8, show_trace=Val(false)) # NonlinearSolve
 ```
 
-MINPACK.jl (fsolve) is much faster than NonlinearSolve.jl (solve) on this problem. It also uses less memory. Both methods have a similar GC overhead, but MINPACK.jl is overall more efficient here.
+There exist different alternatives to solve the shooting equation, as shown in the benchmarks above.
 
 ## [Plot of the solution](@id tutorial-goddard-plot)
 
@@ -380,9 +405,104 @@ We plot the solution of the indirect solution (in red) over the solution of the 
 
 ```@example main-goddard
 f = f1 * (t1, fs) * (t2, fb) * (t3, f0) # concatenation of the flows
-flow_sol = f((t0, tf), x0, p0)          # compute the solution: state, costate, control...
+indirect_sol = f((t0, tf), x0, p0)      # compute the solution: state, costate, control...
 
-plot!(plt, flow_sol; label="indirect", color=2)
+plot!(plt, indirect_sol; label="indirect", color=2)
+```
+
+!!! note "Numerical comparison between direct and indirect solutions"
+
+    ```@raw html
+    <details><summary>Click to unfold and get the code for numerical comparisons.</summary>
+    ```
+
+    ```@example main-goddard
+    using Printf
+
+    function L2_norm(T, X)
+        # T and X are supposed to be one dimensional
+        s = 0.0
+        for i in 1:(length(T) - 1)
+            s += 0.5 * (X[i]^2 + X[i + 1]^2) * (T[i + 1] - T[i])
+        end
+        return √(s)
+    end
+
+    function print_numerical_comparisons(direct_sol, indirect_sol)
+
+        # get relevant data from direct solution
+        t_dir = time_grid(direct_sol)
+        x_dir = state(direct_sol).(t_dir)
+        u_dir = control(direct_sol).(t_dir)
+        v_dir = variable(direct_sol)
+        o_dir = objective(direct_sol)
+        i_dir = iterations(direct_sol)
+
+        # get relevant data from indirect solution
+        t_ind = time_grid(indirect_sol)
+        x_ind = state(indirect_sol).(t_ind)
+        u_ind = control(indirect_sol).(t_ind)
+        v_ind = variable(indirect_sol)
+        o_ind = objective(indirect_sol)
+
+        x_vars = ["r", "v", "m"]
+        u_vars = ["u"]
+        v_vars = ["tf"]
+
+        println("┌─ Goddard problem: direct vs indirect")
+        println("│")
+        println("├─  Number of Iterations")
+        @printf("│     Direct: %d\\n", i_dir)
+
+        # States
+        println("├─  States (L2 Norms)")
+        for i in eachindex(x_vars)
+            xi_dir = [x_dir[k][i] for k in eachindex(t_dir)]
+            xi_ind = [x_ind[k][i] for k in eachindex(t_ind)]
+            L2_ae = L2_norm(t_dir, xi_dir - xi_ind)
+            L2_re = L2_ae / (0.5 * (L2_norm(t_dir, xi_dir) + L2_norm(t_dir, xi_ind)))
+            @printf("│     %-6s Abs: %.3e   Rel: %.3e\\n", x_vars[i], L2_ae, L2_re)
+        end
+
+        # Controls
+        println("├─  Controls (L2 Norms)")
+        for i in eachindex(u_vars)
+            ui_dir = [u_dir[k][i] for k in eachindex(t_dir)]
+            ui_ind = [u_ind[k][i] for k in eachindex(t_ind)]
+            L2_ae = L2_norm(t_dir, ui_dir - ui_ind)
+            L2_re = L2_ae / (0.5 * (L2_norm(t_dir, ui_dir) + L2_norm(t_dir, ui_ind)))
+            @printf("│     %-6s Abs: %.3e   Rel: %.3e\\n", u_vars[i], L2_ae, L2_re)
+        end
+
+        # Variables
+        println("├─  Variables")
+        for i in eachindex(v_vars)
+            vi_dir = v_dir[i]
+            vi_ind = v_ind[i]
+            vi_ae = abs(vi_dir - vi_ind)
+            vi_re = vi_ae / (0.5 * (abs(vi_dir) + abs(vi_ind)))
+            @printf("│     %-6s Abs: %.3e   Rel: %.3e\\n", v_vars[i], vi_ae, vi_re)
+        end
+
+        # Objective
+        o_ae = abs(o_dir - o_ind)
+        o_re = o_ae / (0.5 * (abs(o_dir) + abs(o_ind)))
+        println("├─  Objective")
+        @printf("│            Abs: %.3e   Rel: %.3e\\n", o_ae, o_re)
+        println("└─")
+        return nothing
+    end
+    nothing # hide
+    ```
+
+    ```@raw html
+    </details>
+    ```
+
+We now compare numerically the direct and indirect solutions. The comparison includes L2 norms for the state and control variables, as well as absolute and relative errors for the variable (final time) and the objective. The L2 norm is computed using the trapezoidal rule over the time grid of the direct solution.
+
+```@example main-goddard
+print_numerical_comparisons(direct_sol, indirect_sol)
 ```
 
 ## References
