@@ -1,16 +1,23 @@
 # [Free initial and final times](@id tutorial-free-times-final-initial)
 
+```@meta
+Draft = false
+```
+
+This tutorial is part of a series on optimal control problems with free time variables.
+See also: [Free final time](@ref tutorial-free-times-final) and [Free initial time](@ref tutorial-free-times-initial).
+
 In this tutorial, we consider an optimal control problem with the initial and final times as free variables, that is there are parts of the variable to be optimized. The required packages for the tutorial are:
 
-```@example both_time
-using OptimalControl
-using NLPModelsIpopt
-using Plots
+```@example free-both-times
+using OptimalControl          # Main package
+using NLPModelsIpopt          # Direct solver
+using Plots                   # Visualization
 ```
 
 The problem we consider is the following:
 
-```@example both_time
+```@example free-both-times
 
 @def ocp begin
 
@@ -40,17 +47,17 @@ nothing # hide
 
 We now solve the problem using a direct method.
 
-```@example both_time
+```@example free-both-times
 sol = solve(ocp; grid_size=100)
 nothing # hide
 ```
 
-```@example both_time
+```@example free-both-times
 sol # hide
 ```
 
 And plot the solution.
 
-```@example both_time
+```@example free-both-times
 plot(sol)
 ```
