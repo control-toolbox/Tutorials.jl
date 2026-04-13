@@ -62,6 +62,7 @@ makedocs(;
         prettyurls=false,
         size_threshold_ignore=[
             "tutorial-discretisation.md",
+            "tutorial-nlp.md",
         ],
         assets=[
             asset("https://control-toolbox.org/assets/css/documentation.css"),
