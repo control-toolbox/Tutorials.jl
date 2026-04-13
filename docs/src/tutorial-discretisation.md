@@ -167,7 +167,7 @@ for adnlp_backend in backends
     solver = OptimalControl.Ipopt(print_level=0)
 
     # Initial guess
-    init = OptimalControl.build_initial_guess(ocp, nothing)
+    init = build_initial_guess(ocp, nothing)
 
     # Discretize and build NLP model
     # This lower-level approach with discretize/nlp_model/solve is detailed in the [tutorial on direct transcription](@ref tutorial-nlp)
@@ -197,7 +197,7 @@ for adnlp_backend in backends
             NNZH=nnzh, 
             PrepTime=prepa_time, 
             ExecTime=exec_time, 
-            Objective=-nlp_sol.objective, 
+            Objective=nlp_sol.objective, 
             Iterations=nlp_sol.iter
         )
     )
