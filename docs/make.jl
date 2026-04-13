@@ -48,7 +48,7 @@ repo_url = "github.com/control-toolbox/Tutorials.jl"
 Draft = false
 ```
 =#
-draft = true  # Draft mode: if true, @example blocks in markdown are not executed
+draft = false  # Draft mode: if true, @example blocks in markdown are not executed
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # Build documentation

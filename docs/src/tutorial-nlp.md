@@ -1,10 +1,5 @@
 # [NLP and DOCP manipulations](@id tutorial-nlp)
 
-```@meta
-Draft = false
-CurrentModule =  OptimalControl
-```
-
 We describe here low-level operations related to the discretized optimal control problem. The standard way to solve an OCP is to call `solve(ocp)`, available in three modes of increasing abstraction:
 
 - **Descriptive mode**: `solve(ocp; grid_size=100, ...)` — highest level, uses symbols and plain values (see [basic usage](@extref OptimalControl manual-solve))
