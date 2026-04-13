@@ -1,9 +1,5 @@
 # [Indirect simple shooting](@id tutorial-indirect-simple-shooting)
 
-```@meta
-Draft = false
-```
-
 In this tutorial we present the indirect simple shooting method on a simple example.
 
 Let us start by importing the necessary packages. We import the [OptimalControl.jl](https://control-toolbox.org/OptimalControl.jl) package to define the optimal control problem.  We import the [Plots.jl](https://docs.juliaplots.org) package to plot the solution.  The [OrdinaryDiffEq.jl](https://docs.sciml.ai/OrdinaryDiffEq) package is used as the ODE solver backend by the Flow function from OptimalControl.jl and the [MINPACK.jl](https://github.com/sglyon/MINPACK.jl) package permits to solve the shooting equation.
@@ -167,14 +163,21 @@ We can use the [MINPACK.jl](https://github.com/sglyon/MINPACK.jl) to solve the s
 
 ```@setup main-iss
 using MINPACK
+using NonlinearSolve  # interface to NLE solvers
+struct MYSOL
+    x::Vector{Float64}
+end
 function fsolve(f, j, x; kwargs...)
     try
         MINPACK.fsolve(f, j, x; kwargs...)
     catch e
         println("Error using MINPACK")
         println(e)
-        println("hybrj not supported. Replaced by hybrd even if it is not visible on the doc.")
-        MINPACK.fsolve(f, x; kwargs...)
+        println("hybrj not supported. Replaced by NonlinearSolve even if it is not visible on the doc.")
+        nle! = (s, ξ, λ) -> f(s, ξ)
+        prob = NonlinearProblem(nle!, ξ)
+        sol = solve(prob, SimpleNewtonRaphson(); abstol=1e-8, reltol=1e-8, show_trace=Val(true))
+        return MYSOL(sol.u)
     end
 end
 ```
