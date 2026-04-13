@@ -213,13 +213,13 @@ function shoot!(s, p0, t1, t2, t3, tf)
     x3, p3 = fb(t2, x2, p2, t3)
     xf, pf = f0(t3, x3, p3, tf)
 
-    s[1] = xf[3] - mf               # final mass constraint
-    s[2:3] = pf[1:2] - [1, 0]       # transversality conditions: r(tf) and v(tf) are free
-                                    # objective is -r(tf) → p_r(tf) = 1, and v(tf) free → p_v(tf) = 0
-    s[4] = H1(x1, p1)               # H1 = H01 = 0
-    s[5] = H01(x1, p1)              # at the entrance of the singular arc
-    s[6] = g(x2)                    # g = 0 when entering the boundary arc
-    s[7] = H0(xf, pf)               # since tf is free
+    s[1] = xf[3] - mf           # final mass constraint
+    s[2:3] = pf[1:2] - [1, 0]   # transversality conditions: r(tf) and v(tf) are free
+                                # objective is -r(tf) → p_r(tf) = 1, and v(tf) free → p_v(tf) = 0
+    s[4] = H1(x1, p1)           # H1 = H01 = 0
+    s[5] = H01(x1, p1)          # at the entrance of the singular arc
+    s[6] = g(x2)                # g = 0 when entering the boundary arc
+    s[7] = H0(xf, pf)           # since tf is free
 
 end
 nothing # hide
@@ -276,9 +276,9 @@ function fsolve(f, j, x; kwargs...)
         println("Error using MINPACK")
         println(e)
         println("hybrj not supported. Replaced by NonlinearSolve even if it is not visible on the doc.")
-        nle! = (s, ξ, λ) -> f(s, ξ)
+        nle! = (s, ξ, _) -> f(s, ξ)
         prob = NonlinearProblem(nle!, x)
-        sol = solve(prob; abstol=1e-8, reltol=1e-8, show_trace=Val(true))
+        sol = solve(prob; show_trace=Val(true))
         return MYSOL(sol.u)
     end
 end
@@ -462,7 +462,8 @@ plot!(plt, indirect_sol; label="indirect", color=2)
         println("┌─ Goddard problem: direct vs indirect")
         println("│")
         println("├─  Number of Iterations")
-        @printf("│     Direct: %d\\n", i_dir)
+        @printf("│     Direct: %d\n", i_dir)
+        println("│")
 
         # States
         println("├─  States (L2 Norms)")
@@ -471,8 +472,9 @@ plot!(plt, indirect_sol; label="indirect", color=2)
             xi_ind = [x_ind[k][i] for k in eachindex(t_common)]
             L2_ae = L2_norm(t_common, xi_dir - xi_ind)
             L2_re = L2_ae / (0.5 * (L2_norm(t_common, xi_dir) + L2_norm(t_common, xi_ind)))
-            @printf("│     %-6s Abs: %.3e   Rel: %.3e\\n", x_vars[i], L2_ae, L2_re)
+            @printf("│     %-6s Abs: %.3e   Rel: %.3e\n", x_vars[i], L2_ae, L2_re)
         end
+        println("│")
 
         # Controls
         println("├─  Controls (L2 Norms)")
@@ -481,8 +483,9 @@ plot!(plt, indirect_sol; label="indirect", color=2)
             ui_ind = [u_ind[k][i] for k in eachindex(t_common)]
             L2_ae = L2_norm(t_common, ui_dir - ui_ind)
             L2_re = L2_ae / (0.5 * (L2_norm(t_common, ui_dir) + L2_norm(t_common, ui_ind)))
-            @printf("│     %-6s Abs: %.3e   Rel: %.3e\\n", u_vars[i], L2_ae, L2_re)
+            @printf("│     %-6s Abs: %.3e   Rel: %.3e\n", u_vars[i], L2_ae, L2_re)
         end
+        println("│")
 
         # Variables
         println("├─  Variables")
@@ -491,14 +494,15 @@ plot!(plt, indirect_sol; label="indirect", color=2)
             vi_ind = v_ind[i]
             vi_ae = abs(vi_dir - vi_ind)
             vi_re = vi_ae / (0.5 * (abs(vi_dir) + abs(vi_ind)))
-            @printf("│     %-6s Abs: %.3e   Rel: %.3e\\n", v_vars[i], vi_ae, vi_re)
+            @printf("│     %-6s Abs: %.3e   Rel: %.3e\n", v_vars[i], vi_ae, vi_re)
         end
+        println("│")
 
         # Objective
+        println("├─  Objective")
         o_ae = abs(o_dir - o_ind)
         o_re = o_ae / (0.5 * (abs(o_dir) + abs(o_ind)))
-        println("├─  Objective")
-        @printf("│            Abs: %.3e   Rel: %.3e\\n", o_ae, o_re)
+        @printf("│            Abs: %.3e   Rel: %.3e\n", o_ae, o_re)
         println("└─")
         return nothing
     end
