@@ -1,4 +1,4 @@
-# Minimal Action Method using Optimal Control
+# [Minimal Action Method using Optimal Control](@id tutorial-mam)
 
 The Minimal Action Method (MAM) is a numerical technique for finding the most probable transition pathway between stable states in stochastic dynamical systems. It achieves this by minimizing an action functional that represents the path's deviation from the deterministic dynamics, effectively identifying the path of least resistance through the system's landscape.
 

@@ -1,4 +1,4 @@
-# A simple Linear–quadratic regulator example
+# [A simple Linear–quadratic regulator example](@id tutorial-lqr)
 
 ## Problem statement
 

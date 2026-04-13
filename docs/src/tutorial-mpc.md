@@ -1,4 +1,4 @@
-# Navigation problem, MPC approach
+# [Navigation problem, MPC approach](@id tutorial-mpc)
 
 We consider a ship in a constant current $w=(w_x,w_y)$, where $\|w\|<1$. The [heading angle](https://en.wikipedia.org/wiki/Heading) is controlled, leading to the following differential equations:
 
