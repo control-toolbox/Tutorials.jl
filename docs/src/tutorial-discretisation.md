@@ -78,7 +78,7 @@ sol = solve(ocp; scheme=:midpoint, display=false)
 plot(sol; size=(800, 800))
 ```
 
-Let us now compare different discretization schemes to evaluate their accuracy and performance. See the [Strategy options](@id manual-solve-strategy-options) for information on default values for parameters like `tol`.
+Let us now compare different discretization schemes to evaluate their accuracy and performance. See the [Strategy options](@extref OptimalControl manual-solve-strategy-options) for information on default values for parameters like `tol`.
 
 ```@example main-disc
 # Solve the problem with different discretization methods

@@ -145,8 +145,9 @@ function continuation_mam(Ts; init_guess=init)
     iterations_list = Int[]
     current_sol = init_guess
     
+    opts = (display=false, grid_size=1000, tol=1e-8, print_level=0)
     for T in Ts
-        current_sol = solve(ocp(T); display=false, init=current_sol, grid_size=1000, tol=1e-8)
+        current_sol = solve(ocp(T); init=current_sol, opts...)
         push!(objectives, objective(current_sol))
         push!(iterations_list, iterations(current_sol))
     end
@@ -155,7 +156,7 @@ function continuation_mam(Ts; init_guess=init)
 end
 
 # Perform continuation
-Ts = range(1, 100, 100)
+Ts = range(50, 100, 101)
 objectives, iters, final_sol = continuation_mam(Ts)
 
 # Display results
@@ -184,14 +185,6 @@ Let us visualize the evolution of the objective function with respect to the tra
 plt1 = scatter(Ts, log10.(objectives), xlabel="Time", label="Objective (log10)")
 vline!(plt1, [T_min], label="Minimum at T=$(round(T_min, digits=1))", z_order=:back)
 plot(plt1, size=(800,400))
-```
-
-We now focus on the region around the minimum for a clearer view:
-
-```@example main-mam
-plt2 = scatter(Ts[40:100], log10.(objectives[40:100]), xlabel="Time", label="Objective (log10)")
-vline!(plt2, [T_min], label="Minimum", z_order=:back)
-plot(plt2, size=(800,400))
 ```
 
 !!! note "Interpretation"
