@@ -1,9 +1,5 @@
 # [Free initial and final times](@id tutorial-free-times-final-initial)
 
-```@meta
-Draft = false
-```
-
 This tutorial is part of a series on optimal control problems with free time variables.
 See also: [Free final time](@ref tutorial-free-times-final) and [Free initial time](@ref tutorial-free-times-initial).
 
