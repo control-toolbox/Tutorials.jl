@@ -1,9 +1,5 @@
 # Minimal Action Method using Optimal Control
 
-```@meta
-Draft = false
-```
-
 The Minimal Action Method (MAM) is a numerical technique for finding the most probable transition pathway between stable states in stochastic dynamical systems. It achieves this by minimizing an action functional that represents the path's deviation from the deterministic dynamics, effectively identifying the path of least resistance through the system's landscape.
 
 This tutorial demonstrates how to implement MAM as an optimal control problem, using the classical Maier-Stein model as a benchmark example.
@@ -145,7 +141,7 @@ function continuation_mam(Ts; init_guess=init)
     iterations_list = Int[]
     current_sol = init_guess
     
-    opts = (display=false, grid_size=1000, tol=1e-8, print_level=0)
+    opts = (display=false, grid_size=1000, tol=1e-8)
     for T in Ts
         current_sol = solve(ocp(T); init=current_sol, opts...)
         push!(objectives, objective(current_sol))

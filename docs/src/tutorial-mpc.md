@@ -1,7 +1,10 @@
 # Navigation problem, MPC approach
 
-We consider a ship in a constant current $w=(w_x,w_y)$, where $\|w\|<1$. 
-The [heading angle](https://en.wikipedia.org/wiki/Heading) is controlled, leading to the following differential equations:
+```@meta
+Draft = false
+```
+
+We consider a ship in a constant current $w=(w_x,w_y)$, where $\|w\|<1$. The [heading angle](https://en.wikipedia.org/wiki/Heading) is controlled, leading to the following differential equations:
 
 ```math
 \begin{array}{rcl}
@@ -11,7 +14,17 @@ The [heading angle](https://en.wikipedia.org/wiki/Heading) is controlled, leadin
 \end{array}
 ```
 
-The angular velocity is limited and normalized: $\|u(t)\| \leq 1$. There are boundary conditions at the initial time $t=0$ and at the final time $t=t_f$, on the position $(x,y)$ and on the angle $\theta$. The objective is to minimize the final time. This topic stems from a collaboration between the University Côte d'Azur and the French company [CGG](https://www.cgg.com), which is interested in optimal maneuvers of very large ships for marine exploration.
+The state variables represent:
+
+- $(x, y)$: the ship's position in the plane
+- $\theta$: the heading angle (direction of the ship's velocity relative to the x-axis)
+- $u$: the angular velocity (rate of change of the heading angle)
+
+The angular velocity is limited and normalized: $\|u(t)\| \leq 1$. There are boundary conditions at the initial time $t=0$ and at the final time $t=t_f$, on the position $(x,y)$ and on the angle $\theta$. The objective is to minimize the final time.
+
+The condition $\|w\|<1$ ensures that the ship can always make progress against the current, since the ship's own velocity has unit magnitude.
+
+This topic stems from a collaboration between the University Côte d'Azur and the French company [CGG](https://www.cgg.com), which is interested in optimal maneuvers of very large ships for marine exploration.
 
 ```@raw html
 <img 
@@ -23,7 +36,7 @@ The angular velocity is limited and normalized: $\|u(t)\| \leq 1$. There are bou
 >
 ```
 
-## Data 
+## Data
 
 ```@example main-mpc
 using LinearAlgebra
@@ -42,6 +55,9 @@ xf = 4.
 yf = 7.
 θf = -π/2
 
+# Current model: combines a constant base current with a position-dependent perturbation.
+# The parameter ε controls the magnitude of the spatial variation, while the base 
+# current w = [0.6, 0.4] represents the mean flow direction.
 function current(x, y) # current as a function of position
     ε = 1e-1
     w = [ 0.6, 0.4 ]
@@ -52,8 +68,15 @@ function current(x, y) # current as a function of position
     end
     return w
 end
+```
 
-#
+!!! note "Plotting utility functions"
+
+    ```@raw html
+    <details><summary>Click to unfold the plotting functions.</summary>
+    ```
+
+    ```@example main-mpc
 function plot_state!(plt, x, y, θ; color=1)
     plot!(plt, [x], [y], marker=:circle, legend=false, color=color, markerstrokecolor=color, markersize=5, z_order=:front)
     quiver!(plt, [x], [y], quiver=([cos(θ)], [sin(θ)]), color=color, linewidth=2, z_order=:front)
@@ -70,26 +93,6 @@ function plot_current!(plt; current=current, N=10, scaling=1)
     return plt
 end
 
-# Display the boundary conditions and the current in the augmented phase plane
-plt = plot(
-    xlims=(-2, 6), 
-    ylims=(-1, 8), 
-    size=(600, 600), 
-    aspect_ratio=1, 
-    xlabel="x", 
-    ylabel="y", 
-    title="Boundary Conditions",
-    leftmargin=5mm, 
-    bottommargin=5mm,
-)
-
-plot_state!(plt, x0, y0, θ0; color=2)
-plot_state!(plt, xf, yf, θf; color=2)
-annotate!([(x0, y0, ("q₀", 12, :top)), (xf, yf, ("qf", 12, :bottom))])
-plot_current!(plt)
-```
-
-```@example main-mpc
 function plot_trajectory!(plt, t, x, y, θ; N=5) # N: number of points where we will display θ
 
     # trajectory
@@ -126,13 +129,37 @@ function plot_trajectory!(plt, t, x, y, θ; N=5) # N: number of points where we 
     
 end
 nothing # hide
+    ```
+
+    ```@raw html
+    </details>
+    ```
+
+```@example main-mpc
+# Display the boundary conditions and the current in the augmented phase plane
+plt = plot(
+    xlims=(-2, 6), 
+    ylims=(-1, 8), 
+    size=(600, 600), 
+    aspect_ratio=1, 
+    xlabel="x", 
+    ylabel="y", 
+    title="Boundary Conditions",
+    leftmargin=5mm, 
+    bottommargin=5mm,
+)
+
+plot_state!(plt, x0, y0, θ0; color=2)
+plot_state!(plt, xf, yf, θf; color=2)
+annotate!([(x0, y0, ("q₀", 12, :top)), (xf, yf, ("qf", 12, :bottom))])
+plot_current!(plt)
 ```
 
 ## OptimalControl solver
 
 ```@example main-mpc
 function solve(t0, x0, y0, θ0, xf, yf, θf, w; 
-    grid_size=300, tol=1e-8, max_iter=500, print_level=4, display=true, disc_method=:euler)
+    grid_size=300, tol=1e-8, max_iter=500, print_level=4, display=true, scheme=:euler)
 
     # Definition of the problem
     ocp = @def begin
@@ -159,9 +186,11 @@ function solve(t0, x0, y0, θ0, xf, yf, θf, w;
 
     # Initialization
     tf_init = 1.5*norm([xf, yf]-[x0, y0])
-    x_init(t) = [ x0, y0, θ0 ] * (tf_init-t)/(tf_init-t0) + [xf, yf, θf] * (t-t0)/(tf_init-t0)
-    u_init = (θf - θ0) / (tf_init-t0)
-    init = (state=x_init, control=u_init, variable=tf_init)
+    init = @init ocp begin
+        tf := tf_init
+        q(t) := [ x0, y0, θ0 ] * (tf_init-t)/(tf_init-t0) + [xf, yf, θf] * (t-t0)/(tf_init-t0)
+        u(t) := (θf - θ0) / (tf_init-t0)
+    end
 
     # Resolution
     sol = OptimalControl.solve(ocp; 
@@ -171,7 +200,7 @@ function solve(t0, x0, y0, θ0, xf, yf, θf, w;
         max_iter=max_iter, 
         print_level=print_level, 
         display=display, 
-        disc_method=disc_method,
+        scheme=scheme,
     )
 
     # Retrieval of useful data
@@ -191,7 +220,7 @@ nothing # hide
 
 ## First resolution
 
-We consider a constant current and we solve a first time the problem.
+We consider a constant current, and we solve a first time the problem. The current is evaluated at the initial position and assumed to remain constant throughout the trajectory.
 
 ```@example main-mpc
 # Resolution
@@ -201,6 +230,12 @@ println("Iterations: ", iter)
 println("Constraints violation: ", cons)
 println("tf: ", tf)
 ```
+
+The solution provides:
+
+- The optimal final time `tf`: the minimum time needed to reach the target
+- The optimal state trajectory $(x(t), y(t), \theta(t))$
+- The optimal control $u(t)$: the angular velocity profile
 
 ```@example main-mpc
 # Displaying the trajectory
@@ -223,9 +258,17 @@ plot(plt_q, plt_u;
 )
 ```
 
+The trajectory shows the ship's path when assuming the current is constant and equal to its value at the initial position.
+
 ## Simulation of the Real System
 
 In the previous simulation, we assumed that the current is constant. However, from a practical standpoint, the current depends on the position $(x, y)$. Given a current model, provided by the function `current`, we can simulate the actual trajectory of the ship, as long as we have the initial condition and the control over time.
+
+!!! note "Realistic trajectory simulation function"
+
+    ```@raw html
+    <details><summary>Click to unfold the simulation code.</summary>
+    ```
 
 ```@example main-mpc
 function realistic_trajectory(tf, t0, x0, y0, θ0, u, current; abstol=1e-12, reltol=1e-12, saveat=[])
@@ -254,6 +297,10 @@ end
 nothing # hide
 ```
 
+    ```@raw html
+    </details>
+    ```
+
 ```@example main-mpc
 # Realistic trajectory
 t, x, y, θ = realistic_trajectory(tf, t0, x0, y0, θ0, u, current)
@@ -279,9 +326,26 @@ plot(plt_q, plt_u;
 )
 ```
 
+Note that the final position (shown in red) differs from the target position (shown in orange). This discrepancy occurs because the control was computed assuming a constant current, but the actual current varies with position. The ship drifts due to the unmodeled spatial variation of the current.
+
 ## MPC Approach
 
 In practice, we do not have the actual current data for the entire trajectory in advance, which is why we will regularly recalculate the optimal control. The idea is to update the optimal control at regular time intervals, taking into account the current at the position where the ship is located. We are therefore led to solve a number of problems with constant current, with this being updated regularly. This is an introduction to the so-called Model Predictive Control (MPC) methods.
+
+The MPC algorithm works as follows:
+
+1. At each iteration, measure the current at the ship's current position
+2. Solve an optimal control problem assuming this current is constant over the entire remaining trajectory
+3. Apply the optimal control for a fixed time step `Δt`
+4. Simulate the ship's motion using the actual position-dependent current
+5. Update the ship's position and repeat until reaching the target
+
+The parameters are:
+
+- `Nmax`: maximum number of MPC iterations (safety limit)
+- `ε`: convergence tolerance - the algorithm stops when within this distance of the target
+- `Δt`: prediction horizon - how long to apply each computed control before re-planning
+- `P`: number of discretization points for the optimal control solver
 
 ```@example main-mpc
 function MPC(t0, x0, y0, θ0, xf, yf, θf, current)
@@ -355,6 +419,15 @@ nothing # hide
 ```
 
 ## Display
+
+The final plot shows:
+
+- The complete MPC trajectory (blue) composed of segments from each iteration
+- Starting points of each segment (orange) where re-planning occurs
+- The final position reached (red) - note that it is much closer to the target than in the constant-current simulation
+- The control profile (right) showing the piecewise re-planning strategy
+
+The MPC approach successfully compensates for the spatial variation of the current by continuously updating the control based on local current measurements.
 
 ```@example main-mpc
 # Trajectory
