@@ -1,9 +1,5 @@
 # Discrete continuation
 
-```@meta
-Draft = false
-```
-
 By using the warm start option, it is easy to implement a basic discrete continuation method, in which a sequence of problems is solved by using each solution as the initial guess for the next problem. This approach typically leads to faster and more reliable convergence than solving each problem with the same initial guess and is particularly useful for problems that require a good initial guess to converge.
 
 ## Continuation on parametric OCP
@@ -176,7 +172,7 @@ function continuation_goddard(Tmax_range; init=nothing, scheme=:midpoint, grid_s
     return data, sols
 end
 
-data, sols = continuation_goddard(range(Tmax_0, Tmax_f, length=8); init=sol0)
+data, sols = continuation_goddard(range(Tmax_0, Tmax_f, length=9); init=sol0)
 println(data)
 ```
 
