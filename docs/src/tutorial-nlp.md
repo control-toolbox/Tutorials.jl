@@ -1,17 +1,17 @@
 # [NLP and DOCP manipulations](@id tutorial-nlp)
 
-```@meta
-CurrentModule =  OptimalControl
-```
+We describe here low-level operations related to the discretized optimal control problem. The standard way to solve an OCP is to call `solve(ocp)`, available in three modes of increasing abstraction:
 
-We describe here some more advanced operations related to the discretized optimal control problem.
-When calling `solve(ocp)` three steps are performed internally:
+- **Descriptive mode**: `solve(ocp; grid_size=100, ...)` — highest level, uses symbols and plain values (see [basic usage](@extref OptimalControl manual-solve))
+- **Explicit mode**: `solve(ocp; discretizer=disc, modeler=mod, solver=sol)` — uses strategy instances as keyword arguments, missing components are filled in automatically (see [explicit mode](@extref OptimalControl manual-solve-explicit))
+- **Canonical mode**: `solve(ocp, init, disc, mod, solv)` — all components passed as positional arguments
 
-- first, the OCP is discretized into a DOCP (a nonlinear optimization problem),
-- then, this DOCP is solved with a nonlinear programming (NLP) solver, which returns a solution of the discretized problem,
-- finally, a functional solution of the OCP is rebuilt from the solution of the discretized problem.
+This tutorial goes one level below the canonical mode and exposes its elementary steps manually. This is useful when you want to:
 
-These steps can also be done separately, for instance if you want to use your own NLP solver. 
+- Use your own NLP solver directly
+- Access and inspect the NLP model
+- Benchmark different components separately
+- Fine-tune each step of the resolution
 
 Let us load the packages.
 
@@ -20,7 +20,7 @@ using OptimalControl
 using Plots
 ```
 
-We define a test problem
+We define a simple test problem: a double integrator with minimal control energy.
 
 ```@example main-nlp
 ocp = @def begin
@@ -32,7 +32,7 @@ ocp = @def begin
     x(0) == [ -1, 0 ]
     x(1) == [ 0, 0 ]
 
-    ẋ(t) == [ x₂(t), u(t) ]
+    ẋ(t) == [ x₂(t), u(t) ]
 
     ∫( 0.5u(t)^2 ) → min
 
@@ -40,64 +40,109 @@ end
 nothing # hide
 ```
 
-## Discretization and NLP problem
+## Step-by-step resolution with OptimalControl
 
-We discretize the problem with [`direct_transcription`](@extref CTDirect.direct_transcription):
+We now perform the resolution step by step, using OptimalControl strategy instances.
+
+### Step 1: Build the initial guess
+
+First, we build an initial guess for the problem. Here we pass `nothing` to use the default initialization. For more options (constant values, time-dependent functions, warm start from a previous solution), see the [initial guess documentation](@extref OptimalControl manual-initial-guess) and the `@init` macro.
 
 ```@example main-nlp
-docp = direct_transcription(ocp)
+init = build_initial_guess(ocp, nothing)
 nothing # hide
 ```
 
-and get the NLP model with [`nlp_model`](@extref CTDirect.nlp_model):
+### Step 2: Discretize the OCP
+
+We create a discretizer strategy and use it to discretize the optimal control problem into a DOCP.
 
 ```@example main-nlp
-nlp = nlp_model(docp)
+discretizer = OptimalControl.Collocation(grid_size=100, scheme=:trapeze)
+docp = discretize(ocp, discretizer)
 nothing # hide
 ```
 
-The DOCP contains information related to the transcription, including a copy of the original OCP, and the NLP is the resulting discretized nonlinear programming problem, in our case an `ADNLPModel`.
+The `docp` is a `DiscretizedModel` that contains information about the discretization, including a copy of the original OCP.
 
-We can now use the solver of our choice to solve it.
+### Step 3: Build the NLP model
 
-## Resolution of the NLP problem
+Next, we create a modeler strategy and build the NLP model from the discretized problem.
 
-For a first example we use the `ipopt` solver from [NLPModelsIpopt.jl](https://jso.dev/NLPModelsIpopt.jl) package to solve the NLP problem.
+```@example main-nlp
+modeler = OptimalControl.ADNLP(backend=:optimized)
+nlp = nlp_model(docp, init, modeler)
+nothing # hide
+```
+
+The `nlp` is an `ADNLPModel` (from the NLPModels ecosystem) representing the discretized nonlinear programming problem. The full list of options for each strategy (`Collocation`, `ADNLP`, etc.) is described in [Strategy options](@extref OptimalControl manual-solve-strategy-options).
+
+### Step 4: Solve the NLP
+
+We have two approaches to solve the NLP problem.
+
+#### Approach A: Using OptimalControl solver wrapper
+
+We can create an OptimalControl solver strategy and use it to solve the NLP:
 
 ```@example main-nlp
 using NLPModelsIpopt
-nlp_sol = ipopt(nlp; print_level=5, mu_strategy="adaptive", tol=1e-8, sb="yes")
+solver = OptimalControl.Ipopt(print_level=5, tol=1e-8, mu_strategy="adaptive")
+nlp_sol = solve(nlp, solver; display=true)
 nothing # hide
 ```
 
-Then, we can build an optimal control problem solution with [`build_OCP_solution`](@extref CTDirect.build_OCP_solution-Tuple{Any}) (note that the multipliers are optional, but the OCP costate will not be retrieved if the multipliers are not provided) and plot it.
+#### Approach B: Using external NLP solvers directly
+
+Alternatively, we can use NLP solvers directly from their respective packages. For instance, with [NLPModelsIpopt.jl](https://jso.dev/NLPModelsIpopt.jl):
 
 ```@example main-nlp
-sol = build_OCP_solution(docp, nlp_sol)
-plot(sol)
+using NLPModelsIpopt
+nlp_sol_ipopt = ipopt(nlp; print_level=5, mu_strategy="adaptive", tol=1e-8, sb="yes")
+nothing # hide
 ```
 
-## Change the NLP solver
-
-Alternatively, we can use [MadNLP.jl](https://madnlp.github.io/MadNLP.jl) to solve anew the NLP problem:
+Or with [MadNLP.jl](https://madnlp.github.io/MadNLP.jl):
 
 ```@example main-nlp
 using MadNLP
-nlp_sol = madnlp(nlp; print_level=MadNLP.ERROR)
-```
-
-## Initial guess
-
-An initial guess, including warm start, can be passed to [`direct_transcription`](@extref CTDirect.direct_transcription) the same way as for `solve`.
-
-```@example main-nlp
-docp = direct_transcription(ocp; init=sol)
+nlp_sol_madnlp = madnlp(nlp; print_level=MadNLP.ERROR, tol=1e-8)
 nothing # hide
 ```
 
-It can also be changed after the transcription is done, with  [`set_initial_guess`](@extref CTDirect.set_initial_guess).
+Note that MadNLP can also be used via the OptimalControl wrapper `OptimalControl.MadNLP(...)`, just like `OptimalControl.Ipopt(...)` above. The full list of available solvers is given in the [explicit mode documentation](@extref OptimalControl manual-solve-explicit).
+
+### Step 5: Build the OCP solution
+
+Finally, we build the optimal control solution from the NLP solution and plot it. Note that the multipliers from the NLP solver are used to compute the costate.
 
 ```@example main-nlp
-set_initial_guess(docp, sol)
-nothing # hide
+sol = ocp_solution(docp, nlp_sol, modeler)
+plot(sol)
+```
+
+## Canonical solve
+
+All the steps above are exactly what the canonical `solve` performs internally. They can be condensed into a single call:
+
+```@example main-nlp
+sol = solve(ocp, init, discretizer, modeler, solver; display=false)
+plot(sol)
+```
+
+This is the **canonical mode** of `solve` (Layer 3): all components are fully specified and passed as positional arguments — no defaults, no auto-completion. The two higher-level modes sit above this:
+
+- **Explicit mode** — pass strategy instances as keyword arguments; missing components are resolved automatically: `solve(ocp; discretizer=disc, modeler=mod, solver=sol)`. See [explicit mode](@extref OptimalControl manual-solve-explicit).
+- **Descriptive mode** — pass plain values and symbols; everything is built internally: `solve(ocp; grid_size=100, tol=1e-8)`. See [basic usage](@extref OptimalControl manual-solve).
+
+## Initial guess and warm start
+
+For a detailed presentation of all the ways to build an initial guess — constant values, time-dependent functions, warm start from a previous solution, or using the `@init` macro — see the [initial guess documentation](@extref OptimalControl manual-initial-guess).
+
+In the step-by-step approach, the initial guess is passed to `nlp_model` via `build_initial_guess`. In canonical mode, it is passed as a positional argument:
+
+```@example main-nlp
+init_warm = build_initial_guess(ocp, sol)
+sol_warm = solve(ocp, init_warm, discretizer, modeler, solver; display=false)
+println("Objective value: ", objective(sol_warm))
 ```

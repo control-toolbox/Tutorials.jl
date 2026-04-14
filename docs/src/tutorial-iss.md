@@ -2,13 +2,12 @@
 
 In this tutorial we present the indirect simple shooting method on a simple example.
 
-Let us start by importing the necessary packages. We import the [OptimalControl.jl](https://control-toolbox.org/OptimalControl.jl) package to define the optimal control problem.  We import the [Plots.jl](https://docs.juliaplots.org) package to plot the solution.  The [OrdinaryDiffEq.jl](https://docs.sciml.ai/OrdinaryDiffEq) package is used to define the shooting function for the indirect method and the [MINPACK.jl](https://github.com/sglyon/MINPACK.jl) package permits to solve the shooting equation.
-
+Let us start by importing the necessary packages. We import the [OptimalControl.jl](https://control-toolbox.org/OptimalControl.jl) package to define the optimal control problem.  We import the [Plots.jl](https://docs.juliaplots.org) package to plot the solution.  The [OrdinaryDiffEq.jl](https://docs.sciml.ai/OrdinaryDiffEq) package is used as the ODE solver backend by the Flow function from OptimalControl.jl and the [MINPACK.jl](https://github.com/sglyon/MINPACK.jl) package permits to solve the shooting equation.
 
 ```@example main-iss
 using BenchmarkTools    # to benchmark the methods
 using OptimalControl    # to define the optimal control problem and its flow
-using OrdinaryDiffEq    # to get the Flow function from OptimalControl
+using OrdinaryDiffEq    # ODE solver backend for Flow from OptimalControl
 using MINPACK           # NLE solver: use to solve the shooting equation
 using NonlinearSolve    # interface to NLE solvers
 using Plots             # to plot the solution
@@ -149,6 +148,10 @@ nothing # hide
 
 At the end, solving (BVP) is equivalent to solve $S(p_0) = 0$. This is what we call the **indirect simple shooting method**. We define an initial guess.
 
+!!! note "Initial guess"
+
+    In practice, the initial guess for the shooting method can be obtained from the solution of the direct method. See for instance the examples [Double integrator: energy minimisation](@extref OptimalControl example-double-integrator-energy) and [Double integrator: time minimisation](@extref OptimalControl example-double-integrator-time).
+
 ```@example main-iss
 ξ = [0.1]    # initial guess
 nothing # hide
@@ -160,14 +163,21 @@ We can use the [MINPACK.jl](https://github.com/sglyon/MINPACK.jl) to solve the s
 
 ```@setup main-iss
 using MINPACK
+using NonlinearSolve  # interface to NLE solvers
+struct MYSOL
+    x::Vector{Float64}
+end
 function fsolve(f, j, x; kwargs...)
     try
         MINPACK.fsolve(f, j, x; kwargs...)
     catch e
-        println("Erreur using MINPACK")
+        println("Error using MINPACK")
         println(e)
-        println("hybrj not supported. Replaced by hybrd even if it is not visible on the doc.")
-        MINPACK.fsolve(f, x; kwargs...)
+        println("hybrj not supported. Replaced by NonlinearSolve even if it is not visible on the doc.")
+        nle! = (s, ξ, λ) -> f(s, ξ)
+        prob = NonlinearProblem(nle!, ξ)
+        sol = solve(prob, SimpleNewtonRaphson(); abstol=1e-8, reltol=1e-8, show_trace=Val(true))
+        return MYSOL(sol.u)
     end
 end
 ```
@@ -201,7 +211,7 @@ println("shoot: |S(p0)| = ", abs(S(p0_sol)), "\n")
 Alternatively, we can use the [NonlinearSolve.jl](https://docs.sciml.ai/NonlinearSolve) package to solve the shooting equation. The code is similar, but we use the `solve` function instead of `fsolve`. Let us define the problem.
 
 ```@example main-iss
-nle!(s, ξ, λ) = s[1] = S(ξ[1])    # auxiliary function
+nle!(s, ξ, _) = s[1] = S(ξ[1])    # auxiliary function
 prob = NonlinearProblem(nle!, ξ)  # NLE problem with initial guess
 nothing # hide
 ```
@@ -227,7 +237,7 @@ Let us benchmark the methods to solve the shooting equation.
 @benchmark solve(prob; abstol=1e-8, reltol=1e-8, show_trace=Val(false)) # NonlinearSolve
 ```
 
-According to the NonlinearSolve documentation, for small nonlinear systems, it could be faster to use the [`SimpleNewtonRaphson()` descent algorithm](https://docs.sciml.ai/NonlinearSolve/stable/tutorials/code_optimization/). 
+We can also use the [`SimpleNewtonRaphson()` descent algorithm](https://docs.sciml.ai/NonlinearSolve/stable/tutorials/code_optimization/) from NonlinearSolve as an alternative solver.
 
 ```@example main-iss
 @benchmark solve(prob, SimpleNewtonRaphson(); abstol=1e-8, reltol=1e-8, show_trace=Val(false)) # NonlinearSolve
@@ -242,6 +252,21 @@ sol = φ((t0, tf), x0, p0_sol)
 plot(sol)
 ```
 
+We can verify that the solution satisfies the PMP by checking that the Hamiltonian is constant along the extremal. Let us define the Hamiltonian and compute its value along the solution.
+
+```@example main-iss
+H(x, p, u) = p * (-x + α * x^2 + u) - 0.5 * u^2  # pseudo-Hamiltonian with p^0 = -1
+
+t = time_grid(sol)
+x(t) = state(sol)(t)
+p(t) = costate(sol)(t)
+u(t) = control(sol)(t)
+
+H_vals = [H(x(t), p(t), u(t)) for t in t]
+println("Hamiltonian: H = ", H_vals[1], " (should be constant)")
+println("Hamiltonian variation: max|H(t) - H(0)| = ", maximum(abs.(H_vals .- H_vals[1])))
+```
+
 In the indirect shooting method, the search for the optimal control is replaced by the computation of its associated extremal. This computation is equivalent to finding the initial costate (or covector) that solves the shooting function. Let us now plot the extremal trajectory in the phase space, along with the shooting function and its solution.
 
 ```@raw html
@@ -252,20 +277,21 @@ In the indirect shooting method, the search for the optimal control is replaced 
 using Plots.PlotMeasures 
 function Plots.plot(S::Function, p0::Float64; Np0=20, kwargs...) 
  
-    # times for wavefronts
+    # times for wavefronts (flow at specific times)
     times = range(t0, tf, length=3)
 
-    # times for trajectories
+    # times for trajectories (high resolution)
     tspan = range(t0, tf, length=100)
 
     # interval of initial covector
     p0_min = -0.5 
     p0_max = 2 
 
-    # covector solution
+    # covector solution (the one that solves the shooting equation)
     p0_sol = p0 
  
-    # plot of the flow in phase space
+    # LEFT PLOT: flow in phase space (x, p)
+    # Plot extremals (trajectories) for different initial costates
     plt_flow = plot() 
     p0s = range(p0_min, p0_max, length=Np0) 
     for i ∈ eachindex(p0s) 
@@ -276,7 +302,8 @@ function Plots.plot(S::Function, p0::Float64; Np0=20, kwargs...)
         plot!(plt_flow, x, p, color=:blue, label=label) 
     end 
  
-    # plot of wavefronts in phase space 
+    # Plot wavefronts: set of points reached by the flow at given times
+    # Wavefronts help visualize how the flow evolves in phase space
     p0s = range(p0_min, p0_max, length=200) 
     xs  = zeros(length(p0s), length(times)) 
     ps  = zeros(length(p0s), length(times)) 
@@ -290,18 +317,20 @@ function Plots.plot(S::Function, p0::Float64; Np0=20, kwargs...)
         plot!(plt_flow, xs[:, j], ps[:, j], color=:green, linewidth=2, label=label) 
     end 
  
-    #  
+    # Add boundary condition x = xf (vertical line)
     plot!(plt_flow, xlims=(-1.1, 1), ylims=(p0_min, p0_max)) 
     plot!(plt_flow, [0, 0], [p0_min, p0_max], color=:black, xlabel="x", ylabel="p", label="x=xf") 
      
-    # solution 
+    # Plot the extremal solution (in red) that satisfies the boundary condition
     sol = φ((t0, tf), x0, p0_sol)
     x = state(sol).(tspan)
     p = costate(sol).(tspan)
     plot!(plt_flow, x, p, color=:red, linewidth=2, label="extremal solution") 
     plot!(plt_flow, [x[end]], [p[end]], seriestype=:scatter, color=:green, label=false) 
  
-    # plot of the shooting function  
+    # RIGHT PLOT: shooting function S(p₀)
+    # The shooting function maps initial costate p₀ to the final state error
+    # The zero of this function gives the correct initial costate
     p0s = range(p0_min, p0_max, length=200) 
     plt_shoot = plot(xlims=(p0_min, p0_max), ylims=(-2, 4), xlabel="p₀", ylabel="y") 
     plot!(plt_shoot, p0s, S, linewidth=2, label="S(p₀)", color=:green) 
@@ -309,7 +338,7 @@ function Plots.plot(S::Function, p0::Float64; Np0=20, kwargs...)
     plot!(plt_shoot, [p0_sol, p0_sol], [-2, 0], color=:black, label="p₀ solution", linestyle=:dash) 
     plot!(plt_shoot, [p0_sol], [0], seriestype=:scatter, color=:green, label=false) 
  
-    # final plot 
+    # Combine both plots: left shows phase space, right shows shooting function
     plot(plt_flow, plt_shoot; layout=(1,2), leftmargin=15px, bottommargin=15px, kwargs...) 
  
 end

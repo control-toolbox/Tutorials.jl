@@ -1,5 +1,8 @@
 # [Optimal control problem with free initial time](@id tutorial-free-times-initial)
 
+This tutorial is part of a series on optimal control problems with free time variables.
+See also: [Free final time](@ref tutorial-free-times-final) and [Free initial and final times](@ref tutorial-free-times-final-initial).
+
 In this tutorial, we study a **minimum-time optimal control problem with free initial time** $t_0$ (negative). The goal is to determine the latest possible starting time so that the system reaches a fixed final state at $t_f = 0$.
 
 The system is the classic **double integrator**:
@@ -9,21 +12,21 @@ The system is the classic **double integrator**:
 - Objective: maximize $t_0$ (equivalently minimize $-t_0$)  
 - Dynamics: $\dot{x}_1 = x_2, \ \dot{x}_2 = u$
 
-```@example initial_time
-using LinearAlgebra: norm
-using OptimalControl
-using NLPModelsIpopt
-using NonlinearSolve
-using OrdinaryDiffEq
-using Plots
-using Printf
+```@example free-initial-time
+using LinearAlgebra: norm    # For vector norm
+using OptimalControl          # Main package
+using NLPModelsIpopt          # Direct solver
+using NonlinearSolve          # Indirect solver
+using OrdinaryDiffEq          # ODE integration
+using Plots                   # Visualization
+using Printf                  # Formatted output
 ```
 
 ## Problem definition
 
 We consider the following setup:
 
-```@example initial_time
+```@example free-initial-time
 tf = 0          # Fixed final time
 x0 = [0, 0]     # Initial state
 xf = [1, 0]     # Final state
@@ -67,14 +70,14 @@ To improve convergence of the direct solver, we constrain `t0` as follows:
 
 We solve the problem using a **direct transcription method**:
 
-```@example initial_time
+```@example free-initial-time
 sol = solve(ocp; grid_size=100)
 nothing # hide
 ```
 
 The solution can be visualized:
 
-```@example initial_time
+```@example free-initial-time
 plt = plot(sol; label="direct", size=(800, 600))
 ```
 
@@ -112,7 +115,7 @@ p(t_0) = (1,1), \quad p(t_f) = (1,-1), \quad t_1=-1, \quad t_0=-2, \quad p^0=-1.
 
 We can now compare the direct numerical solution with this theoretical result:
 
-```@example initial_time
+```@example free-initial-time
 t0 = variable(sol)
 u = control(sol)
 p = costate(sol)
@@ -134,7 +137,7 @@ The numerical results match the theoretical solution almost exactly.
 
 We now solve the PMP system numerically using an **indirect method** (shooting approach), using the direct solution as an initial guess.
 
-```@example initial_time
+```@example free-initial-time
 # Pseudo-Hamiltonian
 H(x, p, u) = p[1]*x[2] + p[2]*u
 
@@ -146,7 +149,7 @@ nothing # hide
 
 Define the flows corresponding to the two control laws $u=+1$ and $u=-1$:
 
-```@example initial_time
+```@example free-initial-time
 const u_pos = 1
 const u_neg = -1
 
@@ -163,7 +166,7 @@ The **shooting function** enforces:
 - Switching condition ($p_2(t_1) = 0$)  
 - Hamiltonian normalization at initial time
 
-```@example initial_time
+```@example free-initial-time
 function shoot!(s, p0, t1, t0)
     x_t0 = x0
     p_t0 = p0
@@ -184,7 +187,7 @@ nothing # hide
 
 To help the nonlinear solver converge, we build a good initial guess from the direct solution:
 
-```@example initial_time
+```@example free-initial-time
 t = time_grid(sol)
 x = state(sol)
 p = costate(sol)
@@ -206,9 +209,9 @@ println("\n‖s‖ (initial guess) = ", norm(s), "\n")
 
 We can now solve the system using an **indirect shooting method**:
 
-```@example initial_time
+```@example free-initial-time
 # Aggregated nonlinear system
-shoot!(s, ξ, λ) = shoot!(s, ξ[1:2], ξ[3], ξ[4])
+shoot!(s, ξ, _) = shoot!(s, ξ[1:2], ξ[3], ξ[4])
 
 # Define the problem and initial guess
 ξ_guess = [p0..., t1, t0]
@@ -219,13 +222,13 @@ indirect_sol = solve(prob; show_trace=Val(true), abstol=1e-8, reltol=1e-8)
 nothing # hide
 ```
 
-```@example initial_time
+```@example free-initial-time
 indirect_sol # hide
 ```
 
 Compare **indirect and direct solutions**:
 
-```@example initial_time
+```@example free-initial-time
 p0 = indirect_sol.u[1:2]
 t1 = indirect_sol.u[3]
 t0 = indirect_sol.u[4]

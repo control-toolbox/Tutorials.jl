@@ -1,3 +1,8 @@
+# to run the documentation generation:
+# julia --project=. docs/make.jl
+pushfirst!(LOAD_PATH, joinpath(@__DIR__, ".."))
+pushfirst!(LOAD_PATH, @__DIR__)
+
 using Documenter
 using DocumenterInterLinks
 using OptimalControl
@@ -16,7 +21,9 @@ links = InterLinks(
     ),
 )
 
-# For reproducibility
+# ═══════════════════════════════════════════════════════════════════════════════
+# Assets for reproducibility
+# ═══════════════════════════════════════════════════════════════════════════════
 mkpath(joinpath(@__DIR__, "src", "assets"))
 cp(
     joinpath(@__DIR__, "Manifest.toml"),
@@ -31,21 +38,32 @@ cp(
 
 repo_url = "github.com/control-toolbox/Tutorials.jl"
 
-# if draft is true, then the julia code from .md is not executed # debug
+# ═══════════════════════════════════════════════════════════════════════════════
+# Configuration
+# ═══════════════════════════════════════════════════════════════════════════════
+# if draft is true, then the julia code from .md is not executed
 # to disable the draft mode in a specific markdown file, use the following:
 #=
 ```@meta
 Draft = false
 ```
 =#
+draft = false  # Draft mode: if true, @example blocks in markdown are not executed
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# Build documentation
+# ═══════════════════════════════════════════════════════════════════════════════
 makedocs(;
-    draft=false,
-    warnonly=[:cross_references, :autodocs_block],
+    draft=draft,
+    warnonly=[:cross_references, :autodocs_block, :external_cross_references],
     sitename="Tutorials",
     format=Documenter.HTML(;
         repolink="https://" * repo_url,
         prettyurls=false,
-        size_threshold_ignore=[""],
+        size_threshold_ignore=[
+            "tutorial-discretisation.md",
+            "tutorial-nlp.md",
+        ],
         assets=[
             asset("https://control-toolbox.org/assets/css/documentation.css"),
             asset("https://control-toolbox.org/assets/js/documentation.js"),
