@@ -2514,7 +2514,6 @@ uuid = "781d530d-4396-4725-bb49-402e4bee1e77"
 version = "1.4.0"
 
 [[deps.Tutorials]]
-deps = ["OrdinaryDiffEq"]
 path = "/home/runner/work/Tutorials.jl/Tutorials.jl"
 uuid = "cb10daa6-a5e5-4c25-a171-ae181b8ea3c9"
 version = "0.4.1"
