@@ -169,6 +169,7 @@ function solve(t0, x0, y0, θ0, xf, yf, θf, w;
         -1 ≤ u(t) ≤ 1
         -2 ≤ x(t) ≤ 4.25
         -2 ≤ y(t) ≤ 8
+        -2π ≤ θ(t) ≤ 2π
 
         q(t0) == [x0, y0, θ0]
         q(tf) == [xf, yf, θf]
