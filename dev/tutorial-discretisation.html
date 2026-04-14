@@ -6,14 +6,16 @@ using NLPModels       # to retrieve information about the NLP problem
 using NLPModelsIpopt  # to solve the problem via a direct method
 using Plots           # to plot the solution
 
-const t0 = 0      # initial time
-const r0 = 1      # initial altitude
-const v0 = 0      # initial speed
-const m0 = 1      # initial mass
-const vmax = 0.1  # maximal authorized speed
-const mf = 0.6    # final mass to target
+t0 = 0      # initial time
+r0 = 1      # initial altitude
+v0 = 0      # initial speed
+m0 = 1      # initial mass
+vmax = 0.1  # maximal authorized speed
+mf = 0.6    # final mass to target
 
-ocp = @def begin # definition of the optimal control problem
+# Goddard problem function
+function goddard_problem()
+    ocp = @def begin # definition of the optimal control problem
 
     tf ∈ R, variable
     t ∈ [t0, tf], time
@@ -30,25 +32,32 @@ ocp = @def begin # definition of the optimal control problem
 
     r(tf) → max
 
-end;
+    end
+    return ocp
+end
+
+ocp = goddard_problem()
 
 # Dynamics
-const Cd = 310
-const Tmax = 3.5
-const β = 500
-const b = 2
+Cd = 310
+Tmax = 3.5
+β = 500
+b = 2
 
 F0(x) = begin
+    # Uncontrolled dynamics: gravity and drag
     r, v, m = x
-    D = Cd * v^2 * exp(-β*(r - 1)) # Drag force
-    return [ v, -D/m - 1/r^2, 0 ]
+    D = Cd * v^2 * exp(-β*(r - 1)) # Aerodynamic drag
+    return [ v, -D/m - 1/r^2, 0 ]   # [dr/dt, dv/dt, dm/dt]
 end
 
 F1(x) = begin
+    # Control dynamics: thrust contribution
     r, v, m = x
-    return [ 0, Tmax/m, -b*Tmax ]
-end</code></pre><h2 id="Discretisation-schemes"><a class="docs-heading-anchor" href="#Discretisation-schemes">Discretisation schemes</a><a id="Discretisation-schemes-1"></a><a class="docs-heading-anchor-permalink" href="#Discretisation-schemes" title="Permalink"></a></h2><p>When calling <code>solve</code>, the option <code>disc_method=...</code> can be used to specify the discretization scheme. In addition to the default implicit <code>:midpoint</code> method, other available options include the implicit <code>:trapeze</code> method (also known as Crank–Nicolson), and Gauss–Legendre collocation schemes with 2 and 3 stages: <code>:gauss_legendre_2</code> and <code>:gauss_legendre_3</code>, of order 4 and 6 respectively. Note that higher-order methods typically result in larger NLP problems for the same number of time steps, and their accuracy also depends on the smoothness of the problem.</p><p>Let us first solve the problem with the default <code>:midpoint</code> method and display the solution.</p><pre><code class="language-julia hljs">sol = solve(ocp; disc_method=:midpoint, display=false)
-plot(sol; size=(800, 800))</code></pre><img src="tutorial-discretisation-b9390ba4.svg" alt="Example block output"/><p>Let us now compare different discretization schemes to evaluate their accuracy and performance.</p><pre><code class="language-julia hljs"># Solve the problem with different discretization methods
+    return [ 0, Tmax/m, -b*Tmax ]   # [dr/dt, dv/dt, dm/dt] due to thrust
+end</code></pre><h2 id="Discretisation-schemes"><a class="docs-heading-anchor" href="#Discretisation-schemes">Discretisation schemes</a><a id="Discretisation-schemes-1"></a><a class="docs-heading-anchor-permalink" href="#Discretisation-schemes" title="Permalink"></a></h2><p>When calling <code>solve</code>, the option <code>scheme=...</code> can be used to specify the discretization scheme. In addition to the default implicit <code>:midpoint</code> method, other available options include the implicit <code>:trapeze</code> method (also known as Crank–Nicolson), and Gauss–Legendre collocation schemes with 2 and 3 stages: <code>:gauss_legendre_2</code> and <code>:gauss_legendre_3</code>, of order 4 and 6 respectively. Note that higher-order methods typically result in larger NLP problems for the same number of time steps, and their accuracy also depends on the smoothness of the problem.</p><p>Let us first solve the problem with the default <code>:midpoint</code> method and display the solution.</p><pre><code class="language-julia hljs">sol = solve(ocp; scheme=:midpoint, display=false)
+@assert successful(sol) &quot;Solution failed&quot;
+plot(sol; size=(800, 800))</code></pre><img src="tutorial-discretisation-a8da93b8.svg" alt="Example block output"/><p>Let us now compare different discretization schemes to evaluate their accuracy and performance. See the <a href="https://control-toolbox.org/OptimalControl.jl/stable/manual-solve.html#manual-solve-strategy-options">Strategy options</a> for information on default values for parameters like <code>tol</code>.</p><pre><code class="language-julia hljs"># Solve the problem with different discretization methods
 solutions = []
 data = DataFrame(
     Scheme=Symbol[],
@@ -65,8 +74,9 @@ schemes = [
     :gauss_legendre_3
 ]
 for scheme in schemes
-    bt = @btimed solve($ocp; disc_method=$scheme, tol=1e-8, display=false)
+    bt = @btimed solve($ocp; scheme=$scheme, tol=1e-8, display=false)
     local sol = bt.value
+    #@assert successful(sol) &quot;Solution failed for scheme=$scheme&quot;
     push!(solutions, (scheme, sol))
     push!(data, (
         Scheme=scheme,
@@ -79,30 +89,30 @@ println(data)</code></pre><pre class="documenter-example-output"><code class="no
  Row │ Scheme            Time      Objective  Iterations
      │ Symbol            Float64   Float64    Int64
 ─────┼───────────────────────────────────────────────────
-   1 │ euler             0.153774    1.01242          30
-   2 │ euler_implicit    0.153626    1.01273          29
-   3 │ trapeze           0.166503    1.01258          30
-   4 │ midpoint          0.233287    1.01258          31
-   5 │ gauss_legendre_2  0.651759    1.01258          21
-   6 │ gauss_legendre_3  1.44329     1.01258          21</code></pre><pre><code class="language-julia hljs"># Plot the results
+   1 │ euler             0.228751    1.01242          30
+   2 │ euler_implicit    0.227399    1.01273          29
+   3 │ trapeze           0.293311    1.01258          30
+   4 │ midpoint          0.361059    1.01258          31
+   5 │ gauss_legendre_2  0.860611    1.01258          21
+   6 │ gauss_legendre_3  2.09795     1.01258          21</code></pre><pre><code class="language-julia hljs"># Plot the results
 x_style = (legend=:none,)
 p_style = (legend=:none,)
 u_style = (legend=:topright,)
 styles = (state_style=x_style, costate_style=p_style, control_style=u_style)
 
-scheme, sol = solutions[1]
-plt = plot(sol; label=string(scheme), styles...)
-for (scheme, sol) in solutions[2:end]
-    plt = plot!(sol; label=string(scheme), styles...)
+plt = plot()
+for (i, (scheme, sol)) in enumerate(solutions)
+    plt = plot!(sol; label=string(scheme), color=i, styles...)
 end
-plot(plt; size=(800, 800))</code></pre><img src="tutorial-discretisation-42ff60e6.svg" alt="Example block output"/><h2 id="Large-problems-and-AD-backend"><a class="docs-heading-anchor" href="#Large-problems-and-AD-backend">Large problems and AD backend</a><a id="Large-problems-and-AD-backend-1"></a><a class="docs-heading-anchor-permalink" href="#Large-problems-and-AD-backend" title="Permalink"></a></h2><p>For some large problems, you may notice that the solver takes a long time before the iterations actually begin. This is due to the computation of sparse derivatives — specifically, the Jacobian of the constraints and the Hessian of the Lagrangian — which can be quite costly. One possible alternative is to set the option <code>adnlp_backend=:manual</code>, which uses simpler sparsity patterns. The resulting matrices are faster to compute but are also less sparse, so this represents a trade-off between automatic differentiation (AD) preparation time and the efficiency of the optimization itself.</p><pre><code class="language-julia hljs">solve(ocp; disc_method=:gauss_legendre_3, grid_size=1000, adnlp_backend=:manual)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">▫ This is OptimalControl version v1.1.6 running with: direct, adnlp, ipopt.
+plot(plt; size=(800, 800))</code></pre><img src="tutorial-discretisation-68a26ad6.svg" alt="Example block output"/><h2 id="Large-problems-and-AD-backend"><a class="docs-heading-anchor" href="#Large-problems-and-AD-backend">Large problems and AD backend</a><a id="Large-problems-and-AD-backend-1"></a><a class="docs-heading-anchor-permalink" href="#Large-problems-and-AD-backend" title="Permalink"></a></h2><p>For some large problems, you may notice that the solver takes a long time before the iterations actually begin. This is due to the computation of sparse derivatives — specifically, the Jacobian of the constraints and the Hessian of the Lagrangian — which can be quite costly. One possible alternative is to set the option <code>backend=:manual</code> in the modeler, which uses simpler sparsity patterns. The resulting matrices are faster to compute but are also less sparse, so this represents a trade-off between automatic differentiation (AD) preparation time and the efficiency of the optimization itself.</p><pre><code class="language-julia hljs">disc = OptimalControl.Collocation(grid_size=1000, scheme=:gauss_legendre_3)
+mod = OptimalControl.ADNLP(backend=:manual)
+sol = OptimalControl.Ipopt()
+solve(ocp; discretizer=disc, modeler=mod, solver=sol)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">▫ This is OptimalControl 2.0.1, solving with: <span class="sgr36"><span class="sgr1">collocation</span></span> → <span class="sgr36"><span class="sgr1">adnlp</span></span> → <span class="sgr36"><span class="sgr1">ipopt</span></span> (<span class="sgr35"><span class="sgr1">cpu</span></span>)
 
-▫ The optimal control problem is solved with CTDirect version v0.17.4.
-
-   ┌─ The NLP is modelled with ADNLPModels and solved with NLPModelsIpopt.
-   │
-   ├─ Number of time steps⋅: 1000
-   └─ Discretisation scheme: gauss_legendre_3
+  📦 Configuration:
+   ├─ <span class="sgr1">Discretizer</span>: <span class="sgr36"><span class="sgr1">collocation</span></span> (grid_size = 1000, scheme = gauss_legendre_3)
+   ├─ <span class="sgr1">Modeler</span>: <span class="sgr36"><span class="sgr1">adnlp</span></span> (backend = manual)
+   └─ <span class="sgr1">Solver</span>: <span class="sgr36"><span class="sgr1">ipopt</span></span>
 
 ▫ This is Ipopt version 3.14.19, running with linear solver MUMPS 5.8.2.
 
@@ -135,27 +145,27 @@ iter    objective    inf_pr   inf_du lg(mu)  ||d||  lg(rg) alpha_du alpha_pr  ls
   10  1.0088776e+00 2.71e-07 9.58e-02  -3.6 7.53e-03    -  1.00e+00 1.00e+00h  1
   11  1.0089150e+00 1.08e-05 1.50e+01  -5.5 1.88e-02    -  9.99e-01 1.00e+00h  1
   12  1.0109999e+00 4.39e-02 1.70e-03  -6.1 8.30e-01    -  1.00e+00 1.00e+00f  1
-  13  1.0121802e+00 3.92e-02 1.08e+01  -6.6 9.52e-01    -  1.00e+00 7.89e-01h  1
-  14  1.0124914e+00 9.62e-03 4.05e-05  -7.0 7.91e-01    -  1.00e+00 1.00e+00h  1
-  15  1.0125502e+00 3.90e-03 3.81e-01  -7.5 6.79e-01    -  1.00e+00 9.42e-01h  1
-  16  1.0125687e+00 2.10e-03 4.63e-06  -8.0 6.09e-01    -  1.00e+00 1.00e+00h  1
-  17  1.0125745e+00 9.53e-04 8.96e-03  -8.7 5.49e-01    -  1.00e+00 9.88e-01h  1
-  18  1.0125756e+00 4.29e-04 2.83e-02  -9.2 7.14e-01    -  9.98e-01 8.26e-01h  1
-  19  1.0125759e+00 1.76e-04 1.27e-07  -9.3 6.09e-01    -  1.00e+00 1.00e+00h  1
+  13  1.0121802e+00 3.92e-02 1.06e+01  -6.6 9.51e-01    -  1.00e+00 7.90e-01h  1
+  14  1.0124916e+00 9.60e-03 1.58e-03  -7.0 7.90e-01    -  1.00e+00 1.00e+00h  1
+  15  1.0125501e+00 3.93e-03 3.38e-01  -7.5 6.78e-01    -  1.00e+00 9.48e-01h  1
+  16  1.0125685e+00 2.07e-03 4.53e-06  -8.0 6.06e-01    -  1.00e+00 1.00e+00h  1
+  17  1.0125743e+00 9.40e-04 1.74e-02  -8.6 5.46e-01    -  1.00e+00 9.77e-01h  1
+  18  1.0125756e+00 4.41e-04 2.86e-02  -9.2 6.91e-01    -  1.00e+00 8.46e-01h  1
+  19  1.0125759e+00 1.75e-04 1.25e-07  -9.3 6.41e-01    -  1.00e+00 1.00e+00h  1
 iter    objective    inf_pr   inf_du lg(mu)  ||d||  lg(rg) alpha_du alpha_pr  ls
-  20  1.0125762e+00 1.09e-04 2.57e-05 -10.0 3.68e-01    -  9.99e-01 1.00e+00h  1
-  21  1.0125763e+00 9.27e-05 1.68e-08 -11.0 6.76e-01    -  1.00e+00 1.00e+00h  1
-  22  1.0125763e+00 2.16e-05 2.26e-09 -11.0 3.05e-01    -  1.00e+00 1.00e+00h  1
+  20  1.0125762e+00 1.07e-04 3.45e-08 -10.0 3.60e-01    -  1.00e+00 1.00e+00h  1
+  21  1.0125763e+00 9.21e-05 1.70e-08 -11.0 6.59e-01    -  1.00e+00 1.00e+00h  1
+  22  1.0125763e+00 2.24e-05 2.34e-09 -11.0 3.10e-01    -  1.00e+00 1.00e+00h  1
 
 Number of Iterations....: 22
 
                                    (scaled)                 (unscaled)
-Objective...............:  -1.0125763121308844e+00    1.0125763121308844e+00
-Dual infeasibility......:   2.2647163260278663e-09    2.2647163260278663e-09
-Constraint violation....:   5.2365700664580572e-10    2.1605821549197657e-05
-Variable bound violation:   0.0000000000000000e+00    0.0000000000000000e+00
-Complementarity.........:   1.6990178150165742e-11    1.6990178150165742e-11
-Overall NLP error.......:   2.2647163260278663e-09    2.1605821549197657e-05
+Objective...............:  -1.0125763121311362e+00    1.0125763121311362e+00
+Dual infeasibility......:   2.3436139230607403e-09    2.3436139230607403e-09
+Constraint violation....:   5.4074100752643517e-10    2.2351828121658368e-05
+Variable bound violation:   1.9198332901509185e-31    1.9198332901509185e-31
+Complementarity.........:   1.7112642826483086e-11    1.7112642826483086e-11
+Overall NLP error.......:   2.3436139230607403e-09    2.2351828121658368e-05
 
 
 Number of objective function evaluations             = 23
@@ -165,9 +175,9 @@ Number of inequality constraint evaluations          = 0
 Number of equality constraint Jacobian evaluations   = 23
 Number of inequality constraint Jacobian evaluations = 0
 Number of Lagrangian Hessian evaluations             = 22
-Total seconds in IPOPT                               = 10.915
+Total seconds in IPOPT                               = 13.112
 
-EXIT: Optimal Solution Found.</code></pre><p>Let us now compare the performance of the two backends. We will use the <code>@btimed</code> macro from the <code>BenchmarkTools</code> package to measure the time taken for both the preparation of the NLP problem and the execution of the solver. Besides, we will also collect the number of non-zero elements in the Jacobian and Hessian matrices, which can be useful to understand the sparsity of the problem, thanks to the functions <code>get_nnzo</code>, <code>get_nnzj</code>, and <code>get_nnzj</code> from the <code>NLPModels</code> package. The problem is first discretized with the <code>direct_transcription</code> method and then solved with the <code>ipopt</code> solver, see the <a href="tutorial-nlp.html#tutorial-nlp">tutorial on direct transcription</a> for more details.</p><pre><code class="language-julia hljs"># DataFrame to store the results
+EXIT: Optimal Solution Found.</code></pre><p>This explicit approach with strategy instances is less high-level than the descriptive method used earlier. It provides more control over the solving process and is detailed in the <a href="https://control-toolbox.org/OptimalControl.jl/stable/manual-solve-explicit.html">explicit mode documentation</a>.</p><p>Let us now compare the performance of the two backends. We will use the <code>@btimed</code> macro from the <code>BenchmarkTools</code> package to measure the time taken for both the preparation of the NLP problem and the execution of the solver. Separating these measurements allows us to understand whether the bottleneck is in the discretization/modeling phase (which depends on the AD backend) or in the solver phase (which depends on the sparsity of the matrices). We use a lower-level approach with explicit strategy instances to separately measure the discretization/modeling time and the solver time.</p><pre><code class="language-julia hljs"># DataFrame to store the results
 data = DataFrame(
     Backend=Symbol[],
     NNZO=Int[],
@@ -185,15 +195,22 @@ backends = [:optimized, :manual]
 # Loop over the backends
 for adnlp_backend in backends
 
-    # Discretize the problem with a large grid size and Gauss-Legendre method
-    bt = @btimed direct_transcription($ocp;
-        disc_method=:gauss_legendre_3,
-        grid_size=1000,
-        adnlp_backend=$adnlp_backend,
-    )
-    docp = bt.value
-    nlp = nlp_model(docp)
+    # Create strategy instances
+    discretizer = OptimalControl.Collocation(grid_size=1000, scheme=:gauss_legendre_3)
+    modeler = OptimalControl.ADNLP(backend=adnlp_backend)
+    solver = OptimalControl.Ipopt(print_level=0)
+
+    # Initial guess
+    init = build_initial_guess(ocp, nothing)
+
+    # Discretize and build NLP model
+    # This lower-level approach with discretize/nlp_model/solve is detailed in the [tutorial on direct transcription](@ref tutorial-nlp)
+    bt = @btimed begin
+        docp = discretize($ocp, $discretizer)
+        nlp_model(docp, $init, $modeler)
+    end
     prepa_time = bt.time
+    nlp = bt.value
 
     # Get the number of non-zero elements
     nnzo = get_nnzo(nlp) # Gradient of the Objective
@@ -201,14 +218,9 @@ for adnlp_backend in backends
     nnzh = get_nnzh(nlp) # Hessian of the Lagrangian
 
     # Solve the problem
-    bt = @btimed ipopt($nlp;
-        print_level=0,
-        mu_strategy=&quot;adaptive&quot;,
-        tol=1e-8,
-        sb=&quot;yes&quot;,
-    )
-    nlp_sol = bt.value
+    bt = @btimed solve($nlp, $solver; display=false)
     exec_time = bt.time
+    nlp_sol = bt.value
 
     # Store the results in the DataFrame
     push!(data,
@@ -219,7 +231,7 @@ for adnlp_backend in backends
             NNZH=nnzh,
             PrepTime=prepa_time,
             ExecTime=exec_time,
-            Objective=-nlp_sol.objective,
+            Objective=nlp_sol.objective,
             Iterations=nlp_sol.iter
         )
     )
@@ -228,6 +240,6 @@ println(data)</code></pre><pre class="documenter-example-output"><code class="no
  Row │ Backend    NNZO   NNZJ    NNZH    PrepTime  ExecTime  Objective  Iterations
      │ Symbol     Int64  Int64   Int64   Float64   Float64   Float64    Int64
 ─────┼─────────────────────────────────────────────────────────────────────────────
-   1 │ optimized  13004   87004   95001  4.44972    18.9754   -1.01258          55
-   2 │ manual     13004  174028  104022  0.225494   11.6206   -1.01258          22</code></pre><h2 id="Explicit-time-grid"><a class="docs-heading-anchor" href="#Explicit-time-grid">Explicit time grid</a><a id="Explicit-time-grid-1"></a><a class="docs-heading-anchor-permalink" href="#Explicit-time-grid" title="Permalink"></a></h2><p>The option <code>time_grid=...</code> allows you to provide the full time grid vector <code>t0, t1, ..., tf</code>, which is especially useful if a non-uniform grid is desired. In the case of a free initial and/or final time, you should provide a normalized grid ranging from 0 to 1. Note that <code>time_grid</code> overrides <code>grid_size</code> if both options are specified.</p><pre><code class="language-julia hljs">sol = solve(ocp; time_grid=[0, 0.1, 0.5, 0.9, 1], display=false)
-println(time_grid(sol))</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">[0.0, 0.022086440107996715, 0.11043220053998357, 0.19877796097197042, 0.22086440107996713]</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="tutorial-continuation.html">« Discrete continuation</a><a class="docs-footer-nextpage" href="tutorial-free-times-final.html">Final time »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.16.1 on <span class="colophon-date" title="Saturday 17 January 2026 14:47">Saturday 17 January 2026</span>. Using Julia version 1.12.4.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+   1 │ optimized  13004   87004   95001  5.15268    31.6654    1.01258          68
+   2 │ manual     13004  174028  104022  0.375602   13.1258    1.01258          22</code></pre><h2 id="Explicit-time-grid"><a class="docs-heading-anchor" href="#Explicit-time-grid">Explicit time grid</a><a id="Explicit-time-grid-1"></a><a class="docs-heading-anchor-permalink" href="#Explicit-time-grid" title="Permalink"></a></h2><p>The option <code>time_grid=...</code> allows you to provide the full time grid vector <code>t0, t1, ..., tf</code>, which is especially useful if a non-uniform grid is desired. In the case of a free initial and/or final time, you should provide a normalized grid ranging from 0 to 1. Note that <code>time_grid</code> overrides <code>grid_size</code> if both options are specified.</p><pre><code class="language-julia hljs">sol = solve(ocp; time_grid=[0, 0.1, 0.5, 0.9, 1], display=false)
+println(time_grid(sol))</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">[0.0, 0.022086440107996572, 0.11043220053998286, 0.19877796097196915, 0.22086440107996572]</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="tutorial-continuation.html">« Discrete continuation</a><a class="docs-footer-nextpage" href="tutorial-free-times-final.html">Final time »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.17.0 on <span class="colophon-date" title="Tuesday 14 April 2026 07:43">Tuesday 14 April 2026</span>. Using Julia version 1.12.6.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
