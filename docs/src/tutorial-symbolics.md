@@ -268,7 +268,7 @@ initial_guess = @init cartpole begin
     F_ctrl(t) := 0.0
 end
 
-sol = solve(cartpole; grid_size=100, init=initial_guess)
+sol = solve(cartpole; display=false, grid_size=100, init=initial_guess)
 ```
 
 ### Results
@@ -396,7 +396,7 @@ html_str = """
   };
   document.getElementById("cpSp$(uid)").oninput=function(){
     spd=parseFloat(this.value);
-    document.getElementById("cpSv$(uid)").textContent=spd.toFixed(2)+"\u00d7";
+    document.getElementById("cpSv$(uid)").textContent=spd.toFixed(2)+"×";
   };
   draw(0);
 })();

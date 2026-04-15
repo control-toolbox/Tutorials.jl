@@ -60,10 +60,12 @@ makedocs(;
     format=Documenter.HTML(;
         repolink="https://" * repo_url,
         prettyurls=false,
-        size_threshold_ignore=[
-            "tutorial-discretisation.md",
-            "tutorial-nlp.md",
-        ],
+        example_size_threshold=1_000_000,
+        size_threshold=1_000_000,
+        # size_threshold_ignore=[
+        #     "tutorial-discretisation.md",
+        #     "tutorial-nlp.md",
+        # ],
         assets=[
             asset("https://control-toolbox.org/assets/css/documentation.css"),
             asset("https://control-toolbox.org/assets/js/documentation.js"),
