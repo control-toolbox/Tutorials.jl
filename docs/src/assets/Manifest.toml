@@ -1,6 +1,6 @@
 # This file is machine-generated - editing it directly is not advised
 
-julia_version = "1.12.6"
+julia_version = "1.12.5"
 manifest_format = "2.0"
 project_hash = "1d73fc8b7306dbb42eb2a1fdd2ae0c8be50a6d19"
 
@@ -227,9 +227,9 @@ version = "0.18.7"
 
 [[deps.CTDirect]]
 deps = ["ADNLPModels", "CTModels", "CTSolvers", "DocStringExtensions", "ExaModels", "SolverCore", "SparseArrays", "SparseConnectivityTracer"]
-git-tree-sha1 = "db1699ffab2f31aeda5dbb61dfa9015773cb70fc"
+git-tree-sha1 = "a4d812f60412f47bf29e685a921d0d675f581d55"
 uuid = "790bbbee-bee9-49ee-8912-a9de031322d5"
-version = "1.0.6"
+version = "1.0.7-beta"
 
 [[deps.CTFlows]]
 deps = ["CTBase", "CTModels", "DocStringExtensions", "ForwardDiff", "LinearAlgebra", "MLStyle", "MacroTools"]
