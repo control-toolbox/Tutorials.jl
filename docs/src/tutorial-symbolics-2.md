@@ -288,3 +288,113 @@ The three panels show the cart position ``x`` and pendulum angle ``\theta``, the
 corresponding velocities ``\dot{x}`` and ``\dot\theta``, and the optimal control force
 ``u``. The periodicity of the state trajectory confirms that a genuine limit cycle has been
 found.
+
+### Animation
+
+The animation below shows the cart-pole evolving along the optimal limit-cycle trajectory.
+The blue cart slides on the horizontal rail while the pendulum swings around the upright
+equilibrium. A ghost trace follows the red bob to make the motion easier to read. Use the
+controls to play, pause, or reset the animation and to adjust the playback speed.
+
+```@example main
+# Serialise trajectory for the JS animation (manual, no extra dependencies)
+json_t  = "[" * join(string.(tsol),  ",") * "]"
+json_x  = "[" * join(string.(xsol),  ",") * "]"
+json_th = "[" * join(string.(θsol),  ",") * "]"
+
+uid    = string(rand(UInt32), base=16)   # unique suffix → safe for multi-example pages
+tf_str = string(round(tsol[end], digits=3))
+
+html_str = """
+<div style="text-align:center;font-family:sans-serif;margin:1.5em 0;">
+  <canvas id="cpC$(uid)" width="700" height="380"
+    style="border:1px solid #ccc;border-radius:6px;background:#fafafa;display:block;margin:0 auto;"></canvas>
+  <div style="margin:6px 0;font-size:0.9em;color:#444;">
+    <span id="cpT$(uid)">t = 0.000 / $(tf_str) s</span>
+  </div>
+  <div style="display:flex;justify-content:center;gap:10px;align-items:center;flex-wrap:wrap;margin-top:4px;">
+    <button id="cpPl$(uid)" style="padding:5px 14px;cursor:pointer;">&#9654; Play</button>
+    <button id="cpPa$(uid)" style="padding:5px 14px;cursor:pointer;">&#9646;&#9646; Pause</button>
+    <button id="cpRe$(uid)" style="padding:5px 14px;cursor:pointer;">&#x21BA; Reset</button>
+    <label style="font-size:0.9em;">Speed:
+      <input type="range" id="cpSp$(uid)" min="0.25" max="3" step="0.25" value="1"
+             style="vertical-align:middle;width:100px;">
+      <span id="cpSv$(uid)">1.00&times;</span>
+    </label>
+  </div>
+</div>
+<script>
+(function(){
+  var T=$(json_t), X=$(json_x), TH=$(json_th), L=$(l_val);
+  var cv=document.getElementById("cpC$(uid)");
+  var ctx=cv.getContext("2d");
+  var W=cv.width, H=cv.height;
+  var railY=H*0.62, sc=80, cW=60, cH=28;
+  var tSim=0, spd=1, rid=null, lts=null, ghost=[];
+  function lerp(a,b,t){return a+(b-a)*t;}
+  function interp(tq){
+    var n=T.length;
+    if(tq<=T[0])return{x:X[0],th:TH[0]};
+    if(tq>=T[n-1])return{x:X[n-1],th:TH[n-1]};
+    var lo=0,hi=n-2;
+    while(lo<hi){var m=(lo+hi)>>1;if(T[m+1]<tq)lo=m+1;else hi=m;}
+    var a=(tq-T[lo])/(T[lo+1]-T[lo]);
+    return{x:lerp(X[lo],X[lo+1],a),th:lerp(TH[lo],TH[lo+1],a)};
+  }
+  function draw(tq){
+    var d=interp(tq);
+    var cx=W/2+d.x*sc, cy=railY;
+    var px=cx, py=cy-cH/2;
+    var bx=px+L*sc*Math.sin(d.th), by=py-L*sc*Math.cos(d.th);
+    ghost.push({x:bx,y:by}); if(ghost.length>25)ghost.shift();
+    ctx.clearRect(0,0,W,H);
+    ctx.beginPath();ctx.moveTo(20,railY);ctx.lineTo(W-20,railY);
+    ctx.strokeStyle="#aaa";ctx.lineWidth=3;ctx.stroke();
+    var wr=8;
+    [[cx-18,cy+cH/2+wr],[cx+18,cy+cH/2+wr]].forEach(function(p){
+      ctx.beginPath();ctx.arc(p[0],p[1],wr,0,2*Math.PI);
+      ctx.fillStyle="#888";ctx.fill();
+    });
+    ctx.beginPath();ctx.rect(cx-cW/2,cy-cH/2,cW,cH);
+    ctx.fillStyle="#4a90d9";ctx.fill();
+    ctx.strokeStyle="#2c5f8a";ctx.lineWidth=1.5;ctx.stroke();
+    ghost.forEach(function(g,i){
+      ctx.beginPath();ctx.arc(g.x,g.y,5,0,2*Math.PI);
+      ctx.fillStyle="rgba(220,60,60,"+((i+1)/ghost.length*0.35)+")";ctx.fill();
+    });
+    ctx.beginPath();ctx.moveTo(px,py);ctx.lineTo(bx,by);
+    ctx.strokeStyle="#222";ctx.lineWidth=3;ctx.stroke();
+    ctx.beginPath();ctx.arc(px,py,5,0,2*Math.PI);ctx.fillStyle="#555";ctx.fill();
+    ctx.beginPath();ctx.arc(bx,by,10,0,2*Math.PI);
+    ctx.fillStyle="#dc3c3c";ctx.fill();ctx.strokeStyle="#8a1a1a";ctx.lineWidth=1.5;ctx.stroke();
+    document.getElementById("cpT$(uid)").textContent=
+      "t = "+tq.toFixed(3)+" / "+T[T.length-1].toFixed(2)+" s";
+  }
+  function step(ts){
+    if(lts!==null){
+      var dt=(ts-lts)*0.001*spd; tSim+=dt;
+      var tf=T[T.length-1]; if(tSim>tf){tSim-=tf;ghost=[];}
+    }
+    lts=ts; draw(tSim); rid=requestAnimationFrame(step);
+  }
+  document.getElementById("cpPl$(uid)").onclick=function(){
+    if(rid===null){lts=null;rid=requestAnimationFrame(step);}
+  };
+  document.getElementById("cpPa$(uid)").onclick=function(){
+    if(rid!==null){cancelAnimationFrame(rid);rid=null;}
+  };
+  document.getElementById("cpRe$(uid)").onclick=function(){
+    if(rid!==null){cancelAnimationFrame(rid);rid=null;}
+    tSim=0;ghost=[];lts=null;draw(0);
+  };
+  document.getElementById("cpSp$(uid)").oninput=function(){
+    spd=parseFloat(this.value);
+    document.getElementById("cpSv$(uid)").textContent=spd.toFixed(2)+"\u00d7";
+  };
+  draw(0);
+})();
+</script>
+"""
+
+HTML(html_str)
+```
