@@ -11,7 +11,6 @@ This tutorial demonstrates how to combine **symbolic derivation of equations of 
 
 The key is to define the kinetic and potential energies and the power of the non-conservative forces, and to let `Symbolics.jl` handle the derivations of the equations of motion using the Lagrange-Euler equation.
 
-
 ## The Cart-Pole System
 
 The system consists of a cart of mass ``m_c`` sliding on a frictionless horizontal rail, with
@@ -99,6 +98,7 @@ motion become the first-order system:
   \dot{x} \\ \dot{\theta} \\ M^{-1}(q)\bigl(-C(q,\dot{q}) + \tau(q,u)\bigr)
 \end{pmatrix}.
 ```
+
 # Optimal Control of a Cart-Pole System using Symbolics.jl
 
 This tutorial demonstrates how to use `Symbolics.jl` to automate the derivation of equations of motion (EOM) for a mechanical system and subsequently solve an optimal control problem using `OptimalControl.jl`.
@@ -284,7 +284,7 @@ Base.show(io::IO, ::MIME"text/html", h::RawHTML) = print(io, h.raw)
 html_anim = """
 <div style="display: flex; justify-content: center; margin: 20px 0;">
     <canvas id="cartpoleCanvas" width="600" height="300" 
-            style="border:1px solid #ddd; background:#fafafa; border-radius: 8px; max-width: 100%;">
+            style="border:1px solid #ddd; border-radius: 8px; max-width: 100%;">
     </canvas>
 </div>
 
@@ -297,6 +297,30 @@ html_anim = """
     
     const canvas = document.getElementById('cartpoleCanvas');
     const ctx = canvas.getContext('2d');
+    
+    // Detect dark/light mode
+    const isDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    
+    // Color palettes
+    const colors = isDark ? {
+        canvas_bg: '#1e1e2e',
+        track: '#4a4a4a',
+        cart: '#4063D8',
+        pole: '#CB3C33',
+        hinge: '#ecf0f1',
+        bob: '#CB3C33',
+        progress_bg: '#3a3a3a',
+        progress: '#4063D8'
+    } : {
+        canvas_bg: '#fafafa',
+        track: '#999',
+        cart: '#4063D8',
+        pole: '#555',
+        hinge: '#2c3e50',
+        bob: '#CB3C33',
+        progress_bg: '#ecf0f1',
+        progress: '#4063D8'
+    };
     
     const scale = 50; 
     const l_px = $(l_val) * scale; 
@@ -321,7 +345,8 @@ html_anim = """
         let cur_x = x[i] + alpha * (x[i+1] - x[i]);
         let cur_th = th[i] + alpha * (th[i+1] - th[i]);
 
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = colors.canvas_bg;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
         
         const cx = canvas.width / 2 + cur_x * scale;
         const cy = canvas.height / 2 + 40; 
@@ -331,11 +356,11 @@ html_anim = """
         ctx.moveTo(0, cy + 15);
         ctx.lineTo(canvas.width, cy + 15);
         ctx.lineWidth = 2;
-        ctx.strokeStyle = '#ccc';
+        ctx.strokeStyle = colors.track;
         ctx.stroke();
 
         // Draw Cart
-        ctx.fillStyle = '#3498db';
+        ctx.fillStyle = colors.cart;
         ctx.fillRect(cx - 30, cy - 15, 60, 30);
         
         // Draw Pole
@@ -347,26 +372,26 @@ html_anim = """
         ctx.lineTo(px, py);
         ctx.lineWidth = 6;
         ctx.lineCap = 'round';
-        ctx.strokeStyle = '#e74c3c';
+        ctx.strokeStyle = colors.pole;
         ctx.stroke();
         
         // Draw Hinge
         ctx.beginPath();
         ctx.arc(cx, cy, 6, 0, 2 * Math.PI);
-        ctx.fillStyle = '#2c3e50';
+        ctx.fillStyle = colors.hinge;
         ctx.fill();
 
         // Draw Bob
         ctx.beginPath();
         ctx.arc(px, py, 8, 0, 2 * Math.PI);
-        ctx.fillStyle = '#e74c3c';
+        ctx.fillStyle = colors.bob;
         ctx.fill();
 
         // Draw Progress Bar at the very bottom
         const bar_height = 4;
-        ctx.fillStyle = '#ecf0f1'; // Background
+        ctx.fillStyle = colors.progress_bg;
         ctx.fillRect(0, canvas.height - bar_height, canvas.width, bar_height);
-        ctx.fillStyle = '#3498db'; // Active progress
+        ctx.fillStyle = colors.progress; // Active progress
         ctx.fillRect(0, canvas.height - bar_height, canvas.width * (sim_t / duration), bar_height);
 
         requestAnimationFrame(draw);
