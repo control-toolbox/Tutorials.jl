@@ -310,13 +310,15 @@ html_anim = """
     const animation_duration = 10.0;
     
     const zone_width = canvas.width / 3;
-    const baseline = canvas.height - 60;
+    const top_margin = 50;   // Space for time label at top
+    const bottom_margin = 120; // Space for ground line + v gauge + Tmax label
+    const baseline = canvas.height - bottom_margin;
     
     // Scale for altitude (r goes from r0 to ~r0+0.1)
     const r_min = r0;
     const r_max_all = Math.max(...r1, ...r2, ...r3);
     const r_range = r_max_all - r_min;
-    const altitude_scale = (canvas.height - 120) / r_range;
+    const altitude_scale = (baseline - top_margin) / r_range;
     
     // Scale for velocity (v goes from 0 to ~0.1)
     const v_max_all = Math.max(...v1, ...v2, ...v3);
