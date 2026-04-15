@@ -60,7 +60,7 @@ plt_iter = plot(data.T, data.Iterations;
     ylabel=&quot;Number of iterations&quot;)
 
 layout = grid(2, 1, heights=[0.5, 0.5])
-plot(plt_obj, plt_iter; layout=layout, size=(800, 600))</code></pre><img src="tutorial-continuation-1a32aafe.svg" alt="Example block output"/><h2 id="Continuation-on-parameter"><a class="docs-heading-anchor" href="#Continuation-on-parameter">Continuation on parameter</a><a id="Continuation-on-parameter-1"></a><a class="docs-heading-anchor-permalink" href="#Continuation-on-parameter" title="Permalink"></a></h2><p>As a second example, we solve a Goddard problem with a decreasing maximum thrust. We define a function that returns the optimal control problem for a given value of <code>Tmax</code>, similar to the first example.</p><p>Let us first define the Goddard problem. Note that the formulation below illustrates all types of constraints, and the problem could be written more compactly.</p><pre><code class="language-julia hljs"># Parameters
+plot(plt_obj, plt_iter; layout=layout, size=(800, 600))</code></pre><img src="tutorial-continuation-8cae2639.svg" alt="Example block output"/><h2 id="Continuation-on-parameter"><a class="docs-heading-anchor" href="#Continuation-on-parameter">Continuation on parameter</a><a id="Continuation-on-parameter-1"></a><a class="docs-heading-anchor-permalink" href="#Continuation-on-parameter" title="Permalink"></a></h2><p>As a second example, we solve a Goddard problem with a decreasing maximum thrust. We define a function that returns the optimal control problem for a given value of <code>Tmax</code>, similar to the first example.</p><p>Let us first define the Goddard problem. Note that the formulation below illustrates all types of constraints, and the problem could be written more compactly.</p><pre><code class="language-julia hljs"># Parameters
 r0 = 1
 v0 = 0
 m0 = 1
@@ -163,13 +163,13 @@ Tmax_values = [1.0, 2.0, 3.0]
 indices = [argmin(abs.(data.Tmax .- T)) for T in Tmax_values]
 
 layout_metrics = grid(2, 1, heights=[0.5, 0.5])
-plot(plt_obj, plt_iter; layout=layout_metrics, size=(800, 600), leftmargin=5mm)</code></pre><img src="tutorial-continuation-08f111fb.svg" alt="Example block output"/><p>We now plot the solutions for the selected <code>Tmax</code> values, using normalized time to compare trajectories with different final times.</p><pre><code class="language-julia hljs">plt_sol = plot()
+plot(plt_obj, plt_iter; layout=layout_metrics, size=(800, 600), leftmargin=5mm)</code></pre><img src="tutorial-continuation-b119f496.svg" alt="Example block output"/><p>We now plot the solutions for the selected <code>Tmax</code> values, using normalized time to compare trajectories with different final times.</p><pre><code class="language-julia hljs">plt_sol = plot()
 for (i, idx) in enumerate(indices)
     plot!(plt_sol, sols[idx]; label=&quot;Tmax=$(round(data.Tmax[idx], digits=2))&quot;, time=:normalize, color=i)
 end
-plot(plt_sol; size=(800, 800), leftmargin=5mm)</code></pre><img src="tutorial-continuation-3277b7ea.svg" alt="Example block output"/><h3 id="Animation"><a class="docs-heading-anchor" href="#Animation">Animation</a><a id="Animation-1"></a><a class="docs-heading-anchor-permalink" href="#Animation" title="Permalink"></a></h3><p>The animation below shows three rockets launching simultaneously with different maximum thrust values (Tmax = 3, 2, 1). The rockets start at the same time (t=0) but reach their final altitudes at different times according to their optimal trajectories. Each rocket displays:</p><ul><li><strong>Altitude</strong> (above the rocket)</li><li><strong>Velocity gauge</strong> (horizontal bar, green→red)</li><li><strong>Fuel gauge</strong> (vertical bar, showing remaining fuel m(t) - mf)</li><li><strong>Flame</strong> (visible when thrust u(t) &gt; 0)</li></ul><div style="display: flex; justify-content: center; margin: 20px 0;">
+plot(plt_sol; size=(800, 800), leftmargin=5mm)</code></pre><img src="tutorial-continuation-d9a1fadd.svg" alt="Example block output"/><h3 id="Animation"><a class="docs-heading-anchor" href="#Animation">Animation</a><a id="Animation-1"></a><a class="docs-heading-anchor-permalink" href="#Animation" title="Permalink"></a></h3><p>The animation below shows three rockets launching simultaneously with different maximum thrust values (Tmax = 3, 2, 1). The rockets start at the same time (t=0) but reach their final altitudes at different times according to their optimal trajectories. Each rocket displays:</p><ul><li><strong>Altitude</strong> (above the rocket)</li><li><strong>Velocity gauge</strong> (horizontal bar, green→red)</li><li><strong>Fuel gauge</strong> (vertical bar, showing remaining fuel m(t) - mf)</li><li><strong>Flame</strong> (visible when thrust u(t) &gt; 0)</li></ul><div style="display: flex; justify-content: center; margin: 20px 0;">
     <canvas id="goddardCanvas" width="900" height="650"
-            style="border:1px solid #ddd; background:#fafafa; border-radius: 8px; max-width: 100%;">
+            style="border:1px solid #ddd; border-radius: 8px; max-width: 100%;">
     </canvas>
 </div>
 
@@ -188,6 +188,40 @@ plot(plt_sol; size=(800, 800), leftmargin=5mm)</code></pre><img src="tutorial-co
     
     const canvas = document.getElementById('goddardCanvas');
     const ctx = canvas.getContext('2d');
+    
+    // Detect dark/light mode
+    const isDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    
+    // Color palettes
+    const colors = isDark ? {
+        canvas_bg: '#1e1e2e',
+        ground: '#4a4a4a',
+        gauge_bg: '#3a3a3a',
+        gauge_high: '#2ecc71',
+        gauge_mid: '#f39c12',
+        gauge_low: '#e74c3c',
+        text: '#ecf0f1',
+        text_secondary: '#bdc3c7',
+        flame_outer: '#e67e22',
+        flame_inner: '#f1c40f',
+        window_fill: 'rgba(255,255,255,0.3)',
+        window_stroke: 'rgba(255,255,255,0.6)',
+        progress: '#4063D8'
+    } : {
+        canvas_bg: '#fafafa',
+        ground: '#ccc',
+        gauge_bg: '#ecf0f1',
+        gauge_high: '#2ecc71',
+        gauge_mid: '#f39c12',
+        gauge_low: '#e74c3c',
+        text: '#2c3e50',
+        text_secondary: '#7f8c8d',
+        flame_outer: '#e67e22',
+        flame_inner: '#f1c40f',
+        window_fill: 'rgba(255,255,255,0.55)',
+        window_stroke: 'rgba(255,255,255,0.85)',
+        progress: '#4063D8'
+    };
     
     // Animation duration in seconds (independent of real problem time)
     const animation_duration = 10.0;
@@ -234,7 +268,7 @@ plot(plt_sol; size=(800, 800), leftmargin=5mm)</code></pre><img src="tutorial-co
         ctx.moveTo(zone_x + 20, baseline + 20);
         ctx.lineTo(zone_x + zone_width - 20, baseline + 20);
         ctx.lineWidth = 2;
-        ctx.strokeStyle = '#ccc';
+        ctx.strokeStyle = colors.ground;
         ctx.stroke();
         
         // Draw fuel gauge (vertical bar to the right of rocket)
@@ -244,16 +278,16 @@ plot(plt_sol; size=(800, 800), leftmargin=5mm)</code></pre><img src="tutorial-co
         const fuel_level = (m - mf) / (m0 - mf);  // 0 to 1
         
         // Fuel gauge background
-        ctx.fillStyle = '#ecf0f1';
+        ctx.fillStyle = colors.gauge_bg;
         ctx.fillRect(fuel_x - 10, fuel_y, 20, fuel_height);
         
         // Fuel gauge fill
         const fuel_fill_height = fuel_level * fuel_height;
-        ctx.fillStyle = fuel_level > 0.5 ? '#2ecc71' : (fuel_level > 0.2 ? '#f39c12' : '#e74c3c');
+        ctx.fillStyle = fuel_level > 0.5 ? colors.gauge_high : (fuel_level > 0.2 ? colors.gauge_mid : colors.gauge_low);
         ctx.fillRect(fuel_x - 10, fuel_y + (fuel_height - fuel_fill_height), 20, fuel_fill_height);
         
         // Fuel gauge label
-        ctx.fillStyle = '#7f8c8d';
+        ctx.fillStyle = colors.text_secondary;
         ctx.font = '14px Arial';
         ctx.textAlign = 'center';
         ctx.fillText('Fuel', fuel_x, fuel_y - 8);
@@ -292,16 +326,16 @@ plot(plt_sol; size=(800, 800), leftmargin=5mm)</code></pre><img src="tutorial-co
         // Window
         ctx.beginPath();
         ctx.arc(center_x, rocket_y + 2, 5, 0, 2 * Math.PI);
-        ctx.fillStyle = 'rgba(255,255,255,0.55)';
+        ctx.fillStyle = colors.window_fill;
         ctx.fill();
-        ctx.strokeStyle = 'rgba(255,255,255,0.85)';
+        ctx.strokeStyle = colors.window_stroke;
         ctx.lineWidth = 1.5;
         ctx.stroke();
 
         // Draw flame if thrust > 0.1
         if (u > 0.1) {
             const flame_size = 10 + 20 * u;
-            ctx.fillStyle = '#e67e22';
+            ctx.fillStyle = colors.flame_outer;
             ctx.beginPath();
             ctx.moveTo(center_x - 10, rocket_bottom);
             ctx.lineTo(center_x, rocket_bottom + flame_size);
@@ -310,7 +344,7 @@ plot(plt_sol; size=(800, 800), leftmargin=5mm)</code></pre><img src="tutorial-co
             ctx.fill();
 
             // Inner flame
-            ctx.fillStyle = '#f1c40f';
+            ctx.fillStyle = colors.flame_inner;
             ctx.beginPath();
             ctx.moveTo(center_x - 5, rocket_bottom);
             ctx.lineTo(center_x, rocket_bottom + flame_size * 0.6);
@@ -320,7 +354,7 @@ plot(plt_sol; size=(800, 800), leftmargin=5mm)</code></pre><img src="tutorial-co
         }
         
         // Draw altitude text
-        ctx.fillStyle = '#2c3e50';
+        ctx.fillStyle = colors.text;
         ctx.font = 'bold 14px Arial';
         ctx.textAlign = 'center';
         ctx.fillText('r = ' + r.toFixed(4), center_x, rocket_y - 40);
@@ -333,20 +367,20 @@ plot(plt_sol; size=(800, 800), leftmargin=5mm)</code></pre><img src="tutorial-co
         const v_level = Math.abs(v) / v_max_all;
         
         // Velocity gauge background
-        ctx.fillStyle = '#ecf0f1';
+        ctx.fillStyle = colors.gauge_bg;
         ctx.fillRect(v_gauge_x, v_gauge_y, v_gauge_width, v_gauge_height);
         
         // Velocity gauge fill
-        ctx.fillStyle = v_level > 0.7 ? '#e74c3c' : (v_level > 0.4 ? '#f39c12' : '#2ecc71');
+        ctx.fillStyle = v_level > 0.7 ? colors.gauge_low : (v_level > 0.4 ? colors.gauge_mid : colors.gauge_high);
         ctx.fillRect(v_gauge_x, v_gauge_y, v_level * v_gauge_width, v_gauge_height);
         
         // Velocity label
-        ctx.fillStyle = '#7f8c8d';
+        ctx.fillStyle = colors.text_secondary;
         ctx.font = '12px Arial';
         ctx.fillText('v', center_x, v_gauge_y + 20);
         
         // Draw Tmax label at bottom
-        ctx.fillStyle = '#2c3e50';
+        ctx.fillStyle = colors.text;
         ctx.font = 'bold 16px Arial';
         ctx.fillText('Tmax = ' + Tmax, center_x, baseline + 90);
     }
@@ -358,10 +392,11 @@ plot(plt_sol; size=(800, 800), leftmargin=5mm)</code></pre><img src="tutorial-co
         const progress = (elapsed % animation_duration) / animation_duration;
         const t_anim = progress * t_max_global;
         
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = colors.canvas_bg;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
         
         // Draw time indicator at top
-        ctx.fillStyle = '#2c3e50';
+        ctx.fillStyle = colors.text;
         ctx.font = 'bold 18px Arial';
         ctx.textAlign = 'center';
         ctx.fillText('t = ' + t_anim.toFixed(3) + ' s', canvas.width / 2, 30);
@@ -387,9 +422,9 @@ plot(plt_sol; size=(800, 800), leftmargin=5mm)</code></pre><img src="tutorial-co
         
         // Draw progress bar at bottom
         const bar_height = 4;
-        ctx.fillStyle = '#ecf0f1';
+        ctx.fillStyle = colors.gauge_bg;
         ctx.fillRect(0, canvas.height - bar_height, canvas.width, bar_height);
-        ctx.fillStyle = '#4063D8';
+        ctx.fillStyle = colors.progress;
         ctx.fillRect(0, canvas.height - bar_height, canvas.width * progress, bar_height);
         
         requestAnimationFrame(draw);
@@ -397,4 +432,4 @@ plot(plt_sol; size=(800, 800), leftmargin=5mm)</code></pre><img src="tutorial-co
     requestAnimationFrame(draw);
 })();
 </script>
-<h2 id="Best-practices-and-limitations"><a class="docs-heading-anchor" href="#Best-practices-and-limitations">Best practices and limitations</a><a id="Best-practices-and-limitations-1"></a><a class="docs-heading-anchor-permalink" href="#Best-practices-and-limitations" title="Permalink"></a></h2><p>The examples above illustrate a basic discrete continuation method. Here are some important considerations:</p><ul><li><p><strong>Step size</strong>: The continuation step size should be chosen carefully. Too large a step may lead to convergence issues, while too small a step may be inefficient. Adaptive step size strategies can improve robustness but are not covered in this tutorial.</p></li><li><p><strong>Convergence monitoring</strong>: Always check that each solution converges successfully using <code>successful(sol)</code>. If a solution fails, consider reducing the step size or providing a better initial guess.</p></li><li><p><strong>Advanced methods</strong>: For more challenging problems, homotopic continuation methods with path following algorithms can be used. These methods adapt the continuation parameter automatically and can handle bifurcations. Such advanced techniques are beyond the scope of this tutorial.</p></li><li><p><strong>Alternative approaches</strong>: In some cases, it may be more efficient to directly parameterize the continuation parameter within the optimal control problem rather than solving a sequence of problems. OptimalControl plans to add this feature in a future release.</p></li></ul></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="index.html">« Getting Started</a><a class="docs-footer-nextpage" href="tutorial-discretisation.html">Discretisation methods »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.17.0 on <span class="colophon-date" title="Wednesday 15 April 2026 20:20">Wednesday 15 April 2026</span>. Using Julia version 1.12.6.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+<h2 id="Best-practices-and-limitations"><a class="docs-heading-anchor" href="#Best-practices-and-limitations">Best practices and limitations</a><a id="Best-practices-and-limitations-1"></a><a class="docs-heading-anchor-permalink" href="#Best-practices-and-limitations" title="Permalink"></a></h2><p>The examples above illustrate a basic discrete continuation method. Here are some important considerations:</p><ul><li><p><strong>Step size</strong>: The continuation step size should be chosen carefully. Too large a step may lead to convergence issues, while too small a step may be inefficient. Adaptive step size strategies can improve robustness but are not covered in this tutorial.</p></li><li><p><strong>Convergence monitoring</strong>: Always check that each solution converges successfully using <code>successful(sol)</code>. If a solution fails, consider reducing the step size or providing a better initial guess.</p></li><li><p><strong>Advanced methods</strong>: For more challenging problems, homotopic continuation methods with path following algorithms can be used. These methods adapt the continuation parameter automatically and can handle bifurcations. Such advanced techniques are beyond the scope of this tutorial.</p></li><li><p><strong>Alternative approaches</strong>: In some cases, it may be more efficient to directly parameterize the continuation parameter within the optimal control problem rather than solving a sequence of problems. OptimalControl plans to add this feature in a future release.</p></li></ul></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="index.html">« Getting Started</a><a class="docs-footer-nextpage" href="tutorial-discretisation.html">Discretisation methods »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.17.0 on <span class="colophon-date" title="Wednesday 15 April 2026 20:23">Wednesday 15 April 2026</span>. Using Julia version 1.12.6.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
