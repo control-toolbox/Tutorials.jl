@@ -230,7 +230,7 @@ end
 
 ### Solving the NLP
 
-The problem is transcribed into a nonlinear program using direct collocation on a uniform grid of 100 intervals, then handed to `Ipopt` via ``NLPModelsIpopt.jl``. We provide a simple initial guess for the state and control trajectories. See [the documentation](https://control-toolbox.org/OptimalControl.jl/stable/manual-solve.html) for more informations.
+The problem is transcribed into a nonlinear program using direct collocation on a uniform grid of 100 intervals, then handed to `Ipopt` via `NLPModelsIpopt.jl`. We provide a simple initial guess for the state and control trajectories. See [the documentation](@extref OptimalControl manual-solve) for more information.
 
 ```@example main
 initial_guess = @init cartpole begin
@@ -260,7 +260,6 @@ plot(p1, p2, p3, layout=(3, 1), size=(800, 700))
 ```
 
 The plots show the cart position ``x`` and pendulum angle ``\theta``, the corresponding velocities, and the optimal control force ``u`` required to stabilize the system back to its initial state within 2 seconds.
-
 
 ### Animation
 

@@ -61,6 +61,7 @@ makedocs(;
         repolink="https://" * repo_url,
         prettyurls=false,
         example_size_threshold=1_000_000,
+        size_threshold_warn=1_000_000,
         size_threshold=1_000_000,
         # size_threshold_ignore=[
         #     "tutorial-discretisation.md",
