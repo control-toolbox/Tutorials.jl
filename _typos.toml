@@ -1,7 +1,7 @@
 [default]
 locale = "en"
 extend-ignore-re = [
-    "ded",
+    "BA",
 ]
 
 [files]
