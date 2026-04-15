@@ -193,7 +193,7 @@ nothing # hide
 
 ### Code Generation
 
-`build_function` compiles the symbolic expression `dX` into a native Julia function with arguments `X`, `u`, and parameter values. The `force_SA=true` flag generates a **StaticArrays** kernel, which avoids heap allocations inside the ODE right-hand side — crucial for solver performance because dimension is small. For larger problems (``X \in \mathrm{R}^n``, ``n > 100``), we would use a mutating dynamics function instead, cf. [Julia Perfomance Tips](https://docs.julialang.org/en/v1/manual/performance-tips/#Consider-StaticArrays.jl-for-small-fixed-size-vector/matrix-operations).
+`build_function` compiles the symbolic expression `dX` into a native Julia function with arguments `X`, `u`, and parameter values. The `force_SA=true` flag generates a **StaticArrays** kernel, which avoids heap allocations inside the ODE right-hand side — crucial for solver performance because dimension is small. For larger problems (``X \in \mathrm{R}^n``, ``n > 100``), we would use a mutating dynamics function instead, cf. [Julia Performance Tips](https://docs.julialang.org/en/v1/manual/performance-tips/#Consider-StaticArrays.jl-for-small-fixed-size-vector/matrix-operations).
 
 ```@example main
 f_expr = build_function(dX, X, u, [m_c, m_p, l, g];
@@ -284,7 +284,7 @@ Base.show(io::IO, ::MIME"text/html", h::RawHTML) = print(io, h.raw)
 html_anim = """
 <div style="display: flex; justify-content: center; margin: 20px 0;">
     <canvas id="cartpoleCanvas" width="600" height="300" 
-            style="border:1px solid #ddd; background:#fafafa; border-radius: 8px; overflow: hidden;">
+            style="border:1px solid #ddd; background:#fafafa; border-radius: 8px; max-width: 100%;">
     </canvas>
 </div>
 
