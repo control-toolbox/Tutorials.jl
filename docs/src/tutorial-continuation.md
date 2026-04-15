@@ -286,7 +286,7 @@ Base.show(io::IO, ::MIME"text/html", h::RawHTML) = print(io, h.raw)
 html_anim = """
 <div style="display: flex; justify-content: center; margin: 20px 0;">
     <canvas id="goddardCanvas" width="900" height="650"
-            style="border:1px solid #ddd; background:#fafafa; border-radius: 8px; overflow: hidden;">
+            style="border:1px solid #ddd; background:#fafafa; border-radius: 8px; max-width: 100%;">
     </canvas>
 </div>
 
@@ -415,7 +415,7 @@ html_anim = """
         const v_gauge_width = 60;
         const v_gauge_height = 8;
         const v_gauge_x = center_x - v_gauge_width / 2;
-        const v_gauge_y = rocket_y + 60;
+        const v_gauge_y = rocket_y + 50;
         const v_level = Math.abs(v) / v_max_all;
         
         // Velocity gauge background
