@@ -434,7 +434,7 @@ html_anim = """
         // Draw Tmax label at bottom
         ctx.fillStyle = '#2c3e50';
         ctx.font = 'bold 16px Arial';
-        ctx.fillText('Tmax = ' + Tmax, center_x, baseline + 80);
+        ctx.fillText('Tmax = ' + Tmax, center_x, baseline + 90);
     }
 
     function draw(time) {
