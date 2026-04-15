@@ -283,7 +283,7 @@ Base.show(io::IO, ::MIME"text/html", h::RawHTML) = print(io, h.raw)
 
 html_anim = """
 <div style="display: flex; justify-content: center; margin: 20px 0;">
-    <canvas id="cartpoleCanvas" width="600" height="300" 
+    <canvas id="cartpoleCanvas" width="900" height="300" 
             style="border:1px solid #ddd; border-radius: 8px; max-width: 100%;">
     </canvas>
 </div>
