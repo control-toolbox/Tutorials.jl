@@ -399,6 +399,8 @@ html_str = """
 })();
 </script>
 """
+```
 
-HTML(html_str)
+```@example main
+HTML(html_str) # hide
 ```
