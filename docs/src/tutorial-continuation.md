@@ -286,7 +286,7 @@ Base.show(io::IO, ::MIME"text/html", h::RawHTML) = print(io, h.raw)
 html_anim = """
 <div style="display: flex; justify-content: center; margin: 20px 0;">
     <canvas id="goddardCanvas" width="900" height="650"
-            style="border:1px solid #ddd; background:#fafafa; border-radius: 8px; max-width: 100%;">
+            style="border:1px solid #ddd; border-radius: 8px; max-width: 100%;">
     </canvas>
 </div>
 
@@ -305,6 +305,40 @@ html_anim = """
     
     const canvas = document.getElementById('goddardCanvas');
     const ctx = canvas.getContext('2d');
+    
+    // Detect dark/light mode
+    const isDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    
+    // Color palettes
+    const colors = isDark ? {
+        canvas_bg: '#1e1e2e',
+        ground: '#4a4a4a',
+        gauge_bg: '#3a3a3a',
+        gauge_high: '#2ecc71',
+        gauge_mid: '#f39c12',
+        gauge_low: '#e74c3c',
+        text: '#ecf0f1',
+        text_secondary: '#bdc3c7',
+        flame_outer: '#e67e22',
+        flame_inner: '#f1c40f',
+        window_fill: 'rgba(255,255,255,0.3)',
+        window_stroke: 'rgba(255,255,255,0.6)',
+        progress: '#4063D8'
+    } : {
+        canvas_bg: '#fafafa',
+        ground: '#ccc',
+        gauge_bg: '#ecf0f1',
+        gauge_high: '#2ecc71',
+        gauge_mid: '#f39c12',
+        gauge_low: '#e74c3c',
+        text: '#2c3e50',
+        text_secondary: '#7f8c8d',
+        flame_outer: '#e67e22',
+        flame_inner: '#f1c40f',
+        window_fill: 'rgba(255,255,255,0.55)',
+        window_stroke: 'rgba(255,255,255,0.85)',
+        progress: '#4063D8'
+    };
     
     // Animation duration in seconds (independent of real problem time)
     const animation_duration = 10.0;
@@ -351,7 +385,7 @@ html_anim = """
         ctx.moveTo(zone_x + 20, baseline + 20);
         ctx.lineTo(zone_x + zone_width - 20, baseline + 20);
         ctx.lineWidth = 2;
-        ctx.strokeStyle = '#ccc';
+        ctx.strokeStyle = colors.ground;
         ctx.stroke();
         
         // Draw fuel gauge (vertical bar to the right of rocket)
@@ -361,16 +395,16 @@ html_anim = """
         const fuel_level = (m - mf) / (m0 - mf);  // 0 to 1
         
         // Fuel gauge background
-        ctx.fillStyle = '#ecf0f1';
+        ctx.fillStyle = colors.gauge_bg;
         ctx.fillRect(fuel_x - 10, fuel_y, 20, fuel_height);
         
         // Fuel gauge fill
         const fuel_fill_height = fuel_level * fuel_height;
-        ctx.fillStyle = fuel_level > 0.5 ? '#2ecc71' : (fuel_level > 0.2 ? '#f39c12' : '#e74c3c');
+        ctx.fillStyle = fuel_level > 0.5 ? colors.gauge_high : (fuel_level > 0.2 ? colors.gauge_mid : colors.gauge_low);
         ctx.fillRect(fuel_x - 10, fuel_y + (fuel_height - fuel_fill_height), 20, fuel_fill_height);
         
         // Fuel gauge label
-        ctx.fillStyle = '#7f8c8d';
+        ctx.fillStyle = colors.text_secondary;
         ctx.font = '14px Arial';
         ctx.textAlign = 'center';
         ctx.fillText('Fuel', fuel_x, fuel_y - 8);
@@ -409,16 +443,16 @@ html_anim = """
         // Window
         ctx.beginPath();
         ctx.arc(center_x, rocket_y + 2, 5, 0, 2 * Math.PI);
-        ctx.fillStyle = 'rgba(255,255,255,0.55)';
+        ctx.fillStyle = colors.window_fill;
         ctx.fill();
-        ctx.strokeStyle = 'rgba(255,255,255,0.85)';
+        ctx.strokeStyle = colors.window_stroke;
         ctx.lineWidth = 1.5;
         ctx.stroke();
 
         // Draw flame if thrust > 0.1
         if (u > 0.1) {
             const flame_size = 10 + 20 * u;
-            ctx.fillStyle = '#e67e22';
+            ctx.fillStyle = colors.flame_outer;
             ctx.beginPath();
             ctx.moveTo(center_x - 10, rocket_bottom);
             ctx.lineTo(center_x, rocket_bottom + flame_size);
@@ -427,7 +461,7 @@ html_anim = """
             ctx.fill();
 
             // Inner flame
-            ctx.fillStyle = '#f1c40f';
+            ctx.fillStyle = colors.flame_inner;
             ctx.beginPath();
             ctx.moveTo(center_x - 5, rocket_bottom);
             ctx.lineTo(center_x, rocket_bottom + flame_size * 0.6);
@@ -437,7 +471,7 @@ html_anim = """
         }
         
         // Draw altitude text
-        ctx.fillStyle = '#2c3e50';
+        ctx.fillStyle = colors.text;
         ctx.font = 'bold 14px Arial';
         ctx.textAlign = 'center';
         ctx.fillText('r = ' + r.toFixed(4), center_x, rocket_y - 40);
@@ -450,20 +484,20 @@ html_anim = """
         const v_level = Math.abs(v) / v_max_all;
         
         // Velocity gauge background
-        ctx.fillStyle = '#ecf0f1';
+        ctx.fillStyle = colors.gauge_bg;
         ctx.fillRect(v_gauge_x, v_gauge_y, v_gauge_width, v_gauge_height);
         
         // Velocity gauge fill
-        ctx.fillStyle = v_level > 0.7 ? '#e74c3c' : (v_level > 0.4 ? '#f39c12' : '#2ecc71');
+        ctx.fillStyle = v_level > 0.7 ? colors.gauge_low : (v_level > 0.4 ? colors.gauge_mid : colors.gauge_high);
         ctx.fillRect(v_gauge_x, v_gauge_y, v_level * v_gauge_width, v_gauge_height);
         
         // Velocity label
-        ctx.fillStyle = '#7f8c8d';
+        ctx.fillStyle = colors.text_secondary;
         ctx.font = '12px Arial';
         ctx.fillText('v', center_x, v_gauge_y + 20);
         
         // Draw Tmax label at bottom
-        ctx.fillStyle = '#2c3e50';
+        ctx.fillStyle = colors.text;
         ctx.font = 'bold 16px Arial';
         ctx.fillText('Tmax = ' + Tmax, center_x, baseline + 90);
     }
@@ -475,10 +509,11 @@ html_anim = """
         const progress = (elapsed % animation_duration) / animation_duration;
         const t_anim = progress * t_max_global;
         
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = colors.canvas_bg;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
         
         // Draw time indicator at top
-        ctx.fillStyle = '#2c3e50';
+        ctx.fillStyle = colors.text;
         ctx.font = 'bold 18px Arial';
         ctx.textAlign = 'center';
         ctx.fillText('t = ' + t_anim.toFixed(3) + ' s', canvas.width / 2, 30);
@@ -504,9 +539,9 @@ html_anim = """
         
         // Draw progress bar at bottom
         const bar_height = 4;
-        ctx.fillStyle = '#ecf0f1';
+        ctx.fillStyle = colors.gauge_bg;
         ctx.fillRect(0, canvas.height - bar_height, canvas.width, bar_height);
-        ctx.fillStyle = '#4063D8';
+        ctx.fillStyle = colors.progress;
         ctx.fillRect(0, canvas.height - bar_height, canvas.width * progress, bar_height);
         
         requestAnimationFrame(draw);
