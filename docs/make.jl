@@ -48,7 +48,7 @@ repo_url = "github.com/control-toolbox/Tutorials.jl"
 Draft = false
 ```
 =#
-draft = false  # Draft mode: if true, @example blocks in markdown are not executed
+draft = true  # Draft mode: if true, @example blocks in markdown are not executed
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # Build documentation
@@ -85,6 +85,7 @@ makedocs(;
             "Linear–quadratic regulator" => "tutorial-lqr.md",
             "Minimal action" => "tutorial-mam.md",
             "Model Predictive Control" => "tutorial-mpc.md",
+            "Symbolics Mechanics" => "tutorial-symbolics.md",
         ],
     ],
     plugins=[links],
