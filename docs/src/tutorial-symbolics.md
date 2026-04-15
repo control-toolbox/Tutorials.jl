@@ -21,7 +21,7 @@ a rigid pendulum of mass ``m_p`` and length ``l`` attached to it. A horizontal f
 
 ```@raw html
 <figure>
-  <img src="cartpole_sketch.svg" alt="Cart-pole diagram" width="350"/>
+  <img src="./assets/cartpole_sketch.svg" alt="Cart-pole diagram" width="350"/>
   <figcaption>Fig. 1 — Cart-pole system. The angle θ is measured from the upright position.</figcaption>
 </figure>
 ```
