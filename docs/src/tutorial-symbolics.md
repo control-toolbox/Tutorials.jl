@@ -242,7 +242,7 @@ We now formulate the optimal control problem using the `@def` macro from Optimal
 The boundary conditions ``X(0) = X(t_f)`` encode the periodicity of the orbit directly.
 
 ```@example main
-@def cartpole_ocp begin
+@def cartpole begin
     t ∈ [0, tf_val], time
     X = (x_ocp, θ_ocp, v_ocp, ω_ocp) ∈ R⁴, state
     F_ctrl ∈ R, control
@@ -263,9 +263,12 @@ grid of 100 intervals, then handed to **Ipopt** via NLPModelsIpopt. The `@time` 
 reports wall-clock time, which on first call includes Julia's JIT compilation.
 
 ```@example main
-initial_guess = (state=[0.0, 0.0, 0.0, 0.1], control=0.0)
+initial_guess = @init cartpole begin
+    X(t) := [0.0, 0.0, 0.0, 0.1]
+    F_ctrl(t) := 0.0
+end
 
-sol = solve(cartpole_ocp; display=true, grid_size=100, init=initial_guess)
+sol = solve(cartpole; grid_size=100, init=initial_guess)
 ```
 
 ### Results
