@@ -375,32 +375,63 @@ html_anim = """
         ctx.textAlign = 'center';
         ctx.fillText('Fuel', fuel_x, fuel_y - 8);
         
-        // Draw rocket body
+        // Draw rocket: nose cone + body + fins + window
+        const rocket_bottom = rocket_y + 18;
         ctx.fillStyle = color;
+
+        // Nose cone
         ctx.beginPath();
-        ctx.moveTo(center_x, rocket_y - 30);  // Top
-        ctx.lineTo(center_x + 15, rocket_y + 15);  // Right
-        ctx.lineTo(center_x - 15, rocket_y + 15);  // Left
+        ctx.moveTo(center_x, rocket_y - 38);
+        ctx.lineTo(center_x - 12, rocket_y - 10);
+        ctx.lineTo(center_x + 12, rocket_y - 10);
         ctx.closePath();
         ctx.fill();
-        
+
+        // Body
+        ctx.fillRect(center_x - 12, rocket_y - 10, 24, 28);
+
+        // Left fin
+        ctx.beginPath();
+        ctx.moveTo(center_x - 12, rocket_y + 6);
+        ctx.lineTo(center_x - 24, rocket_y + 22);
+        ctx.lineTo(center_x - 12, rocket_y + 18);
+        ctx.closePath();
+        ctx.fill();
+
+        // Right fin
+        ctx.beginPath();
+        ctx.moveTo(center_x + 12, rocket_y + 6);
+        ctx.lineTo(center_x + 24, rocket_y + 22);
+        ctx.lineTo(center_x + 12, rocket_y + 18);
+        ctx.closePath();
+        ctx.fill();
+
+        // Window
+        ctx.beginPath();
+        ctx.arc(center_x, rocket_y + 2, 5, 0, 2 * Math.PI);
+        ctx.fillStyle = 'rgba(255,255,255,0.55)';
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(255,255,255,0.85)';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+
         // Draw flame if thrust > 0.1
         if (u > 0.1) {
             const flame_size = 10 + 20 * u;
             ctx.fillStyle = '#e67e22';
             ctx.beginPath();
-            ctx.moveTo(center_x - 10, rocket_y + 15);
-            ctx.lineTo(center_x, rocket_y + 15 + flame_size);
-            ctx.lineTo(center_x + 10, rocket_y + 15);
+            ctx.moveTo(center_x - 10, rocket_bottom);
+            ctx.lineTo(center_x, rocket_bottom + flame_size);
+            ctx.lineTo(center_x + 10, rocket_bottom);
             ctx.closePath();
             ctx.fill();
-            
+
             // Inner flame
             ctx.fillStyle = '#f1c40f';
             ctx.beginPath();
-            ctx.moveTo(center_x - 5, rocket_y + 15);
-            ctx.lineTo(center_x, rocket_y + 15 + flame_size * 0.6);
-            ctx.lineTo(center_x + 5, rocket_y + 15);
+            ctx.moveTo(center_x - 5, rocket_bottom);
+            ctx.lineTo(center_x, rocket_bottom + flame_size * 0.6);
+            ctx.lineTo(center_x + 5, rocket_bottom);
             ctx.closePath();
             ctx.fill();
         }
@@ -428,7 +459,7 @@ html_anim = """
         
         // Velocity label
         ctx.fillStyle = '#7f8c8d';
-        ctx.font = '10px Arial';
+        ctx.font = '12px Arial';
         ctx.fillText('v', center_x, v_gauge_y + 20);
         
         // Draw Tmax label at bottom
