@@ -17,7 +17,7 @@ using Plots, Printf
 We aim to find the most probable transition path between two stable states of a stochastic dynamical system. For a system with deterministic dynamics $f(x)$ and small noise, the transition path minimizes the action functional:
 
 ```math
-S[x(\cdot), u(\cdot)] = \int_0^T \|u(t) - f(x(t))\|^2 \, dt
+S[x(\cdot), u(\cdot)] = \int_0^T \|u(t) - f(x(t))\|^2 \, \mathrm{d}t
 ```
 
 subject to the path dynamics:
@@ -72,19 +72,15 @@ We provide an initial guess for the path using a simple interpolation with the `
 # Time horizon
 T = 50
 
-# Helper functions for initial state guess
-L(t) = -(1 - t/T) + t/T      # Linear interpolation from -1 to 1
-P(t) = 0.3*(-L(t)^2 + 1)     # Parabolic arc (approximates saddle crossing)
-
 init = @init ocp(T) begin
-    # Linear interpolation for x₁
-    x₁(t) := L(t)
-    # Parabolic guess for x₂
-    x₂(t) := P(t)
-    # Control from vector field
-    u(t) := f(L(t), P(t))
+    x₁(t) := -(1 - t/T) + t/T       # Linear interpolation from -1 to 1
+    x₂(t) := 0.3*(-x₁(t)^2 + 1)     # Parabolic arc (approximates saddle crossing)
+    u(t) := f(x₁(t), x₂(t))         # Control from vector field
 end
-nothing # hide
+
+# Visualize the initial guess (solve without optimization, max_iter=0)
+sol_init = solve(ocp(T); init=init, grid_size=1000, max_iter=0)
+plot(sol_init)
 ```
 
 !!! note "Initial guess strategy"
