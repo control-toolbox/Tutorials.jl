@@ -6,10 +6,11 @@ on:
       - main
     tags: '*'
   pull_request:
+    types: [labeled, opened, synchronize, reopened]
     
 jobs:
   call:
-    if: ${{ ! contains(github.event.pull_request.labels.*.name, 'run ci') }}
+    if: contains(github.event.pull_request.labels.*.name, 'run ci')
     uses: control-toolbox/CTActions/.github/workflows/ci.yml@main
     with:
       runs_on: '["ubuntu-latest"]'

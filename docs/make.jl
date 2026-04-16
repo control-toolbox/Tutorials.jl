@@ -48,7 +48,7 @@ repo_url = "github.com/control-toolbox/Tutorials.jl"
 Draft = false
 ```
 =#
-draft = true  # Draft mode: if true, @example blocks in markdown are not executed
+draft = false  # Draft mode: if true, @example blocks in markdown are not executed
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # Build documentation
@@ -60,7 +60,10 @@ makedocs(;
     format=Documenter.HTML(;
         repolink="https://" * repo_url,
         prettyurls=false,
-        size_threshold_ignore=["tutorial-discretisation.md", "tutorial-nlp.md"],
+        example_size_threshold=1_000_000,
+        size_threshold_warn=1_000_000,
+        size_threshold=1_000_000,
+        # size_threshold_ignore=["tutorial-discretisation.md", "tutorial-nlp.md"],
         assets=[
             asset("https://control-toolbox.org/assets/css/documentation.css"),
             asset("https://control-toolbox.org/assets/js/documentation.js"),
@@ -82,6 +85,7 @@ makedocs(;
             "Linear–quadratic regulator" => "tutorial-lqr.md",
             "Minimal action" => "tutorial-mam.md",
             "Model Predictive Control" => "tutorial-mpc.md",
+            "Symbolics Mechanics" => "tutorial-symbolics.md",
         ],
     ],
     plugins=[links],
