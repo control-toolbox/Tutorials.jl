@@ -1,6 +1,6 @@
 name = "Tutorials"
 uuid = "cb10daa6-a5e5-4c25-a171-ae181b8ea3c9"
-version = "0.4.1"
+version = "0.5.0"
 authors = ["Olivier Cots <olivier.cots@toulouse-inp.fr>"]
 
 [compat]
