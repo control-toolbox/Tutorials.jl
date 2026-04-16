@@ -130,7 +130,6 @@ D = Differential(t)
 @variables x(t) θ(t)
 
 q = [x, θ]
-
 nothing # hide
 ```
 
@@ -156,8 +155,8 @@ nothing # hide
 Starting from ``\mathcal{L} = T - V``, `Symbolics.jl` computes the terms of the Euler–Lagrange equations. To isolate the accelerations, we substitute the symbolic time derivatives with algebraic variables. This allows us to identify the **standard manipulator form** components: the mass matrix is the Jacobian of the residual with respect to the accelerations ``\ddot{q}``, and the bias vector contains the remaining terms.
 
 ```@example main
-A = D.(Symbolics.gradient(L, D.(q)))
-B = Symbolics.gradient(L, q)
+A = D.(Symbolics.gradient(L, D.(q)))  # d/dt(∂L/∂q̇)
+B = Symbolics.gradient(L, q)          # ∂L/∂q
 Q = Symbolics.gradient(P_non_conservative, D.(q))
 
 # Euler-Lagrange residual: d/dt(∂L/∂q̇) - ∂L/∂q - Q = 0
