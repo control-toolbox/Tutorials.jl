@@ -85,7 +85,7 @@ makedocs(;
             "Linear–quadratic regulator" => "tutorial-lqr.md",
             "Minimal action" => "tutorial-mam.md",
             "Model Predictive Control" => "tutorial-mpc.md",
-            "Symbolics Mechanics" => "tutorial-symbolics.md",
+            "Symbolic Lagrangian Mechanics" => "tutorial-symbolics.md",
         ],
     ],
     plugins=[links],
