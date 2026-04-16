@@ -1,9 +1,5 @@
 # Cart-Pole Limit Cycle via Symbolic Lagrangian Mechanics
 
-```@meta
-Draft = false
-```
-
 This tutorial demonstrates how to combine **symbolic derivation of equations of motion** (via
 [`Symbolics.jl`](https://symbolics.juliasymbolics.org/)) with **direct optimal control**
 (via [OptimalControl.jl](https://control-toolbox.org/OptimalControl.jl/)) to find a
