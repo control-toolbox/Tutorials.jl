@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="313.82666"
+   height="158.66362"
+   viewBox="0 0 313.82666 158.66362"
+   version="1.1"
+   id="svg216"
+   sodipodi:docname="cartpole_sketch.svg"
+   inkscape:version="1.2 (dc2aeda, 2022-05-15)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview218"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     showgrid="false"
+     inkscape:zoom="1.6047635"
+     inkscape:cx="123.69424"
+     inkscape:cy="61.068188"
+     inkscape:window-width="1512"
+     inkscape:window-height="916"
+     inkscape:window-x="0"
+     inkscape:window-y="38"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg216" />
+  <defs
+     id="defs190">
+    <marker
+       style="overflow:visible"
+       id="TriangleStart"
+       refX="0"
+       refY="0"
+       orient="auto-start-reverse"
+       inkscape:stockid="TriangleStart"
+       markerWidth="6"
+       markerHeight="5"
+       viewBox="0 0 5.3244081 6.1553851"
+       inkscape:isstock="true"
+       inkscape:collect="always"
+       preserveAspectRatio="none">
+      <path
+         transform="scale(0.5)"
+         style="fill:context-stroke;fill-rule:evenodd;stroke:context-stroke;stroke-width:1pt"
+         d="M 5.77,0 -2.88,5 V -5 Z"
+         id="path135" />
+    </marker>
+    <style
+       id="style182">
+      .track   { stroke: #999; }
+      .cart    { fill: #4063D8; stroke: #2c4fa0; }
+      .hinge   { fill: #2c3e50; }
+      .rod     { stroke: #555; }
+      .bob     { fill: #CB3C33; stroke: #8a1a1a; }
+      .annot   { stroke: #888; fill: none; }
+      .label   { fill: #555; font-family: Arial, sans-serif; }
+      .force   { stroke: #CB3C33; }
+      .arrow   { fill: #CB3C33; }
+      .xarrow  { stroke: #555; }
+      .xlabel  { fill: #555; font-family: Arial, sans-serif; font-size: 13px; }
+      @media (prefers-color-scheme: dark) {
+        .track  { stroke: #555; }
+        .cart   { fill: #4063D8; stroke: #6080e8; }
+        .hinge  { fill: #ecf0f1; }
+        .rod    { stroke: #bdc3c7; }
+        .bob    { fill: #CB3C33; stroke: #e05050; }
+        .annot  { stroke: #aaa; fill: none; }
+        .label  { fill: #bdc3c7; }
+        .force  { stroke: #e05050; }
+        .arrow  { fill: #e05050; }
+        .xarrow { stroke: #bdc3c7; }
+        .xlabel { fill: #bdc3c7; }
+      }
+    </style>
+    <marker
+       id="arrowhead"
+       markerWidth="10"
+       markerHeight="7"
+       refX="9"
+       refY="3.5"
+       orient="auto"
+       viewBox="0 0 10 7"
+       preserveAspectRatio="xMidYMid">
+      <polygon
+         points="10,3.5 0,7 0,0 "
+         class="arrow"
+         id="polygon184" />
+    </marker>
+    <marker
+       id="xarrowhead"
+       markerWidth="8"
+       markerHeight="6"
+       refX="7"
+       refY="3"
+       orient="auto"
+       viewBox="0 0 8 6"
+       preserveAspectRatio="xMidYMid">
+      <polygon
+         points="0,0 8,3 0,6 "
+         class="arrow"
+         style="fill:#555555"
+         id="polygon187" />
+    </marker>
+  </defs>
+  <path
+     id="line192-0"
+     style="fill:none;stroke:#999999;stroke-width:0.749806"
+     class="track"
+     d="m 109.01617,66.335535 c 0,0 2.66987,-7.02161 10.83691,-9.55147 8.16704,-2.52986 13.65788,1.23699 13.65788,1.23699"
+     sodipodi:nodetypes="czc" />
+  <line
+     x1="133.40085"
+     y1="99.381401"
+     x2="82.760437"
+     y2="31.113207"
+     class="rod"
+     stroke-width="3"
+     stroke-linecap="round"
+     id="line198" />
+  <!-- Track -->
+  <line
+     x1="13.590039"
+     y1="125.55579"
+     x2="303.59003"
+     y2="125.55579"
+     class="track"
+     stroke-width="2.5"
+     id="line192" />
+  <!-- Cart body (no wheels) -->
+  <rect
+     x="101.59004"
+     y="100.55579"
+     width="64"
+     height="26"
+     rx="4"
+     class="cart"
+     stroke-width="1.5"
+     id="rect194" />
+  <!-- Hinge -->
+  <circle
+     cx="133.59004"
+     cy="100.55579"
+     r="5"
+     class="hinge"
+     id="circle196" />
+  <!-- Pendulum rod -->
+  <!-- Pendulum bob -->
+  <circle
+     cx="47.933208"
+     cy="74.295029"
+     r="12"
+     class="bob"
+     stroke-width="1.5"
+     id="circle200"
+     transform="rotate(-36.567523)" />
+  <!-- Angle θ dashed reference + arc -->
+  <line
+     x1="133.59004"
+     y1="100.55579"
+     x2="133.59004"
+     y2="12.343751"
+     class="annot"
+     stroke-width="1.66031"
+     stroke-dasharray="4, 3"
+     id="line202" />
+  <text
+     x="114.16084"
+     y="52.973534"
+     class="label"
+     font-size="14px"
+     font-style="italic"
+     id="text206">θ</text>
+  <!-- Force u arrow -->
+  <line
+     x1="165.59004"
+     y1="113.55579"
+     x2="225.27538"
+     y2="113.55579"
+     class="force"
+     stroke-width="2.44306"
+     marker-end="url(#arrowhead)"
+     id="line208"
+     style="stroke-width:2.443;stroke-dasharray:none;marker-end:url(#TriangleStart)" />
+  <text
+     x="193.18916"
+     y="107.16372"
+     class="label"
+     font-size="12px"
+     text-anchor="middle"
+     font-style="italic"
+     id="text210">u</text>
+  <!-- x position arrow + label -->
+  <text
+     x="133.78026"
+     y="145.27246"
+     class="xlabel"
+     text-anchor="middle"
+     font-style="italic"
+     id="text214">x</text>
+</svg>
