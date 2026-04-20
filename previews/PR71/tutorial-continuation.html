@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Discrete continuation · Tutorials</title><meta name="title" content="Discrete continuation · Tutorials"/><meta property="og:title" content="Discrete continuation · Tutorials"/><meta property="twitter:title" content="Discrete continuation · Tutorials"/><meta name="description" content="Documentation for Tutorials."/><meta property="og:description" content="Documentation for Tutorials."/><meta property="twitter:description" content="Documentation for Tutorials."/><script data-outdated-warner src="assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.050/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="assets/documenter.js"></script><script src="search_index.js"></script><script src="siteinfo.js"></script><script src="../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="assets/themes/catppuccin-mocha.css" data-theme-name="catppuccin-mocha"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="assets/themes/catppuccin-macchiato.css" data-theme-name="catppuccin-macchiato"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="assets/themes/catppuccin-frappe.css" data-theme-name="catppuccin-frappe"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="assets/themes/catppuccin-latte.css" data-theme-name="catppuccin-latte"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="assets/themeswap.js"></script><link href="https://control-toolbox.org/assets/css/documentation.css" rel="stylesheet" type="text/css"/><script src="https://control-toolbox.org/assets/js/documentation.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit"><a href="index.html">Tutorials</a></span></div><button class="docs-search-query input is-rounded is-small is-clickable my-2 mx-auto py-1 px-2" id="documenter-search-query">Search docs (Ctrl + /)</button><ul class="docs-menu"><li><a class="tocitem" href="index.html">Getting Started</a></li><li><span class="tocitem">Tutorials and Advanced Features</span><ul><li class="is-active"><a class="tocitem" href="tutorial-continuation.html">Discrete continuation</a><ul class="internal"><li><a class="tocitem" href="#Continuation-on-parametric-OCP"><span>Continuation on parametric OCP</span></a></li><li><a class="tocitem" href="#Continuation-on-parameter"><span>Continuation on parameter</span></a></li><li><a class="tocitem" href="#Best-practices-and-limitations"><span>Best practices and limitations</span></a></li></ul></li><li><a class="tocitem" href="tutorial-discretisation.html">Discretisation methods</a></li><li><input class="collapse-toggle" id="menuitem-2-3" type="checkbox"/><label class="tocitem" for="menuitem-2-3"><span class="docs-label">Free times</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="tutorial-free-times-final.html">Final time</a></li><li><a class="tocitem" href="tutorial-free-times-initial.html">Initial time</a></li><li><a class="tocitem" href="tutorial-free-times-final-initial.html">Final and initial times</a></li></ul></li><li><a class="tocitem" href="tutorial-nlp.html">NLP manipulations</a></li><li><a class="tocitem" href="tutorial-iss.html">Indirect simple shooting</a></li><li><a class="tocitem" href="tutorial-goddard.html">Goddard: direct, indirect</a></li><li><a class="tocitem" href="tutorial-lqr.html">Linear–quadratic regulator</a></li><li><a class="tocitem" href="tutorial-mam.html">Minimal action</a></li><li><a class="tocitem" href="tutorial-mpc.html">Model Predictive Control</a></li><li><a class="tocitem" href="tutorial-symbolics.html">Symbolic Lagrangian Mechanics</a></li></ul></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><a class="docs-sidebar-button docs-navbar-link fa-solid fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">Tutorials and Advanced Features</a></li><li class="is-active"><a href="tutorial-continuation.html">Discrete continuation</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href="tutorial-continuation.html">Discrete continuation</a></li></ul></nav><div class="docs-right"><a class="docs-navbar-link" href="https://github.com/control-toolbox/Tutorials.jl" title="View the repository on GitHub"><span class="docs-icon fa-brands"></span><span class="docs-label is-hidden-touch">GitHub</span></a><a class="docs-navbar-link" href="https://github.com/control-toolbox/Tutorials.jl/blob/main/docs/src/tutorial-continuation.md" title="Edit source on GitHub"><span class="docs-icon fa-solid"></span></a><a class="docs-settings-button docs-navbar-link fa-solid fa-gear" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-article-toggle-button fa-solid fa-chevron-up" id="documenter-article-toggle-button" href="javascript:;" title="Collapse all docstrings"></a></div></header><article class="content" id="documenter-page"><h1 id="tutorial-continuation"><a class="docs-heading-anchor" href="#tutorial-continuation">Discrete continuation</a><a id="tutorial-continuation-1"></a><a class="docs-heading-anchor-permalink" href="#tutorial-continuation" title="Permalink"></a></h1><p>By using the warm start option, it is easy to implement a basic discrete continuation method, in which a sequence of problems is solved by using each solution as the initial guess for the next problem. This approach typically leads to faster and more reliable convergence than solving each problem with the same initial guess and is particularly useful for problems that require a good initial guess to converge.</p><h2 id="Continuation-on-parametric-OCP"><a class="docs-heading-anchor" href="#Continuation-on-parametric-OCP">Continuation on parametric OCP</a><a id="Continuation-on-parametric-OCP-1"></a><a class="docs-heading-anchor-permalink" href="#Continuation-on-parametric-OCP" title="Permalink"></a></h2><p>The most concise way to perform discrete continuation is to define a function that returns the optimal control problem for a given value of the continuation parameter, and then solve a sequence of such problems. We illustrate this using a simple double integrator problem, where the fixed final time is gradually increased.</p><p>First we load the required packages:</p><pre><code class="language-julia hljs">using DataFrames
+using OptimalControl
+using NLPModelsIpopt
+using Printf
+using Plots</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">&lt;&lt; @example-block not executed in draft mode &gt;&gt;</code></pre><p>The <code>init</code> parameter of the <code>solve</code> function allows providing an initial guess. See the <a href="https://control-toolbox.org/OptimalControl.jl/stable/manual-initial-guess.html">initial guess documentation</a> for more details.</p><p>We write a function that returns the OCP for a given final time:</p><pre><code class="language-julia hljs">function problem(T)
+
+    ocp = @def begin
+
+        t ∈ [0, T], time
+        x ∈ R², state
+        u ∈ R, control
+
+        q = x₁
+        v = x₂
+
+        q(0) == 0
+        v(0) == 0
+        q(T) == 1
+        v(T) == 0
+        ẋ(t) == [v(t), u(t)]
+
+        ∫(u(t)^2) → min
+
+    end
+
+    return ocp
+end
+nothing # hide</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">&lt;&lt; @example-block not executed in draft mode &gt;&gt;</code></pre><p>Then we perform the continuation with a simple <em>for</em> loop, using each solution to initialize the next problem. We wrap the continuation in a function to avoid global variables.</p><pre><code class="language-julia hljs">function continuation_parametric(T_range; init=nothing, scheme=:midpoint, grid_size=200)
+    data = DataFrame(T=Float64[], Objective=Float64[], Iterations=Int[])
+    for T ∈ T_range
+        ocp = problem(T)
+        sol = solve(ocp; init=init, display=false, scheme=scheme, grid_size=grid_size)
+        @assert successful(sol) &quot;Solution failed for T=$T&quot;
+        init = sol
+        push!(data, (T=T, Objective=objective(sol), Iterations=iterations(sol)))
+    end
+    return data
+end
+
+data = continuation_parametric(range(1, 2, length=5))
+println(data)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">&lt;&lt; @example-block not executed in draft mode &gt;&gt;</code></pre><p>We can visualize the evolution of the objective and the number of iterations with respect to the final time.</p><pre><code class="language-julia hljs">plt_obj = plot(data.T, data.Objective;
+    seriestype=:scatter,
+    title=&quot;Double integrator&quot;,
+    label=&quot;Objective&quot;,
+    xlabel=&quot;Final time T&quot;,
+    ylabel=&quot;∫u(t)² dt&quot;)
+
+plt_iter = plot(data.T, data.Iterations;
+    seriestype=:scatter,
+    label=&quot;Iterations&quot;,
+    xlabel=&quot;Final time T&quot;,
+    ylabel=&quot;Number of iterations&quot;)
+
+layout = grid(2, 1, heights=[0.5, 0.5])
+plot(plt_obj, plt_iter; layout=layout, size=(800, 600))</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">&lt;&lt; @example-block not executed in draft mode &gt;&gt;</code></pre><h2 id="Continuation-on-parameter"><a class="docs-heading-anchor" href="#Continuation-on-parameter">Continuation on parameter</a><a id="Continuation-on-parameter-1"></a><a class="docs-heading-anchor-permalink" href="#Continuation-on-parameter" title="Permalink"></a></h2><p>As a second example, we solve a Goddard problem with a decreasing maximum thrust. We define a function that returns the optimal control problem for a given value of <code>Tmax</code>, similar to the first example.</p><p>Let us first define the Goddard problem. Note that the formulation below illustrates all types of constraints, and the problem could be written more compactly.</p><pre><code class="language-julia hljs"># Parameters
+r0 = 1
+v0 = 0
+m0 = 1
+mf = 0.6
+x0 = [r0, v0, m0]
+vmax = 0.1
+
+# Dynamics
+function F0(x)
+    # Uncontrolled dynamics: gravity and drag
+    r, v, m = x
+    D = Cd * v^2 * exp(-β*(r - 1))  # Aerodynamic drag
+    return [ v, -D/m - 1/r^2, 0 ]   # [dr/dt, dv/dt, dm/dt]
+end
+function F1(x, Tmax)
+    # Control dynamics: thrust contribution
+    r, v, m = x
+    return [ 0, Tmax/m, -b*Tmax ]   # [dr/dt, dv/dt, dm/dt] due to thrust
+end
+
+# Parameters for the dynamics
+Cd = 310
+β = 500
+b = 2
+Tmax_0 = 3
+Tmax_f = 1
+
+# Goddard problem function that takes Tmax as parameter
+function goddard_problem(Tmax)
+    ocp = @def begin
+
+        tf ∈ R, variable
+        t ∈ [0, tf], time
+        x = (r, v, m) ∈ R^3, state
+        u ∈ R, control
+
+        0.01 ≤ tf ≤ Inf
+
+        x(0) == x0
+        m(tf) == mf
+        r0 ≤ r(t) ≤ r0 + 0.1
+        v0 ≤ v(t) ≤ vmax
+        mf ≤ m(t) ≤ m0
+        0 ≤ u(t) ≤ 1
+
+        ẋ(t) == F0(x(t)) + u(t) * F1(x(t), Tmax)
+
+        r(tf) → max
+
+    end
+    return ocp
+end
+
+# Solve the problem with a reference value of Tmax
+sol0 = solve(goddard_problem(Tmax_0); display=false, scheme=:midpoint, grid_size=200)
+@printf(&quot;Objective for reference solution: %.6f\n&quot;, objective(sol0))</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">&lt;&lt; @example-block not executed in draft mode &gt;&gt;</code></pre><p>Then, we perform the continuation on the maximal thrust. We wrap the continuation in a function that redefines the OCP at each step with the new <code>Tmax</code> value.</p><pre><code class="language-julia hljs">function continuation_goddard(Tmax_range; init=nothing, scheme=:midpoint, grid_size=200)
+    data = DataFrame(Tmax=Float64[], Objective=Float64[], Iterations=Int[])
+    sols = Vector{Any}()
+    sol = init
+    for Tmax_local ∈ Tmax_range
+        ocp = goddard_problem(Tmax_local)
+        sol = solve(ocp; init=sol, display=false, scheme=scheme, grid_size=grid_size)
+        @assert successful(sol) &quot;Solution failed for Tmax=$Tmax_local&quot;
+        push!(data, (Tmax=Tmax_local, Objective=objective(sol), Iterations=iterations(sol)))
+        push!(sols, sol)
+    end
+    return data, sols
+end
+
+data, sols = continuation_goddard(range(Tmax_0, Tmax_f, length=9); init=sol0)
+println(data)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">&lt;&lt; @example-block not executed in draft mode &gt;&gt;</code></pre><p>We plot now the objective with respect to the maximal thrust, as well as the solutions for <code>Tmax=3</code>, <code>Tmax=2</code>, and <code>Tmax=1</code>. The time is normalized for the solution plots to compare trajectories with different final times.</p><pre><code class="language-julia hljs">using Plots.PlotMeasures # for leftmargin
+
+plt_obj = plot(data.Tmax, data.Objective;
+    seriestype=:scatter,
+    title=&quot;Goddard problem&quot;,
+    label=&quot;r(tf)&quot;,
+    xlabel=&quot;Maximal thrust (Tmax)&quot;,
+    ylabel=&quot;Maximal altitude r(tf)&quot;)
+
+plt_iter = plot(data.Tmax, data.Iterations;
+    seriestype=:scatter,
+    label=&quot;Iterations&quot;,
+    xlabel=&quot;Maximal thrust (Tmax)&quot;,
+    ylabel=&quot;Number of iterations&quot;)
+
+# Find indices closest to desired Tmax values
+Tmax_values = [1.0, 2.0, 3.0]
+indices = [argmin(abs.(data.Tmax .- T)) for T in Tmax_values]
+
+layout_metrics = grid(2, 1, heights=[0.5, 0.5])
+plot(plt_obj, plt_iter; layout=layout_metrics, size=(800, 600), leftmargin=5mm)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">&lt;&lt; @example-block not executed in draft mode &gt;&gt;</code></pre><p>We now plot the solutions for the selected <code>Tmax</code> values, using normalized time to compare trajectories with different final times.</p><pre><code class="language-julia hljs">plt_sol = plot()
+for (i, idx) in enumerate(indices)
+    plot!(plt_sol, sols[idx]; label=&quot;Tmax=$(round(data.Tmax[idx], digits=2))&quot;, time=:normalize, color=i)
+end
+plot(plt_sol; size=(800, 800), leftmargin=5mm)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">&lt;&lt; @example-block not executed in draft mode &gt;&gt;</code></pre><h3 id="Animation"><a class="docs-heading-anchor" href="#Animation">Animation</a><a id="Animation-1"></a><a class="docs-heading-anchor-permalink" href="#Animation" title="Permalink"></a></h3><p>The animation below shows three rockets launching simultaneously with different maximum thrust values (Tmax = 3, 2, 1). The rockets start at the same time (t=0) but reach their final altitudes at different times according to their optimal trajectories. Each rocket displays:</p><ul><li><strong>Altitude</strong> (above the rocket)</li><li><strong>Velocity gauge</strong> (horizontal bar, green→red)</li><li><strong>Fuel gauge</strong> (vertical bar, showing remaining fuel m(t) - mf)</li><li><strong>Flame</strong> (visible when thrust u(t) &gt; 0)</li></ul><pre><code class="language-julia hljs"># Extract data for the 3 selected solutions (Tmax ≈ 3, 2, 1)
+selected_sols = [sols[idx] for idx in indices]
+selected_Tmax = [round(data.Tmax[idx], digits=2) for idx in indices]
+
+# Extract time grids and state/control data for each solution
+solutions_data = []
+for (sol, Tmax_val) in zip(selected_sols, selected_Tmax)
+    t_grid = time_grid(sol)
+    X = state(sol).(t_grid)
+    u = control(sol).(t_grid)
+    
+    # Extract r, v, m from state
+    r = [x[1] for x in X]
+    v = [x[2] for x in X]
+    m = [x[3] for x in X]
+    
+    push!(solutions_data, (t=t_grid, r=r, v=v, m=m, u=u))
+end
+
+# Serialize to JSON for JavaScript injection
+json_t1 = &quot;[&quot; * join(string.(solutions_data[1].t), &quot;,&quot;) * &quot;]&quot;
+json_r1 = &quot;[&quot; * join(string.(solutions_data[1].r), &quot;,&quot;) * &quot;]&quot;
+json_v1 = &quot;[&quot; * join(string.(solutions_data[1].v), &quot;,&quot;) * &quot;]&quot;
+json_m1 = &quot;[&quot; * join(string.(solutions_data[1].m), &quot;,&quot;) * &quot;]&quot;
+json_u1 = &quot;[&quot; * join(string.(solutions_data[1].u), &quot;,&quot;) * &quot;]&quot;
+
+json_t2 = &quot;[&quot; * join(string.(solutions_data[2].t), &quot;,&quot;) * &quot;]&quot;
+json_r2 = &quot;[&quot; * join(string.(solutions_data[2].r), &quot;,&quot;) * &quot;]&quot;
+json_v2 = &quot;[&quot; * join(string.(solutions_data[2].v), &quot;,&quot;) * &quot;]&quot;
+json_m2 = &quot;[&quot; * join(string.(solutions_data[2].m), &quot;,&quot;) * &quot;]&quot;
+json_u2 = &quot;[&quot; * join(string.(solutions_data[2].u), &quot;,&quot;) * &quot;]&quot;
+
+json_t3 = &quot;[&quot; * join(string.(solutions_data[3].t), &quot;,&quot;) * &quot;]&quot;
+json_r3 = &quot;[&quot; * join(string.(solutions_data[3].r), &quot;,&quot;) * &quot;]&quot;
+json_v3 = &quot;[&quot; * join(string.(solutions_data[3].v), &quot;,&quot;) * &quot;]&quot;
+json_m3 = &quot;[&quot; * join(string.(solutions_data[3].m), &quot;,&quot;) * &quot;]&quot;
+json_u3 = &quot;[&quot; * join(string.(solutions_data[3].u), &quot;,&quot;) * &quot;]&quot;
+
+# Inject real Tmax values for labels
+json_Tmax1 = string(selected_Tmax[1])
+json_Tmax2 = string(selected_Tmax[2])
+json_Tmax3 = string(selected_Tmax[3])
+
+# Inject m0 and mf values
+json_m0 = string(m0)
+json_mf = string(mf)
+
+# Inject r0 value
+json_r0 = string(r0)
+
+# Calculate global max time for animation loop
+t_max_global = max(solutions_data[1].t[end], solutions_data[2].t[end], solutions_data[3].t[end])
+
+# Define RawHTML wrapper for Documenter
+struct RawHTML
+    raw::String
+end
+Base.show(io::IO, ::MIME&quot;text/html&quot;, h::RawHTML) = print(io, h.raw)
+
+html_anim = &quot;&quot;&quot;
+&lt;div style=&quot;display: flex; justify-content: center; margin: 20px 0;&quot;&gt;
+    &lt;canvas id=&quot;goddardCanvas&quot; width=&quot;900&quot; height=&quot;650&quot;
+            style=&quot;border:1px solid #ddd; border-radius: 8px; max-width: 100%;&quot;&gt;
+    &lt;/canvas&gt;
+&lt;/div&gt;
+
+&lt;script&gt;
+(function() {
+    // Data injected from Julia
+    const t1 = $json_t1, r1 = $json_r1, v1 = $json_v1, m1 = $json_m1, u1 = $json_u1;
+    const t2 = $json_t2, r2 = $json_r2, v2 = $json_v2, m2 = $json_m2, u2 = $json_u2;
+    const t3 = $json_t3, r3 = $json_r3, v3 = $json_v3, m3 = $json_m3, u3 = $json_u3;
+    
+    const Tmax1 = $json_Tmax1, Tmax2 = $json_Tmax2, Tmax3 = $json_Tmax3;
+    
+    const t_max_global = $t_max_global;
+    const m0 = $json_m0, mf = $json_mf;
+    const r0 = $json_r0;
+    
+    const canvas = document.getElementById(&#39;goddardCanvas&#39;);
+    const ctx = canvas.getContext(&#39;2d&#39;);
+    
+    // Detect dark/light mode
+    const isDark = window.matchMedia &amp;&amp; window.matchMedia(&#39;(prefers-color-scheme: dark)&#39;).matches;
+    
+    // Color palettes
+    const colors = isDark ? {
+        canvas_bg: &#39;#1e1e2e&#39;,
+        ground: &#39;#4a4a4a&#39;,
+        gauge_bg: &#39;#3a3a3a&#39;,
+        gauge_high: &#39;#2ecc71&#39;,
+        gauge_mid: &#39;#f39c12&#39;,
+        gauge_low: &#39;#e74c3c&#39;,
+        text: &#39;#ecf0f1&#39;,
+        text_secondary: &#39;#bdc3c7&#39;,
+        flame_outer: &#39;#e67e22&#39;,
+        flame_inner: &#39;#f1c40f&#39;,
+        window_fill: &#39;rgba(255,255,255,0.3)&#39;,
+        window_stroke: &#39;rgba(255,255,255,0.6)&#39;,
+        progress: &#39;#4063D8&#39;
+    } : {
+        canvas_bg: &#39;#fafafa&#39;,
+        ground: &#39;#ccc&#39;,
+        gauge_bg: &#39;#ecf0f1&#39;,
+        gauge_high: &#39;#2ecc71&#39;,
+        gauge_mid: &#39;#f39c12&#39;,
+        gauge_low: &#39;#e74c3c&#39;,
+        text: &#39;#2c3e50&#39;,
+        text_secondary: &#39;#7f8c8d&#39;,
+        flame_outer: &#39;#e67e22&#39;,
+        flame_inner: &#39;#f1c40f&#39;,
+        window_fill: &#39;rgba(255,255,255,0.55)&#39;,
+        window_stroke: &#39;rgba(255,255,255,0.85)&#39;,
+        progress: &#39;#4063D8&#39;
+    };
+    
+    // Animation duration in seconds (independent of real problem time)
+    const animation_duration = 10.0;
+    
+    const zone_width = canvas.width / 3;
+    const top_margin = 50;   // Space for time label at top
+    const bottom_margin = 120; // Space for ground line + v gauge + Tmax label
+    const baseline = canvas.height - bottom_margin;
+    
+    // Scale for altitude (r goes from r0 to ~r0+0.1)
+    const r_min = r0;
+    const r_max_all = Math.max(...r1, ...r2, ...r3);
+    const r_range = r_max_all - r_min;
+    const altitude_scale = (baseline - top_margin) / r_range;
+    
+    // Scale for velocity (v goes from 0 to ~0.1)
+    const v_max_all = Math.max(...v1, ...v2, ...v3);
+    
+    let start_time = null;
+
+    function interpolate(t, data_t, data_y) {
+        // Find interval
+        let i = 0;
+        while(i &lt; data_t.length - 1 &amp;&amp; data_t[i + 1] &lt; t) { i++; }
+        
+        if (i &gt;= data_t.length - 1) {
+            return data_y[data_y.length - 1];  // Return final value if past end
+        }
+        
+        const dt = data_t[i+1] - data_t[i];
+        const alpha = (dt &gt; 0) ? (t - data_t[i]) / dt : 0;
+        return data_y[i] + alpha * (data_y[i+1] - data_y[i]);
+    }
+
+    function drawRocket(zone_idx, t, r, v, m, u, color, Tmax) {
+        const zone_x = zone_idx * zone_width;
+        const center_x = zone_x + zone_width / 2;
+        
+        // Rocket position
+        const rocket_y = baseline - altitude_scale * (r - r_min);
+        
+        // Draw ground line
+        ctx.beginPath();
+        ctx.moveTo(zone_x + 20, baseline + 20);
+        ctx.lineTo(zone_x + zone_width - 20, baseline + 20);
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = colors.ground;
+        ctx.stroke();
+        
+        // Draw fuel gauge (vertical bar to the right of rocket)
+        const fuel_x = center_x + 80;
+        const fuel_height = 200;
+        const fuel_y = baseline - fuel_height;
+        const fuel_level = (m - mf) / (m0 - mf);  // 0 to 1
+        
+        // Fuel gauge background
+        ctx.fillStyle = colors.gauge_bg;
+        ctx.fillRect(fuel_x - 10, fuel_y, 20, fuel_height);
+        
+        // Fuel gauge fill
+        const fuel_fill_height = fuel_level * fuel_height;
+        ctx.fillStyle = fuel_level &gt; 0.5 ? colors.gauge_high : (fuel_level &gt; 0.2 ? colors.gauge_mid : colors.gauge_low);
+        ctx.fillRect(fuel_x - 10, fuel_y + (fuel_height - fuel_fill_height), 20, fuel_fill_height);
+        
+        // Fuel gauge label
+        ctx.fillStyle = colors.text_secondary;
+        ctx.font = &#39;14px Arial&#39;;
+        ctx.textAlign = &#39;center&#39;;
+        ctx.fillText(&#39;Fuel&#39;, fuel_x, fuel_y - 8);
+        
+        // Draw rocket: nose cone + body + fins + window
+        const rocket_bottom = rocket_y + 18;
+        ctx.fillStyle = color;
+
+        // Nose cone
+        ctx.beginPath();
+        ctx.moveTo(center_x, rocket_y - 38);
+        ctx.lineTo(center_x - 12, rocket_y - 10);
+        ctx.lineTo(center_x + 12, rocket_y - 10);
+        ctx.closePath();
+        ctx.fill();
+
+        // Body
+        ctx.fillRect(center_x - 12, rocket_y - 10, 24, 28);
+
+        // Left fin
+        ctx.beginPath();
+        ctx.moveTo(center_x - 12, rocket_y + 6);
+        ctx.lineTo(center_x - 24, rocket_y + 22);
+        ctx.lineTo(center_x - 12, rocket_y + 18);
+        ctx.closePath();
+        ctx.fill();
+
+        // Right fin
+        ctx.beginPath();
+        ctx.moveTo(center_x + 12, rocket_y + 6);
+        ctx.lineTo(center_x + 24, rocket_y + 22);
+        ctx.lineTo(center_x + 12, rocket_y + 18);
+        ctx.closePath();
+        ctx.fill();
+
+        // Window
+        ctx.beginPath();
+        ctx.arc(center_x, rocket_y + 2, 5, 0, 2 * Math.PI);
+        ctx.fillStyle = colors.window_fill;
+        ctx.fill();
+        ctx.strokeStyle = colors.window_stroke;
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+
+        // Draw flame if thrust &gt; 0.1
+        if (u &gt; 0.1) {
+            const flame_size = 10 + 20 * u;
+            ctx.fillStyle = colors.flame_outer;
+            ctx.beginPath();
+            ctx.moveTo(center_x - 10, rocket_bottom);
+            ctx.lineTo(center_x, rocket_bottom + flame_size);
+            ctx.lineTo(center_x + 10, rocket_bottom);
+            ctx.closePath();
+            ctx.fill();
+
+            // Inner flame
+            ctx.fillStyle = colors.flame_inner;
+            ctx.beginPath();
+            ctx.moveTo(center_x - 5, rocket_bottom);
+            ctx.lineTo(center_x, rocket_bottom + flame_size * 0.6);
+            ctx.lineTo(center_x + 5, rocket_bottom);
+            ctx.closePath();
+            ctx.fill();
+        }
+        
+        // Draw altitude text
+        ctx.fillStyle = colors.text;
+        ctx.font = &#39;bold 14px Arial&#39;;
+        ctx.textAlign = &#39;center&#39;;
+        ctx.fillText(&#39;r = &#39; + r.toFixed(4), center_x, rocket_y - 40);
+        
+        // Draw velocity gauge (horizontal bar)
+        const v_gauge_width = 60;
+        const v_gauge_height = 8;
+        const v_gauge_x = center_x - v_gauge_width / 2;
+        const v_gauge_y = rocket_y + 50;
+        const v_level = Math.abs(v) / v_max_all;
+        
+        // Velocity gauge background
+        ctx.fillStyle = colors.gauge_bg;
+        ctx.fillRect(v_gauge_x, v_gauge_y, v_gauge_width, v_gauge_height);
+        
+        // Velocity gauge fill
+        ctx.fillStyle = v_level &gt; 0.7 ? colors.gauge_low : (v_level &gt; 0.4 ? colors.gauge_mid : colors.gauge_high);
+        ctx.fillRect(v_gauge_x, v_gauge_y, v_level * v_gauge_width, v_gauge_height);
+        
+        // Velocity label
+        ctx.fillStyle = colors.text_secondary;
+        ctx.font = &#39;12px Arial&#39;;
+        ctx.fillText(&#39;v&#39;, center_x, v_gauge_y + 20);
+        
+        // Draw Tmax label at bottom
+        ctx.fillStyle = colors.text;
+        ctx.font = &#39;bold 16px Arial&#39;;
+        ctx.fillText(&#39;Tmax = &#39; + Tmax, center_x, baseline + 90);
+    }
+
+    function draw(time) {
+        if (!start_time) start_time = time;
+        
+        const elapsed = (time - start_time) / 1000.0;
+        const progress = (elapsed % animation_duration) / animation_duration;
+        const t_anim = progress * t_max_global;
+        
+        ctx.fillStyle = colors.canvas_bg;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        // Draw time indicator at top
+        ctx.fillStyle = colors.text;
+        ctx.font = &#39;bold 18px Arial&#39;;
+        ctx.textAlign = &#39;center&#39;;
+        ctx.fillText(&#39;t = &#39; + t_anim.toFixed(3) + &#39; s&#39;, canvas.width / 2, 30);
+        
+        // Interpolate and draw each rocket
+        const r1_cur = interpolate(t_anim, t1, r1);
+        const v1_cur = interpolate(t_anim, t1, v1);
+        const m1_cur = interpolate(t_anim, t1, m1);
+        const u1_cur = interpolate(t_anim, t1, u1);
+        drawRocket(0, t_anim, r1_cur, v1_cur, m1_cur, u1_cur, &#39;#CB3C33&#39;, Tmax1);
+        
+        const r2_cur = interpolate(t_anim, t2, r2);
+        const v2_cur = interpolate(t_anim, t2, v2);
+        const m2_cur = interpolate(t_anim, t2, m2);
+        const u2_cur = interpolate(t_anim, t2, u2);
+        drawRocket(1, t_anim, r2_cur, v2_cur, m2_cur, u2_cur, &#39;#389826&#39;, Tmax2);
+        
+        const r3_cur = interpolate(t_anim, t3, r3);
+        const v3_cur = interpolate(t_anim, t3, v3);
+        const m3_cur = interpolate(t_anim, t3, m3);
+        const u3_cur = interpolate(t_anim, t3, u3);
+        drawRocket(2, t_anim, r3_cur, v3_cur, m3_cur, u3_cur, &#39;#9558B2&#39;, Tmax3);
+        
+        // Draw progress bar at bottom
+        const bar_height = 4;
+        ctx.fillStyle = colors.gauge_bg;
+        ctx.fillRect(0, canvas.height - bar_height, canvas.width, bar_height);
+        ctx.fillStyle = colors.progress;
+        ctx.fillRect(0, canvas.height - bar_height, canvas.width * progress, bar_height);
+        
+        requestAnimationFrame(draw);
+    }
+    requestAnimationFrame(draw);
+})();
+&lt;/script&gt;
+&quot;&quot;&quot;</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">&lt;&lt; @setup-block not executed in draft mode &gt;&gt;</code></pre><pre><code class="language-julia hljs">RawHTML(html_anim)  # hide</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">&lt;&lt; @example-block not executed in draft mode &gt;&gt;</code></pre><h2 id="Best-practices-and-limitations"><a class="docs-heading-anchor" href="#Best-practices-and-limitations">Best practices and limitations</a><a id="Best-practices-and-limitations-1"></a><a class="docs-heading-anchor-permalink" href="#Best-practices-and-limitations" title="Permalink"></a></h2><p>The examples above illustrate a basic discrete continuation method. Here are some important considerations:</p><ul><li><p><strong>Step size</strong>: The continuation step size should be chosen carefully. Too large a step may lead to convergence issues, while too small a step may be inefficient. Adaptive step size strategies can improve robustness but are not covered in this tutorial.</p></li><li><p><strong>Convergence monitoring</strong>: Always check that each solution converges successfully using <code>successful(sol)</code>. If a solution fails, consider reducing the step size or providing a better initial guess.</p></li><li><p><strong>Advanced methods</strong>: For more challenging problems, homotopic continuation methods with path following algorithms can be used. These methods adapt the continuation parameter automatically and can handle bifurcations. Such advanced techniques are beyond the scope of this tutorial.</p></li><li><p><strong>Alternative approaches</strong>: In some cases, it may be more efficient to directly parameterize the continuation parameter within the optimal control problem rather than solving a sequence of problems. OptimalControl plans to add this feature in a future release.</p></li></ul></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="index.html">« Getting Started</a><a class="docs-footer-nextpage" href="tutorial-discretisation.html">Discretisation methods »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.17.0 on <span class="colophon-date" title="Monday 20 April 2026 18:53">Monday 20 April 2026</span>. Using Julia version 1.12.6.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
