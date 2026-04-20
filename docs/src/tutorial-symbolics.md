@@ -1,11 +1,26 @@
-# Cart-Pole Limit Cycle via Symbolic Lagrangian Mechanics
+```@meta
+Draft = false
+```
+
+# Cart-Pole Periodic Orbit via Symbolic Lagrangian Mechanics
 
 This tutorial demonstrates how to combine **symbolic derivation of equations of motion** (via
 [`Symbolics.jl`](https://symbolics.juliasymbolics.org/)) with **direct optimal control**
 (via [OptimalControl.jl](https://control-toolbox.org/OptimalControl.jl/)) to find a
-**periodic orbit** (limit cycle) for a cart-pole system.
+**periodic orbit** for a [cart-pole](https://en.wikipedia.org/wiki/Inverted_pendulum) system.
 
-The key is to define the kinetic and potential energies and the power of the non-conservative forces, and to let `Symbolics.jl` handle the derivations of the equations of motion using the Lagrange-Euler equation.
+The first step is to obtain an explicit state-space model
+```math
+\dot X = f(X,u),
+```
+from the Lagrangian description of the system. This is done automatically using `Symbolics.jl`, avoiding manual derivations.
+We then formulate an optimal control problem: find a control input ``u(t)`` such that the system returns to its initial state after a fixed time ``t_f`` (periodicity constraint), while minimizing the quadratic cost
+```math
+\int_0^{t_f} u(t)^2 \,\mathrm d t.
+```
+
+For reference, we first outline how the dynamics ``f(X,u)`` can be derived by hand from the Euler–Lagrange equations.
+We then show how to obtain the same model automatically using `Symbolics.jl`. This second approach is the one used in practice in this tutorial, as it scales to more complex systems and avoids lengthy manual computations.
 
 ## The Cart-Pole System
 
@@ -63,13 +78,13 @@ The equations of motion follow from:
 - \frac{\partial \mathcal{L}}{\partial q} = Q.
 ```
 
-They can be written in the standard **manipulator form** (also known as **robotic equation of motion**):
+They can be written in the form (cf. [the manipulator equations](https://underactuated.mit.edu/multibody.html#manipulator))
 
 ```math
-M(q)\,\ddot{q} = -C(q,\dot{q}) + \tau(q, u),
+M(q)\,\ddot{q} + b(q, \dot q, u) = 0,
 ```
 
-where the symmetric positive-definite **mass matrix** is:
+where $M$ is the (symmetric positive-definite) **mass matrix** :
 
 ```math
 M(q) =
@@ -79,25 +94,22 @@ M(q) =
 \end{pmatrix},
 ```
 
-and the right-hand side collects Coriolis/gravity terms and the control torque. Instead of
-deriving these by hand, we rely on `Symbolics.jl` to compute and **analytically invert**
-``M(q)`` for us.
+and the $b$ the bias, which collects Coriolis/gravity terms and the control torque. Instead of deriving these by hand, we rely on `Symbolics.jl` to compute and **analytically invert** ``M(q)`` for us to solve the equations of motion for $\ddot q$.
 
 ### State-Space Form
 
-Defining the state $X = (x,\,\theta,\,\dot{x},\,\dot{\theta})$, the equations of
-motion become the first-order system:
+Defining the state $X = (x,\,\theta,\,\dot{x},\,\dot{\theta})$, the equations of motion become the first-order system:
 
 ```math
 \dot{X}(t) = f\!\left(X(t),\, u(t)\right) =
 \begin{pmatrix}
-  \dot{x} \\ \dot{\theta} \\ M^{-1}(q)\bigl(-C(q,\dot{q}) + \tau(q,u)\bigr)
+  \dot{x} \\ \dot{\theta} \\ M^{-1}(q) \bigl(-b(q, \dot q, u)\bigr)
 \end{pmatrix}.
 ```
 
 # Optimal Control of a Cart-Pole System using Symbolics.jl
 
-This tutorial demonstrates how to use `Symbolics.jl` to automate the derivation of equations of motion (EOM) for a mechanical system and subsequently solve an optimal control problem using `OptimalControl.jl`.
+This tutorial demonstrates how to use `Symbolics.jl` to automate the derivation of equations of motion (EOM) for a mechanical system and subsequently solve an optimal control problem using `OptimalControl.jl`. 
 
 ## Implementation
 
@@ -133,20 +145,38 @@ q = [x, θ]
 nothing # hide
 ```
 
+
+
 ### Automated Kinematics and Lagrangian
 
-We express the positions, kinetic energy, potential energy, and (non-conservative) power symbolically. The time derivatives ``\dot{p}_c`` and ``\dot{p}_p`` are computed automatically by `D.(...)`.
+The primary advantage of this approach is that the user is solely required to define the fundamental physical quantities. Once the Cartesian positions and the applied forces are specified, the kinetic energy ``T``, potential energy ``V``, and non-conservative power ``P_{nc}`` are formulated directly.
+
+The necessary kinematic and dynamic definitions are:
+
+```math
+\begin{align*}
+p_c &= (x,\,0) \\
+p_p &= (x + l \sin\theta,\,l \cos\theta) \\
+F &= (u,\,0) \\
+\\
+T &= \tfrac{1}{2}m_c\,\|\dot{p}_c\|^2 + \tfrac{1}{2}m_p\,\|\dot{p}_p\|^2 \\
+V &= m_p\,g\,p_{p,y} \\
+P_{nc} &= F \cdot \dot{p}_c
+\end{align*}
+```
+
+All subsequent heavy lifting, including the computation of the time velocities ``\dot{p}_c`` and ``\dot{p}_p``, is executed automatically.
 
 ```@example main
 p_c = [x, 0.0]
-p_p = [x + l * sin(θ), l * cos(θ)]
-F_ext = [u, 0.0]
+p_p =[x + l * sin(θ), l * cos(θ)]
+F = [u, 0.0]
 
-T = 0.5 * m_c * sum(abs2, D.(p_c)) + 0.5 * m_p * sum(abs2, D.(p_p))
+squared_norm(x) = sum(abs2, x)
+T = 0.5 * m_c * squared_norm(D.(p_c)) + 0.5 * m_p * squared_norm(D.(p_p))
 V = g * (m_p * p_p[2])
-L = T - V
+P_non_conservative = dot(F, D.(p_c))
 
-P_non_conservative = dot(D.(p_c), F_ext)
 nothing # hide
 ```
 
@@ -155,49 +185,43 @@ nothing # hide
 Starting from ``\mathcal{L} = T - V``, `Symbolics.jl` computes the terms of the Euler–Lagrange equations. To isolate the accelerations, we substitute the symbolic time derivatives with algebraic variables. This allows us to identify the **standard manipulator form** components: the mass matrix is the Jacobian of the residual with respect to the accelerations ``\ddot{q}``, and the bias vector contains the remaining terms.
 
 ```@example main
-A = D.(Symbolics.gradient(L, D.(q)))  # d/dt(∂L/∂q̇)
+L = T - V
+
+dq = D.(q)
+ddq = D.(dq)
+
+A = D.(Symbolics.gradient(L, dq))  # d/dt(∂L/∂q̇)
 B = Symbolics.gradient(L, q)          # ∂L/∂q
-Q = Symbolics.gradient(P_non_conservative, D.(q))
+Q = Symbolics.gradient(P_non_conservative, dq)
 
 # Euler-Lagrange residual: d/dt(∂L/∂q̇) - ∂L/∂q - Q = 0
-el_eqs = expand_derivatives.(A - B - Q)
+el_res = expand_derivatives.(A - B - Q)
 
-# Helper to create algebraic variables for derivatives
-diff_var(qi, suffix) = Symbolics.variable(Symbol(Symbolics.operation(Symbolics.value(qi)), suffix))
+# Identify mass matrix M and bias vector b such that M·ddq + b = 0
+mass = Symbolics.jacobian(el_res, ddq)
+bias = Symbolics.substitute.(el_res, (Dict(ddq .=> 0.0),))
 
-# Static aliases for velocities and accelerations
-v = diff_var.(q, :_t)
-dv = diff_var.(q, :_tt)
+# Solve for accelerations analytically: ddq = M⁻¹(-b)
+ddq_solution = Symbolics.simplify_fractions.(mass \ (-bias))
 
-# Freeze time derivatives into static algebraic variables
-sub_rules = Dict([D.(q) .=> v; D.(D.(q)) .=> dv])
-residual = Symbolics.substitute.(el_eqs, (sub_rules,))
-
-# Identify mass matrix M and bias vector b such that M·dv + b = 0
-mass = Symbolics.jacobian(residual, dv)
-bias = Symbolics.substitute.(residual, (Dict(dv .=> 0.0),))
-
-# Solve for accelerations analytically: dv = M⁻¹(-b)
-accel = Symbolics.simplify_fractions.(mass \ (-bias))
-
-# Fully explicit state derivative: Ẋ = [v, accel]
-X = [q; v]
-dX = [v; accel]
+# Fully explicit state derivative: Ẋ = [dq, accel]
+X = [q; dq]
+dX = [dq; ddq_solution]
 nothing # hide
 ```
 
 ### Code Generation
 
-`build_function` compiles the symbolic expression `dX` into a native Julia function with arguments `X`, `u`, and parameter values. The `force_SA=true` flag generates a **StaticArrays** kernel, which avoids heap allocations inside the ODE right-hand side — crucial for solver performance because dimension is small. For larger problems (``X \in \mathrm{R}^n``, ``n > 100``), we would use a mutating dynamics function instead, cf. [Julia Performance Tips](https://docs.julialang.org/en/v1/manual/performance-tips/#Consider-StaticArrays.jl-for-small-fixed-size-vector/matrix-operations).
+`Symbolics.build_function` compiles the symbolic expression `dX` into a native Julia function with arguments `X`, `u`, and parameter values. The `force_SA=true` flag generates a **StaticArrays** kernel, which avoids heap allocations inside the ODE right-hand side — crucial for solver performance because dimension is small. For larger problems (``X \in \mathrm{R}^n``, ``n > 100``), we would use a mutating dynamics function instead, cf. [Julia Performance Tips](https://docs.julialang.org/en/v1/manual/performance-tips/#Consider-StaticArrays.jl-for-small-fixed-size-vector/matrix-operations).
 
 ```@example main
-f_expr = build_function(dX, X, u, [m_c, m_p, l, g];
-    expression=Val{false}, force_SA=true)
-f_sym = f_expr[1]   # out-of-place variant: (state, u, params) → SVector
+# out-of-place variant: (state, u, params) → SVector
+cartpole_dynamics = build_function(dX, X, u, [m_c, m_p, l, g];
+    expression=Val{false}, force_SA=true)[1]
 
 const p_vals  = [m_c_val, m_p_val, l_val, g_val]
 
-cartpole_dynamics(X, u) = f_sym(X, u, p_vals)
+f(X, u) = cartpole_dynamics(X, u, p_vals)  # Function used by OptimalControl.jl
 nothing # hide
 ```
 
@@ -215,9 +239,9 @@ We now formulate the optimal control problem using the `@def` macro from `Optima
     θ(0) == 0
     v(0) == 0
     ω(0) == 0.2
-    X(tf_val) - X(0) == [0, 0, 0, 0]  # Periodic orbit
+    X(tf_val) - X(0) == [0, 0, 0, 0]  # Periodic orbit, remove `- X(0)` for finishing at the equilibrium
 
-    Ẋ(t) == cartpole_dynamics(X(t), u(t))
+    Ẋ(t) == f(X(t), u(t))
 
     ∫(u(t)^2) → min
 end
@@ -258,7 +282,7 @@ The plots show the cart position ``x`` and pendulum angle ``\theta``, the corres
 
 ### Animation
 
-The animation below shows the cart-pole evolving along the optimal limit-cycle trajectory. The blue cart slides on the horizontal rail while the pendulum swings around the upright equilibrium.
+The animation below shows the cart-pole evolving along the optimal periodic trajectory. The blue cart slides on the horizontal rail while the pendulum swings around the upright equilibrium.
 
 ```@setup main
 # Extract states for the animation
@@ -269,6 +293,7 @@ xsol = X_mat[1, :]
 json_t  = "[" * join(string.(tsol),  ",") * "]"
 json_x  = "[" * join(string.(xsol),  ",") * "]"
 json_th = "[" * join(string.(θsol),  ",") * "]"
+json_u  = "[" * join(string.(usol),  ",") * "]"
 
 # Define a wrapper to instruct Documenter to render the output as HTML
 struct RawHTML
@@ -289,6 +314,7 @@ html_anim = """
     const t = $json_t;
     const x = $json_x;
     const th = $json_th;
+    const u = $json_u;
     
     const canvas = document.getElementById('cartpoleCanvas');
     const ctx = canvas.getContext('2d');
@@ -339,6 +365,7 @@ html_anim = """
         let alpha = (dt > 0) ? (sim_t - t[i]) / dt : 0;
         let cur_x = x[i] + alpha * (x[i+1] - x[i]);
         let cur_th = th[i] + alpha * (th[i+1] - th[i]);
+        let cur_u = u[i] + alpha * (u[i+1] - u[i]);
 
         ctx.fillStyle = colors.canvas_bg;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -381,6 +408,29 @@ html_anim = """
         ctx.arc(px, py, 8, 0, 2 * Math.PI);
         ctx.fillStyle = colors.bob;
         ctx.fill();
+
+        // Draw Control Force Arrow
+        const u_scale = 3.0; // Scale factor for the force magnitude
+        const u_len = cur_u * u_scale;
+        if (Math.abs(u_len) > 2) {
+            const arr_y = cy + 8; // Slight y-offset to prevent overlapping with the hinge
+            
+            // Arrow shaft
+            ctx.beginPath();
+            ctx.moveTo(cx, arr_y);
+            ctx.lineTo(cx + u_len, arr_y);
+            ctx.lineWidth = 4;
+            ctx.strokeStyle = '#CB3C33';
+            ctx.stroke();
+            
+            // Arrow head
+            ctx.beginPath();
+            ctx.moveTo(cx + u_len, arr_y);
+            ctx.lineTo(cx + u_len - Math.sign(cur_u) * 8, arr_y - 6);
+            ctx.lineTo(cx + u_len - Math.sign(cur_u) * 8, arr_y + 6);
+            ctx.fillStyle = '#CB3C33';
+            ctx.fill();
+        }
 
         // Draw Progress Bar at the very bottom
         const bar_height = 4;
