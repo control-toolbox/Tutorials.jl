@@ -1,7 +1,3 @@
-```@meta
-Draft = false
-```
-
 # Cart-Pole Periodic Orbit via Symbolic Lagrangian Mechanics
 
 This tutorial demonstrates how to combine **symbolic derivation of equations of motion** (via
