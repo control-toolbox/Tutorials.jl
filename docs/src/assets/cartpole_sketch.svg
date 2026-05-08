@@ -53,29 +53,33 @@
     </marker>
     <style
        id="style182">
-      .track   { stroke: #999; }
+      .arc     { stroke: #000; }
+      .arc-arrow { fill: #000; }
+      .track   { stroke: #000; }
       .cart    { fill: #4063D8; stroke: #2c4fa0; }
       .hinge   { fill: #2c3e50; }
       .rod     { stroke: #555; }
       .bob     { fill: #CB3C33; stroke: #8a1a1a; }
       .annot   { stroke: #888; fill: none; }
-      .label   { fill: #555; font-family: Arial, sans-serif; }
+      .label   { fill: #000; font-family: Arial, sans-serif; font-size: 1em; }
       .force   { stroke: #CB3C33; }
       .arrow   { fill: #CB3C33; }
       .xarrow  { stroke: #555; }
-      .xlabel  { fill: #555; font-family: Arial, sans-serif; font-size: 13px; }
+      .xlabel  { fill: #000; font-family: Arial, sans-serif; font-size: 1em; }
       @media (prefers-color-scheme: dark) {
-        .track  { stroke: #555; }
+        .arc     { stroke: #fff; }
+        .arc-arrow { fill: #fff; }
+        .track  { stroke: #fff; }
         .cart   { fill: #4063D8; stroke: #6080e8; }
         .hinge  { fill: #ecf0f1; }
         .rod    { stroke: #bdc3c7; }
         .bob    { fill: #CB3C33; stroke: #e05050; }
         .annot  { stroke: #aaa; fill: none; }
-        .label  { fill: #bdc3c7; }
+        .label  { fill: #fff; }
         .force  { stroke: #e05050; }
         .arrow  { fill: #e05050; }
         .xarrow { stroke: #bdc3c7; }
-        .xlabel { fill: #bdc3c7; }
+        .xlabel { fill: #fff; }
       }
     </style>
     <marker
@@ -93,6 +97,20 @@
          id="polygon184" />
     </marker>
     <marker
+       id="arc-arrowhead"
+       markerWidth="10"
+       markerHeight="7"
+       refX="0"
+       refY="3.5"
+       orient="auto"
+       viewBox="0 0 10 7"
+       preserveAspectRatio="xMidYMid">
+      <polygon
+         points="0,3.5 10,7 10,0 "
+         class="arc-arrow"
+         id="polygon-arc" />
+    </marker>
+    <marker
        id="xarrowhead"
        markerWidth="8"
        markerHeight="6"
@@ -108,10 +126,10 @@
          id="polygon187" />
     </marker>
   </defs>
-  <path
+<path
      id="line192-0"
-     style="fill:none;stroke:#999999;stroke-width:0.749806"
-     class="track"
+     style="fill:none;stroke-width:0.749806;marker-start:url(#arc-arrowhead)"
+     class="arc"
      d="m 109.01617,66.335535 c 0,0 2.66987,-7.02161 10.83691,-9.55147 8.16704,-2.52986 13.65788,1.23699 13.65788,1.23699"
      sodipodi:nodetypes="czc" />
   <line
@@ -173,7 +191,6 @@
      x="114.16084"
      y="52.973534"
      class="label"
-     font-size="14px"
      font-style="italic"
      id="text206">θ</text>
   <!-- Force u arrow -->

@@ -55,14 +55,11 @@ draft = false  # Draft mode: if true, @example blocks in markdown are not execut
 # ═══════════════════════════════════════════════════════════════════════════════
 makedocs(;
     draft=draft,
-    warnonly=[:cross_references, :autodocs_block, :external_cross_references],
+    warnonly=true,
     sitename="Tutorials",
     format=Documenter.HTML(;
         repolink="https://" * repo_url,
         prettyurls=false,
-        example_size_threshold=1_000_000,
-        size_threshold_warn=1_000_000,
-        size_threshold=1_000_000,
         # size_threshold_ignore=["tutorial-discretisation.md", "tutorial-nlp.md"],
         assets=[
             asset("https://control-toolbox.org/assets/css/documentation.css"),
