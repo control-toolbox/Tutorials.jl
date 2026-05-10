@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Symbolic Lagrangian Mechanics · Tutorials</title><meta name="title" content="Symbolic Lagrangian Mechanics · Tutorials"/><meta property="og:title" content="Symbolic Lagrangian Mechanics · Tutorials"/><meta property="twitter:title" content="Symbolic Lagrangian Mechanics · Tutorials"/><meta name="description" content="Documentation for Tutorials."/><meta property="og:description" content="Documentation for Tutorials."/><meta property="twitter:description" content="Documentation for Tutorials."/><script data-outdated-warner src="assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.050/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="assets/documenter.js"></script><script src="search_index.js"></script><script src="siteinfo.js"></script><script src="../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="assets/themes/catppuccin-mocha.css" data-theme-name="catppuccin-mocha"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="assets/themes/catppuccin-macchiato.css" data-theme-name="catppuccin-macchiato"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="assets/themes/catppuccin-frappe.css" data-theme-name="catppuccin-frappe"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="assets/themes/catppuccin-latte.css" data-theme-name="catppuccin-latte"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="assets/themeswap.js"></script><link href="https://control-toolbox.org/assets/css/documentation.css" rel="stylesheet" type="text/css"/><script src="https://control-toolbox.org/assets/js/documentation.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit"><a href="index.html">Tutorials</a></span></div><button class="docs-search-query input is-rounded is-small is-clickable my-2 mx-auto py-1 px-2" id="documenter-search-query">Search docs (Ctrl + /)</button><ul class="docs-menu"><li><a class="tocitem" href="index.html">Getting Started</a></li><li><span class="tocitem">Tutorials and Advanced Features</span><ul><li><a class="tocitem" href="tutorial-continuation.html">Discrete continuation</a></li><li><a class="tocitem" href="tutorial-discretisation.html">Discretisation methods</a></li><li><input class="collapse-toggle" id="menuitem-2-3" type="checkbox"/><label class="tocitem" for="menuitem-2-3"><span class="docs-label">Free times</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="tutorial-free-times-final.html">Final time</a></li><li><a class="tocitem" href="tutorial-free-times-initial.html">Initial time</a></li><li><a class="tocitem" href="tutorial-free-times-final-initial.html">Final and initial times</a></li></ul></li><li><a class="tocitem" href="tutorial-nlp.html">NLP manipulations</a></li><li><a class="tocitem" href="tutorial-iss.html">Indirect simple shooting</a></li><li><a class="tocitem" href="tutorial-goddard.html">Goddard: direct, indirect</a></li><li><a class="tocitem" href="tutorial-lqr.html">Linear–quadratic regulator</a></li><li><a class="tocitem" href="tutorial-mam.html">Minimal action</a></li><li><a class="tocitem" href="tutorial-mpc.html">Model Predictive Control</a></li><li class="is-active"><a class="tocitem" href="tutorial-symbolics.html">Symbolic Lagrangian Mechanics</a><ul class="internal"><li><a class="tocitem" href="#The-Cart-Pole-System"><span>The Cart-Pole System</span></a></li><li class="toplevel"><a class="tocitem" href="#Optimal-Control-of-a-Cart-Pole-System-using-Symbolics.jl"><span>Optimal Control of a Cart-Pole System using Symbolics.jl</span></a></li><li><a class="tocitem" href="#Implementation"><span>Implementation</span></a></li></ul></li></ul></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><a class="docs-sidebar-button docs-navbar-link fa-solid fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">Tutorials and Advanced Features</a></li><li class="is-active"><a href="tutorial-symbolics.html">Symbolic Lagrangian Mechanics</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href="tutorial-symbolics.html">Symbolic Lagrangian Mechanics</a></li></ul></nav><div class="docs-right"><a class="docs-navbar-link" href="https://github.com/control-toolbox/Tutorials.jl" title="View the repository on GitHub"><span class="docs-icon fa-brands"></span><span class="docs-label is-hidden-touch">GitHub</span></a><a class="docs-navbar-link" href="https://github.com/control-toolbox/Tutorials.jl/blob/main/docs/src/tutorial-symbolics.md" title="Edit source on GitHub"><span class="docs-icon fa-solid"></span></a><a class="docs-settings-button docs-navbar-link fa-solid fa-gear" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-article-toggle-button fa-solid fa-chevron-up" id="documenter-article-toggle-button" href="javascript:;" title="Collapse all docstrings"></a></div></header><article class="content" id="documenter-page"><h1 id="tutorial-symbolics"><a class="docs-heading-anchor" href="#tutorial-symbolics">Cart-Pole Periodic Orbit via Symbolic Lagrangian Mechanics</a><a id="tutorial-symbolics-1"></a><a class="docs-heading-anchor-permalink" href="#tutorial-symbolics" title="Permalink"></a></h1><p>This tutorial demonstrates how to combine <strong>symbolic derivation of equations of motion</strong> (via <a href="https://symbolics.juliasymbolics.org/"><code>Symbolics.jl</code></a>) with <strong>direct optimal control</strong> (via <a href="https://control-toolbox.org/OptimalControl.jl/">OptimalControl.jl</a>) to find a <strong>periodic orbit</strong> for a <a href="https://en.wikipedia.org/wiki/Inverted_pendulum">cart-pole</a> system.</p><p>The first step is to obtain an explicit state-space model</p><p class="math-container">\[\dot X = f(X,u),\]</p><p>from the Lagrangian description of the system. This is done automatically using <code>Symbolics.jl</code>, avoiding manual derivations. We then formulate an optimal control problem: find a control input <span>$u(t)$</span> such that the system returns to its initial state after a fixed time <span>$t_f$</span> (periodicity constraint), while minimizing the quadratic cost</p><p class="math-container">\[\int_0^{t_f} u(t)^2 \,\mathrm d t.\]</p><p>For reference, we first outline how the dynamics <span>$f(X,u)$</span> can be derived by hand from the Euler–Lagrange equations. We then show how to obtain the same model automatically using <code>Symbolics.jl</code>. This second approach is the one used in practice in this tutorial, as it scales to more complex systems and avoids lengthy manual computations.</p><h2 id="The-Cart-Pole-System"><a class="docs-heading-anchor" href="#The-Cart-Pole-System">The Cart-Pole System</a><a id="The-Cart-Pole-System-1"></a><a class="docs-heading-anchor-permalink" href="#The-Cart-Pole-System" title="Permalink"></a></h2><p>The system consists of a cart of mass <span>$m_c$</span> sliding on a frictionless horizontal rail, with a rigid pendulum of mass <span>$m_p$</span> and length <span>$l$</span> attached to it. A horizontal force <span>$u$</span> (the control input) acts on the cart.</p><figure>
+  <img src="./assets/cartpole_sketch.svg" alt="Cart-pole diagram" width="350"/>
+  <figcaption>Fig. 1 — Cart-pole system. The angle θ is measured from the upright position.</figcaption>
+</figure><p>The configuration vector is <span>$q = (x,\, \theta)$</span>, where <span>$x$</span> is the cart position and <span>$\theta = 0$</span> corresponds to the <strong>upright</strong> (unstable) equilibrium of the pendulum.</p><h3 id="Positions"><a class="docs-heading-anchor" href="#Positions">Positions</a><a id="Positions-1"></a><a class="docs-heading-anchor-permalink" href="#Positions" title="Permalink"></a></h3><p>The Cartesian positions of the two bodies are:</p><p class="math-container">\[p_c = \begin{pmatrix} x \\ 0 \end{pmatrix}, \qquad
+p_p = \begin{pmatrix} x + l\sin\theta \\ l\cos\theta \end{pmatrix}.\]</p><h3 id="Lagrangian"><a class="docs-heading-anchor" href="#Lagrangian">Lagrangian</a><a id="Lagrangian-1"></a><a class="docs-heading-anchor-permalink" href="#Lagrangian" title="Permalink"></a></h3><p>The kinetic and potential energies are:</p><p class="math-container">\[T = \tfrac{1}{2}m_c\,\|\dot{p}_c\|^2 + \tfrac{1}{2}m_p\,\|\dot{p}_p\|^2
+  = \tfrac{1}{2}(m_c+m_p)\dot{x}^2
+    + m_p l\,\dot{x}\dot{\theta}\cos\theta
+    + \tfrac{1}{2}m_p l^2\dot{\theta}^2,\]</p><p class="math-container">\[V = m_p\,g\,l\cos\theta.\]</p><p>The Lagrangian is <span>$\mathcal{L} = T - V$</span>. The virtual power <span>$P_{nc}$</span> of the non-conservative force (control) <span>$F = (u, 0)$</span> acting on the cart gives the generalised force vector:</p><p class="math-container">\[P_{nc} = F \cdot \dot{p}_c = u\,\dot{x},
+\quad\Longrightarrow\quad
+Q = \frac{\partial P_{nc}}{\partial \dot{q}} = \begin{pmatrix} u \\ 0 \end{pmatrix}.\]</p><h3 id="Euler–Lagrange-Equation"><a class="docs-heading-anchor" href="#Euler–Lagrange-Equation">Euler–Lagrange Equation</a><a id="Euler–Lagrange-Equation-1"></a><a class="docs-heading-anchor-permalink" href="#Euler–Lagrange-Equation" title="Permalink"></a></h3><p>The equations of motion follow from:</p><p class="math-container">\[\frac{d}{dt}\frac{\partial \mathcal{L}}{\partial \dot{q}}
+- \frac{\partial \mathcal{L}}{\partial q} = Q.\]</p><p>They can be written in the form (cf. <a href="https://underactuated.mit.edu/multibody.html#manipulator">the manipulator equations</a>)</p><p class="math-container">\[M(q)\,\ddot{q} + b(q, \dot q, u) = 0,\]</p><p>where <span>$M$</span> is the (symmetric positive-definite) <strong>mass matrix</strong> :</p><p class="math-container">\[M(q) =
+\begin{pmatrix}
+  m_c + m_p &amp; m_p l \cos\theta \\
+  m_p l \cos\theta &amp; m_p l^2
+\end{pmatrix},\]</p><p>and the <span>$b$</span> the bias, which collects Coriolis/gravity terms and the control torque. Instead of deriving these by hand, we rely on <code>Symbolics.jl</code> to compute and <strong>analytically invert</strong> <span>$M(q)$</span> for us to solve the equations of motion for <span>$\ddot q$</span>.</p><h3 id="State-Space-Form"><a class="docs-heading-anchor" href="#State-Space-Form">State-Space Form</a><a id="State-Space-Form-1"></a><a class="docs-heading-anchor-permalink" href="#State-Space-Form" title="Permalink"></a></h3><p>Defining the state <span>$X = (x,\,\theta,\,\dot{x},\,\dot{\theta})$</span>, the equations of motion become the first-order system:</p><p class="math-container">\[\dot{X}(t) = f\!\left(X(t),\, u(t)\right) =
+\begin{pmatrix}
+  \dot{x} \\ \dot{\theta} \\ M^{-1}(q) \bigl(-b(q, \dot q, u)\bigr)
+\end{pmatrix}.\]</p><h1 id="Optimal-Control-of-a-Cart-Pole-System-using-Symbolics.jl"><a class="docs-heading-anchor" href="#Optimal-Control-of-a-Cart-Pole-System-using-Symbolics.jl">Optimal Control of a Cart-Pole System using Symbolics.jl</a><a id="Optimal-Control-of-a-Cart-Pole-System-using-Symbolics.jl-1"></a><a class="docs-heading-anchor-permalink" href="#Optimal-Control-of-a-Cart-Pole-System-using-Symbolics.jl" title="Permalink"></a></h1><p>This tutorial demonstrates how to use <code>Symbolics.jl</code> to automate the derivation of equations of motion (EOM) for a mechanical system and subsequently solve an optimal control problem using <code>OptimalControl.jl</code>. </p><h2 id="Implementation"><a class="docs-heading-anchor" href="#Implementation">Implementation</a><a id="Implementation-1"></a><a class="docs-heading-anchor-permalink" href="#Implementation" title="Permalink"></a></h2><h3 id="Setup-and-Imports"><a class="docs-heading-anchor" href="#Setup-and-Imports">Setup &amp; Imports</a><a id="Setup-and-Imports-1"></a><a class="docs-heading-anchor-permalink" href="#Setup-and-Imports" title="Permalink"></a></h3><pre><code class="language-julia hljs">using OptimalControl
+using NLPModelsIpopt
+using Symbolics
+using LinearAlgebra: dot
+using Plots</code></pre><h3 id="Physical-Parameters-and-Symbolic-Variables"><a class="docs-heading-anchor" href="#Physical-Parameters-and-Symbolic-Variables">Physical Parameters and Symbolic Variables</a><a id="Physical-Parameters-and-Symbolic-Variables-1"></a><a class="docs-heading-anchor-permalink" href="#Physical-Parameters-and-Symbolic-Variables" title="Permalink"></a></h3><p>We declare all parameters both as numerical constants (for the final function evaluation) and as symbolic variables (for the Lagrangian computation). We define the configuration vector <span>$q = (x, \theta)$</span>.</p><pre><code class="language-julia hljs"># Physical constants
+const m_c_val = 5.0
+const m_p_val = 1.0
+const l_val   = 2.0
+const g_val   = 9.81
+const tf_val  = 2.0
+
+# Symbolic variables
+@variables t
+D = Differential(t)
+@variables m_c m_p l g u
+@variables x(t) θ(t)
+
+q = [x, θ]</code></pre><h3 id="Automated-Kinematics-and-Lagrangian"><a class="docs-heading-anchor" href="#Automated-Kinematics-and-Lagrangian">Automated Kinematics and Lagrangian</a><a id="Automated-Kinematics-and-Lagrangian-1"></a><a class="docs-heading-anchor-permalink" href="#Automated-Kinematics-and-Lagrangian" title="Permalink"></a></h3><p>The primary advantage of this approach is that the user is solely required to define the fundamental physical quantities. Once the Cartesian positions and the applied forces are specified, the kinetic energy <span>$T$</span>, potential energy <span>$V$</span>, and non-conservative power <span>$P_{nc}$</span> are formulated directly.</p><p>The necessary kinematic and dynamic definitions are:</p><p class="math-container">\[\begin{align*}
+p_c &amp;= (x,\,0) \\
+p_p &amp;= (x + l \sin\theta,\,l \cos\theta) \\
+F &amp;= (u,\,0) \\
+\\
+T &amp;= \tfrac{1}{2}m_c\,\|\dot{p}_c\|^2 + \tfrac{1}{2}m_p\,\|\dot{p}_p\|^2 \\
+V &amp;= m_p\,g\,p_{p,y} \\
+P_{nc} &amp;= F \cdot \dot{p}_c
+\end{align*}\]</p><p>All subsequent heavy lifting, including the computation of the time velocities <span>$\dot{p}_c$</span> and <span>$\dot{p}_p$</span>, is executed automatically.</p><pre><code class="language-julia hljs">p_c = [x, 0.0]
+p_p =[x + l * sin(θ), l * cos(θ)]
+F = [u, 0.0]
+
+squared_norm(x) = sum(abs2, x)
+T = 0.5 * m_c * squared_norm(D.(p_c)) + 0.5 * m_p * squared_norm(D.(p_p))
+V = g * (m_p * p_p[2])
+P_non_conservative = dot(F, D.(p_c))</code></pre><h3 id="Euler–Lagrange-Equations-and-Mass-Matrix-Inversion"><a class="docs-heading-anchor" href="#Euler–Lagrange-Equations-and-Mass-Matrix-Inversion">Euler–Lagrange Equations and Mass-Matrix Inversion</a><a id="Euler–Lagrange-Equations-and-Mass-Matrix-Inversion-1"></a><a class="docs-heading-anchor-permalink" href="#Euler–Lagrange-Equations-and-Mass-Matrix-Inversion" title="Permalink"></a></h3><p>Starting from <span>$\mathcal{L} = T - V$</span>, <code>Symbolics.jl</code> computes the terms of the Euler–Lagrange equations. To isolate the accelerations, we substitute the symbolic time derivatives with algebraic variables. This allows us to identify the <strong>standard manipulator form</strong> components: the mass matrix is the Jacobian of the residual with respect to the accelerations <span>$\ddot{q}$</span>, and the bias vector contains the remaining terms.</p><pre><code class="language-julia hljs">L = T - V
+
+dq = D.(q)
+ddq = D.(dq)
+
+A = D.(Symbolics.gradient(L, dq))  # d/dt(∂L/∂q̇)
+B = Symbolics.gradient(L, q)          # ∂L/∂q
+Q = Symbolics.gradient(P_non_conservative, dq)
+
+# Euler-Lagrange residual: d/dt(∂L/∂q̇) - ∂L/∂q - Q = 0
+el_res = expand_derivatives.(A - B - Q)
+
+# Identify mass matrix M and bias vector b such that M·ddq + b = 0
+mass = Symbolics.jacobian(el_res, ddq)
+bias = Symbolics.substitute.(el_res, (Dict(ddq .=&gt; 0.0),))
+
+# Solve for accelerations analytically: ddq = M⁻¹(-b)
+ddq_solution = Symbolics.simplify_fractions.(mass \ (-bias))
+
+# Fully explicit state derivative: Ẋ = [dq, accel]
+X = [q; dq]
+dX = [dq; ddq_solution]</code></pre><h3 id="Code-Generation"><a class="docs-heading-anchor" href="#Code-Generation">Code Generation</a><a id="Code-Generation-1"></a><a class="docs-heading-anchor-permalink" href="#Code-Generation" title="Permalink"></a></h3><p><code>Symbolics.build_function</code> compiles the symbolic expression <code>dX</code> into a native Julia function with arguments <code>X</code>, <code>u</code>, and parameter values. The <code>force_SA=true</code> flag generates a <strong>StaticArrays</strong> kernel, which avoids heap allocations inside the ODE right-hand side — crucial for solver performance because dimension is small. For larger problems (<span>$X \in \mathrm{R}^n$</span>, <span>$n &gt; 100$</span>), we would use a mutating dynamics function instead, cf. <a href="https://docs.julialang.org/en/v1/manual/performance-tips/#Consider-StaticArrays.jl-for-small-fixed-size-vector/matrix-operations">Julia Performance Tips</a>.</p><pre><code class="language-julia hljs"># out-of-place variant: (state, u, params) → SVector
+cartpole_dynamics = build_function(dX, X, u, [m_c, m_p, l, g];
+    expression=Val{false}, force_SA=true)[1]
+
+const p_vals  = [m_c_val, m_p_val, l_val, g_val]
+
+f(X, u) = cartpole_dynamics(X, u, p_vals)  # Function used by OptimalControl.jl</code></pre><h3 id="Optimal-Control-Problem-Definition"><a class="docs-heading-anchor" href="#Optimal-Control-Problem-Definition">Optimal Control Problem Definition</a><a id="Optimal-Control-Problem-Definition-1"></a><a class="docs-heading-anchor-permalink" href="#Optimal-Control-Problem-Definition" title="Permalink"></a></h3><p>We now formulate the optimal control problem using the <code>@def</code> macro from <code>OptimalControl.jl</code>. The initial state is not at rest because <span>$ω(0) = 0.2$</span>, while the boundary condition <span>$X(0) - X(tf) = 0$</span> encodes the periodicity of the orbit.</p><pre><code class="language-julia hljs">@def cartpole begin
+    t ∈ [0, tf_val], time
+    X = (x, θ, v, ω) ∈ R⁴, state
+    u ∈ R, control
+
+    x(0) == 0
+    θ(0) == 0
+    v(0) == 0
+    ω(0) == 0.2
+    X(tf_val) - X(0) == [0, 0, 0, 0]  # Periodic orbit, remove `- X(0)` for finishing at the equilibrium
+
+    Ẋ(t) == f(X(t), u(t))
+
+    ∫(u(t)^2) → min
+end</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi"><span class="sgr1">Abstract definition:
+
+</span>    t ∈ [0, tf_val], time
+    X = ((x, θ, v, ω) ∈ R⁴, state)
+    u ∈ R, control
+    x(0) == 0
+    θ(0) == 0
+    v(0) == 0
+    ω(0) == 0.2
+    X(tf_val) - X(0) == [0, 0, 0, 0]
+    Ẋ(t) == f(X(t), u(t))
+    ∫(u(t) ^ 2) → min
+
+<span class="sgr1">The (autonomous) optimal control problem is of the form:
+</span>
+<span class="sgr34">    minimize  </span>J(X, u) = ∫ f⁰(X(t), u(t)) dt, over [0, 2.0]
+
+<span class="sgr34">    subject to
+</span>
+        Ẋ(t) = f(X(t), u(t)), t in [0, 2.0] a.e.,
+
+        ϕ₋ ≤ ϕ(X(0), X(2.0)) ≤ ϕ₊, 
+
+    where X(t) = (x(t), θ(t), v(t), ω(t)) ∈ R⁴ and u(t) ∈ R.
+</code></pre><h3 id="Solving-the-NLP"><a class="docs-heading-anchor" href="#Solving-the-NLP">Solving the NLP</a><a id="Solving-the-NLP-1"></a><a class="docs-heading-anchor-permalink" href="#Solving-the-NLP" title="Permalink"></a></h3><p>The problem is transcribed into a nonlinear program using direct collocation on a uniform grid of 100 intervals, then handed to <code>Ipopt</code> via <code>NLPModelsIpopt.jl</code>. We provide a simple initial guess for the state and control trajectories. See <a href="https://control-toolbox.org/OptimalControl.jl/stable/manual-solve.html">the documentation</a> for more information.</p><pre><code class="language-julia hljs">initial_guess = @init cartpole begin
+    X(t) := [0.0, 0.0, 0.0, 0.2]
+    u(t) := 0.0
+end
+
+sol = solve(cartpole; display=false, grid_size=100, init=initial_guess)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">• Solver:
+  ✓ Successful  : true
+  │  Status     : first_order
+  │  Message    : Ipopt/generic
+  │  Iterations : 3
+  │  Objective  : 1319.7901091697754
+  └─ Constraints violation : 6.676326158583379e-13
+
+• Boundary duals: [1.8502399426370747e-13, -7.43117350157122e-12, -4990.076339128374, -12844.887616517442, 2495.0381695641872, 14667.425629531555, -2495.0381695641863, -6422.443808258719]
+</code></pre><h3 id="Results"><a class="docs-heading-anchor" href="#Results">Results</a><a id="Results-1"></a><a class="docs-heading-anchor-permalink" href="#Results" title="Permalink"></a></h3><pre><code class="language-julia hljs">tsol = time_grid(sol)
+Xsol = state(sol).(tsol)
+usol = control(sol).(tsol)
+
+X_mat = reduce(hcat, Xsol)
+q_sol = X_mat[1:2, :]&#39;
+dq_sol = X_mat[3:4, :]&#39;
+
+p1 = plot(tsol, q_sol, label=[&quot;x&quot; &quot;θ&quot;], title=&quot;Configuration&quot;)
+p2 = plot(tsol, dq_sol, label=[&quot;v&quot; &quot;ω&quot;], title=&quot;Velocities&quot;)
+p3 = plot(tsol, usol, label=&quot;u&quot;, title=&quot;Control&quot;, linetype=:steppost)
+
+plot(p1, p2, p3, layout=(3, 1), size=(800, 700))</code></pre><img src="tutorial-symbolics-7c460a73.svg" alt="Example block output"/><p>The plots show the cart position <span>$x$</span> and pendulum angle <span>$\theta$</span>, the corresponding velocities, and the optimal control force <span>$u$</span> required to stabilize the system back to its initial state within 2 seconds.</p><h3 id="Animation"><a class="docs-heading-anchor" href="#Animation">Animation</a><a id="Animation-1"></a><a class="docs-heading-anchor-permalink" href="#Animation" title="Permalink"></a></h3><p>The animation below shows the cart-pole evolving along the optimal periodic trajectory. The blue cart slides on the horizontal rail while the pendulum swings around the upright equilibrium.</p><div style="display: flex; justify-content: center; margin: 20px 0;">
+    <canvas id="cartpoleCanvas" width="900" height="300" 
+            style="border:1px solid #ddd; border-radius: 8px; max-width: 100%;">
+    </canvas>
+</div>
+
+<script>
+(function() {
+    // Julia directly interpolates the arrays into the JS here
+    const t = [0.0,0.02,0.04,0.06,0.08,0.1,0.12,0.14,0.16,0.18,0.2,0.22,0.24,0.26,0.28,0.3,0.32,0.34,0.36,0.38,0.4,0.42,0.44,0.46,0.48,0.5,0.52,0.54,0.56,0.58,0.6,0.62,0.64,0.66,0.68,0.7,0.72,0.74,0.76,0.78,0.8,0.82,0.84,0.86,0.88,0.9,0.92,0.94,0.96,0.98,1.0,1.02,1.04,1.06,1.08,1.1,1.12,1.14,1.16,1.18,1.2,1.22,1.24,1.26,1.28,1.3,1.32,1.34,1.36,1.38,1.4,1.42,1.44,1.46,1.48,1.5,1.52,1.54,1.56,1.58,1.6,1.62,1.64,1.66,1.68,1.7,1.72,1.74,1.76,1.78,1.8,1.82,1.84,1.86,1.88,1.9,1.92,1.94,1.96,1.98,2.0];
+    const x = [0.0,0.002677089826049452,0.01034610311509078,0.022308029687291685,0.03791343061907833,0.05655950726297172,0.07768716096187078,0.10077822717173467,0.12535297384339614,0.15096789271408756,0.17721377409099714,0.20371403382401435,0.2301232504510954,0.2561258673439843,0.2814350164639438,0.3057914251435259,0.32896237374196247,0.35074067906449574,0.37094368537440836,0.3894122511818878,0.40600972547632264,0.4206209115369881,0.4331510198832402,0.4435246143624252,0.4516845569281839,0.45759095746995204,0.46122013526363514,0.46256359836826716,0.4616270467263374,0.45842940395100024,0.4530018818959266,0.4453870811771108,0.4356381299054969,0.4238178620332007,0.40999803593881734,0.3942585931921901,0.37668695685096826,0.3573773681490692,0.33643026003532,0.3139516657010152,0.290052659988317,0.26484883138725945,0.23845978219753788,0.21100865434272298,0.18262167827021286,0.15342774234221318,0.12355798011433056,0.09314537290296172,0.06232436505545778,0.03123048935381826,1.7048202763467078e-16,-0.031230489353817916,-0.06232436505545744,-0.09314537290296139,-0.12355798011433039,-0.153427742342213,-0.1826216782702127,-0.21100865434272248,-0.23845978219753738,-0.264848831387259,-0.29005265998831664,-0.3139516657010149,-0.33643026003531973,-0.3573773681490689,-0.376686956850968,-0.39425859319218975,-0.4099980359388171,-0.4238178620332005,-0.43563812990549666,-0.4453870811771104,-0.45300188189592616,-0.45842940395099985,-0.4616270467263371,-0.4625635983682668,-0.46122013526363487,-0.4575909574699517,-0.45168455692818354,-0.44352461436242485,-0.4331510198832398,-0.4206209115369877,-0.40600972547632225,-0.3894122511818874,-0.37094368537440814,-0.3507406790644955,-0.32896237374196224,-0.3057914251435257,-0.28143501646394353,-0.25612586734398407,-0.2301232504510952,-0.2037140338240141,-0.1772137740909969,-0.1509678927140873,-0.1253529738433959,-0.1007782271717344,-0.07768716096187081,-0.05655950726297174,-0.03791343061907834,-0.0223080296872917,-0.010346103115090786,-0.0026770898260494555,0.0];
+    const th = [-1.2370527330256971e-30,0.002662762357861966,0.002833570573669706,0.0008624370460016254,-0.0029296325963520135,-0.00824852572715079,-0.014824959986485576,-0.022412570658385273,-0.030786191329797912,-0.03974033572097199,-0.049087867630174864,-0.058658834795750195,-0.068299437937562,-0.07787110602080193,-0.08724965125963828,-0.09632448137298116,-0.10499785127422866,-0.11318414112136843,-0.12080915206461333,-0.12780941484970523,-0.1341315095316123,-0.13973139688570047,-0.14457376370173097,-0.14863138508799684,-0.15188450730433908,-0.15432025460121077,-0.15593206318415664,-0.15671914485626517,-0.15668598220761873,-0.15584185649534837,-0.15420040864763745,-0.15177923317036815,-0.14859950416203904,-0.1446856321651537,-0.14006495020523568,-0.1347674270898613,-0.1288254058528004,-0.12227336512274517,-0.1151477011608457,-0.1074865283344635,-0.09932949586448439,-0.09071761878912478,-0.08169312121827259,-0.07229929009994217,-0.06258033787640176,-0.05258127256504481,-0.04234777395221494,-0.03192607473198201,-0.021362845552160555,-0.010705083043275599,-4.928457742506319e-17,0.0107050830432755,0.021362845552160458,0.03192607473198191,0.04234777395221489,0.05258127256504476,0.0625803378764017,0.072299290099942,0.08169312121827242,0.09071761878912463,0.09932949586448428,0.10748652833446339,0.1151477011608456,0.12227336512274507,0.1288254058528003,0.13476742708986122,0.1400649502052356,0.14468563216515365,0.14859950416203896,0.15177923317036804,0.15420040864763734,0.1558418564953483,0.15668598220761867,0.1567191448562651,0.1559320631841566,0.15432025460121068,0.151884507304339,0.14863138508799675,0.14457376370173086,0.13973139688570035,0.13413150953161215,0.12780941484970507,0.12080915206461325,0.11318414112136833,0.10499785127422855,0.09632448137298107,0.08724965125963817,0.07787110602080181,0.06829943793756191,0.05865883479575009,0.04908786763017476,0.039740335720971895,0.03078619132979782,0.02241257065838518,0.01482495998648558,0.008248525727150789,0.0029296325963520105,-0.0008624370460016273,-0.002833570573669708,-0.002662762357861968,-2.2999641970335733e-29];
+    const u = [66.94028301240886,57.89788731270301,49.47011790751814,41.624811457751555,34.3282026338163,27.54746692452632,21.25214822249293,15.414823660102298,10.01126295911284,5.020267977244107,0.42332520420003766,-3.795834962537767,-7.651707013671485,-11.157463320370134,-14.32536333242946,-17.167102883435977,-19.6940963509081,-21.91769087424202,-23.8493163654015,-25.500578018988257,-26.883299741760023,-28.009527643161075,-28.891502698064976,-29.54161112557511,-29.972320110577126,-30.19610538441305,-30.22537600218206,-30.07240049996276,-29.74923754997496,-29.26767329463288,-28.639166750538006,-27.874804034192042,-26.985261665119292,-25.980778834728145,-24.87113827238858,-23.665655174289522,-22.373173566507514,-21.002069433721594,-19.56025994370159,-18.055218122089528,-16.49399237162187,-14.883230276702855,-13.229206182191772,-11.53785208032378,-9.814791379310273,-8.06537516009452,-6.29472055365727,-4.50775089057758,-2.7092372881069955,-0.9038413489161042,0.903841348916091,2.709237288106983,4.507750890577571,6.294720553657262,8.065375160094518,9.814791379310273,11.537852080323763,13.229206182191753,14.88323027670283,16.493992371621882,18.055218122089517,19.560259943701595,21.002069433721594,22.3731735665075,23.66565517428952,24.871138272388578,25.980778834728135,26.985261665119264,27.874804034192042,28.639166750537996,29.267673294632868,29.74923754997496,30.072400499962782,30.225376002182063,30.196105384413055,29.972320110577144,29.541611125575102,28.891502698064986,28.00952764316108,26.883299741760034,25.500578018988225,23.849316365401506,21.917690874242027,19.694096350908033,17.167102883435923,14.325363332429406,11.15746332037007,7.651707013671436,3.795834962537753,-0.42332520420007486,-5.020267977244219,-10.011262959112855,-15.414823660102314,-21.252148222492902,-27.54746692452625,-34.32820263381635,-41.624811457751434,-49.47011790751808,-57.897887312702885,-66.94028301240883,-66.94028301240883];
+    
+    const canvas = document.getElementById('cartpoleCanvas');
+    const ctx = canvas.getContext('2d');
+    
+    // Detect dark/light mode
+    const isDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    
+    // Color palettes
+    const colors = isDark ? {
+        canvas_bg: '#1e1e2e',
+        track: '#4a4a4a',
+        cart: '#4063D8',
+        pole: '#CB3C33',
+        hinge: '#ecf0f1',
+        bob: '#CB3C33',
+        progress_bg: '#3a3a3a',
+        progress: '#4063D8'
+    } : {
+        canvas_bg: '#fafafa',
+        track: '#999',
+        cart: '#4063D8',
+        pole: '#555',
+        hinge: '#2c3e50',
+        bob: '#CB3C33',
+        progress_bg: '#ecf0f1',
+        progress: '#4063D8'
+    };
+    
+    const scale = 50; 
+    const l_px = 2.0 * scale; 
+    const duration = t[t.length - 1];
+
+    let start_time = null;
+
+    function draw(time) {
+        if (!start_time) start_time = time;
+        
+        // Seamless periodic loop
+        let elapsed = time - start_time;
+        let sim_t = (elapsed / 1000.0) % duration;
+        
+        // Find the current time interval
+        let i = 0;
+        while(i < t.length - 1 && t[i + 1] < sim_t) { i++; }
+
+        // Linear interpolation for buttery smooth frames
+        let dt = t[i+1] - t[i];
+        let alpha = (dt > 0) ? (sim_t - t[i]) / dt : 0;
+        let cur_x = x[i] + alpha * (x[i+1] - x[i]);
+        let cur_th = th[i] + alpha * (th[i+1] - th[i]);
+        let cur_u = u[i] + alpha * (u[i+1] - u[i]);
+
+        ctx.fillStyle = colors.canvas_bg;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        const cx = canvas.width / 2 + cur_x * scale;
+        const cy = canvas.height / 2 + 40; 
+
+        // Draw Track
+        ctx.beginPath();
+        ctx.moveTo(0, cy + 15);
+        ctx.lineTo(canvas.width, cy + 15);
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = colors.track;
+        ctx.stroke();
+
+        // Draw Cart
+        ctx.fillStyle = colors.cart;
+        ctx.fillRect(cx - 30, cy - 15, 60, 30);
+        
+        // Draw Pole
+        const px = cx + l_px * Math.sin(cur_th);
+        const py = cy - l_px * Math.cos(cur_th);
+        
+        ctx.beginPath();
+        ctx.moveTo(cx, cy);
+        ctx.lineTo(px, py);
+        ctx.lineWidth = 6;
+        ctx.lineCap = 'round';
+        ctx.strokeStyle = colors.pole;
+        ctx.stroke();
+        
+        // Draw Hinge
+        ctx.beginPath();
+        ctx.arc(cx, cy, 6, 0, 2 * Math.PI);
+        ctx.fillStyle = colors.hinge;
+        ctx.fill();
+
+        // Draw Bob
+        ctx.beginPath();
+        ctx.arc(px, py, 8, 0, 2 * Math.PI);
+        ctx.fillStyle = colors.bob;
+        ctx.fill();
+
+        // Draw Control Force Arrow
+        const u_scale = 3.0; // Scale factor for the force magnitude
+        const u_len = cur_u * u_scale;
+        if (Math.abs(u_len) > 2) {
+            const arr_y = cy + 8; // Slight y-offset to prevent overlapping with the hinge
+            
+            // Arrow shaft
+            ctx.beginPath();
+            ctx.moveTo(cx, arr_y);
+            ctx.lineTo(cx + u_len, arr_y);
+            ctx.lineWidth = 4;
+            ctx.strokeStyle = '#CB3C33';
+            ctx.stroke();
+            
+            // Arrow head
+            ctx.beginPath();
+            ctx.moveTo(cx + u_len, arr_y);
+            ctx.lineTo(cx + u_len - Math.sign(cur_u) * 8, arr_y - 6);
+            ctx.lineTo(cx + u_len - Math.sign(cur_u) * 8, arr_y + 6);
+            ctx.fillStyle = '#CB3C33';
+            ctx.fill();
+        }
+
+        // Draw Progress Bar at the very bottom
+        const bar_height = 4;
+        ctx.fillStyle = colors.progress_bg;
+        ctx.fillRect(0, canvas.height - bar_height, canvas.width, bar_height);
+        ctx.fillStyle = colors.progress; // Active progress
+        ctx.fillRect(0, canvas.height - bar_height, canvas.width * (sim_t / duration), bar_height);
+
+        requestAnimationFrame(draw);
+    }
+    requestAnimationFrame(draw);
+})();
+</script>
+</article><nav class="docs-footer"><a class="docs-footer-prevpage" href="tutorial-mpc.html">« Model Predictive Control</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.17.0 on <span class="colophon-date" title="Sunday 10 May 2026 20:06">Sunday 10 May 2026</span>. Using Julia version 1.12.6.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
