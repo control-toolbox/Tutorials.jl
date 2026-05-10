@@ -1,4 +1,4 @@
-# Cart-Pole Periodic Orbit via Symbolic Lagrangian Mechanics
+# [Cart-Pole Periodic Orbit via Symbolic Lagrangian Mechanics](@id tutorial-symbolics)
 
 This tutorial demonstrates how to combine **symbolic derivation of equations of motion** (via
 [`Symbolics.jl`](https://symbolics.juliasymbolics.org/)) with **direct optimal control**

@@ -19,6 +19,7 @@ From this page, you can find a list of tutorials to solve optimal control proble
 | **[Linear–quadratic regulator](@ref tutorial-lqr)** | A simple LQR example illustrating how to solve a linear-quadratic OCP. |
 | **[Minimal action](@ref tutorial-mam)** | Applies the Minimal Action Method (MAM) to find the most probable transition pathway between stable states in a stochastic system. |
 | **[Model Predictive Control](@ref tutorial-mpc)** | Implements MPC for ship navigation in a sea current, with a real-time replanning loop. |
+| **[Symbolic dynamics derivation](@ref tutorial-symbolics)** | Derives the equation of motion for the cart-pole symbolically and determines a periodic orbit. |
 
 ## Reproducibility
 
