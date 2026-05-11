@@ -2729,7 +2729,7 @@ version = "1.4.0"
 [[deps.Tutorials]]
 path = "/home/runner/work/Tutorials.jl/Tutorials.jl"
 uuid = "cb10daa6-a5e5-4c25-a171-ae181b8ea3c9"
-version = "0.5.0"
+version = "0.5.1"
 
 [[deps.URIs]]
 git-tree-sha1 = "bef26fb046d031353ef97a82e3fdb6afe7f21b1a"
