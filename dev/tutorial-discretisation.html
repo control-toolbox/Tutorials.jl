@@ -57,7 +57,7 @@ F1(x) = begin
     return [ 0, Tmax/m, -b*Tmax ]   # [dr/dt, dv/dt, dm/dt] due to thrust
 end</code></pre><h2 id="Discretisation-schemes"><a class="docs-heading-anchor" href="#Discretisation-schemes">Discretisation schemes</a><a id="Discretisation-schemes-1"></a><a class="docs-heading-anchor-permalink" href="#Discretisation-schemes" title="Permalink"></a></h2><p>When calling <code>solve</code>, the option <code>scheme=...</code> can be used to specify the discretization scheme. In addition to the default implicit <code>:midpoint</code> method, other available options include the implicit <code>:trapeze</code> method (also known as Crank–Nicolson), and Gauss–Legendre collocation schemes with 2 and 3 stages: <code>:gauss_legendre_2</code> and <code>:gauss_legendre_3</code>, of order 4 and 6 respectively. Note that higher-order methods typically result in larger NLP problems for the same number of time steps, and their accuracy also depends on the smoothness of the problem.</p><p>Let us first solve the problem with the default <code>:midpoint</code> method and display the solution.</p><pre><code class="language-julia hljs">sol = solve(ocp; scheme=:midpoint, display=false)
 @assert successful(sol) &quot;Solution failed&quot;
-plot(sol; size=(800, 800))</code></pre><img src="tutorial-discretisation-05a4515d.svg" alt="Example block output"/><p>Let us now compare different discretization schemes to evaluate their accuracy and performance. See the <a href="https://control-toolbox.org/OptimalControl.jl/stable/manual-solve.html#manual-solve-strategy-options">Strategy options</a> for information on default values for parameters like <code>tol</code>.</p><pre><code class="language-julia hljs"># Solve the problem with different discretization methods
+plot(sol; size=(800, 800))</code></pre><img src="tutorial-discretisation-0a0a7b76.svg" alt="Example block output"/><p>Let us now compare different discretization schemes to evaluate their accuracy and performance. See the <a href="https://control-toolbox.org/OptimalControl.jl/stable/manual-solve.html#manual-solve-strategy-options">Strategy options</a> for information on default values for parameters like <code>tol</code>.</p><pre><code class="language-julia hljs"># Solve the problem with different discretization methods
 solutions = []
 data = DataFrame(
     Scheme=Symbol[],
@@ -89,12 +89,12 @@ println(data)</code></pre><pre class="documenter-example-output"><code class="no
  Row │ Scheme            Time      Objective  Iterations
      │ Symbol            Float64   Float64    Int64
 ─────┼───────────────────────────────────────────────────
-   1 │ euler             0.230997    1.01242          30
-   2 │ euler_implicit    0.225083    1.01273          29
-   3 │ trapeze           0.301394    1.01258          30
-   4 │ midpoint          0.331843    1.01258          31
-   5 │ gauss_legendre_2  0.977292    1.01258          24
-   6 │ gauss_legendre_3  2.26585     1.01259          25</code></pre><pre><code class="language-julia hljs"># Plot the results
+   1 │ euler             0.238054    1.01242          30
+   2 │ euler_implicit    0.234259    1.01273          29
+   3 │ trapeze           0.304164    1.01258          30
+   4 │ midpoint          0.34761     1.01258          31
+   5 │ gauss_legendre_2  1.08314     1.01258          24
+   6 │ gauss_legendre_3  3.034       1.01259          25</code></pre><pre><code class="language-julia hljs"># Plot the results
 x_style = (legend=:none,)
 p_style = (legend=:none,)
 u_style = (legend=:topright,)
@@ -104,7 +104,7 @@ plt = plot()
 for (i, (scheme, sol)) in enumerate(solutions)
     plt = plot!(sol; label=string(scheme), color=i, styles...)
 end
-plot(plt; size=(800, 800))</code></pre><img src="tutorial-discretisation-a6c7fa42.svg" alt="Example block output"/><h2 id="Large-problems-and-AD-backend"><a class="docs-heading-anchor" href="#Large-problems-and-AD-backend">Large problems and AD backend</a><a id="Large-problems-and-AD-backend-1"></a><a class="docs-heading-anchor-permalink" href="#Large-problems-and-AD-backend" title="Permalink"></a></h2><p>For some large problems, you may notice that the solver takes a long time before the iterations actually begin. This is due to the computation of sparse derivatives — specifically, the Jacobian of the constraints and the Hessian of the Lagrangian — which can be quite costly. One possible alternative is to set the option <code>backend=:manual</code> in the modeler, which uses simpler sparsity patterns. The resulting matrices are faster to compute but are also less sparse, so this represents a trade-off between automatic differentiation (AD) preparation time and the efficiency of the optimization itself.</p><pre><code class="language-julia hljs">disc = OptimalControl.Collocation(grid_size=1000, scheme=:gauss_legendre_3)
+plot(plt; size=(800, 800))</code></pre><img src="tutorial-discretisation-db5fc989.svg" alt="Example block output"/><h2 id="Large-problems-and-AD-backend"><a class="docs-heading-anchor" href="#Large-problems-and-AD-backend">Large problems and AD backend</a><a id="Large-problems-and-AD-backend-1"></a><a class="docs-heading-anchor-permalink" href="#Large-problems-and-AD-backend" title="Permalink"></a></h2><p>For some large problems, you may notice that the solver takes a long time before the iterations actually begin. This is due to the computation of sparse derivatives — specifically, the Jacobian of the constraints and the Hessian of the Lagrangian — which can be quite costly. One possible alternative is to set the option <code>backend=:manual</code> in the modeler, which uses simpler sparsity patterns. The resulting matrices are faster to compute but are also less sparse, so this represents a trade-off between automatic differentiation (AD) preparation time and the efficiency of the optimization itself.</p><pre><code class="language-julia hljs">disc = OptimalControl.Collocation(grid_size=1000, scheme=:gauss_legendre_3)
 mod = OptimalControl.ADNLP(backend=:manual)
 sol = OptimalControl.Ipopt()
 solve(ocp; discretizer=disc, modeler=mod, solver=sol)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">▫ This is OptimalControl 2.0.4, solving with: <span class="sgr36"><span class="sgr1">collocation</span></span> → <span class="sgr36"><span class="sgr1">adnlp</span></span> → <span class="sgr36"><span class="sgr1">ipopt</span></span> (<span class="sgr35"><span class="sgr1">cpu</span></span>)
@@ -137,7 +137,7 @@ iter    objective    inf_pr   inf_du lg(mu)  ||d||  lg(rg) alpha_du alpha_pr  ls
    3  1.0205727e+00 2.69e+00 2.03e+04   0.1 8.16e+00    -  1.00e+00 5.95e-01h  1
    4  1.0109042e+00 2.89e-01 4.10e+03  -0.1 2.41e+00    -  1.00e+00 9.89e-01h  1
    5  1.0146582e+00 2.08e-01 2.60e+06   0.9 1.76e+01    -  9.55e-01 1.48e-01f  1
-   6  1.0058473e+00 1.29e-01 7.09e+04   1.0 1.02e+00    -  1.00e+00 9.90e-01h  1
+   6  1.0058474e+00 1.29e-01 7.09e+04   1.0 1.02e+00    -  1.00e+00 9.90e-01h  1
    7  1.0072920e+00 2.42e-02 3.53e+03   0.5 3.01e-01    -  1.00e+00 1.00e+00f  1
    8  1.0072625e+00 1.36e-05 5.60e+03  -1.0 2.65e-02    -  1.00e+00 1.00e+00h  1
    9  1.0072601e+00 5.35e-07 1.02e+00  -2.9 8.84e-03    -  1.00e+00 1.00e+00h  1
@@ -145,58 +145,48 @@ iter    objective    inf_pr   inf_du lg(mu)  ||d||  lg(rg) alpha_du alpha_pr  ls
   10  1.0072624e+00 1.12e-07 8.96e-04  -4.8 6.04e-03    -  1.00e+00 1.00e+00h  1
   11  1.0076060e+00 2.95e-03 1.29e+01  -5.7 4.33e-01    -  9.91e-01 1.00e+00h  1
   12  1.0096103e+00 8.30e-02 1.57e+01  -6.1 1.83e+00    -  1.00e+00 8.80e-01h  1
-  13  1.0114964e+00 7.63e-02 3.77e-03  -6.2 1.11e+00    -  1.00e+00 1.00e+00h  1
-  14  1.0121064e+00 1.35e-02 4.29e-02  -6.6 5.18e-01    -  1.00e+00 9.99e-01h  1
-  15  1.0123768e+00 1.57e-02 9.24e-01  -7.1 1.14e+00    -  1.00e+00 9.40e-01h  1
-  16  1.0124595e+00 5.24e-03 1.37e-05  -7.2 9.36e-01    -  1.00e+00 1.00e+00h  1
-  17  1.0125208e+00 2.79e-03 6.74e-06  -7.6 6.51e-01    -  1.00e+00 1.00e+00h  1
-  18  1.0125413e+00 1.04e-03 4.62e-02  -7.8 9.30e-01    -  1.00e+00 9.56e-01h  1
-  19  1.0125526e+00 5.95e-06 1.92e-03  -8.8 1.12e-02  -4.0 9.99e-01 1.00e+00h  1
+  13  1.0115018e+00 7.67e-02 1.01e-01  -6.2 1.11e+00    -  9.96e-01 1.00e+00h  1
+  14  1.0121023e+00 1.32e-02 2.38e-02  -6.6 5.14e-01    -  1.00e+00 9.99e-01h  1
+  15  1.0123761e+00 1.57e-02 8.69e-01  -7.1 1.13e+00    -  1.00e+00 9.44e-01h  1
+  16  1.0124643e+00 5.43e-03 4.38e-01  -7.3 9.88e-01    -  1.00e+00 9.02e-01h  1
+  17  1.0125277e+00 3.58e-03 7.86e-06  -7.6 7.61e-01    -  1.00e+00 1.00e+00h  1
+  18  1.0125453e+00 1.15e-03 1.05e-01  -7.8 1.10e+00    -  1.00e+00 8.91e-01h  1
+  19  1.0125605e+00 8.35e-04 3.83e-02  -8.1 1.15e+00    -  9.41e-01 1.00e+00h  1
 iter    objective    inf_pr   inf_du lg(mu)  ||d||  lg(rg) alpha_du alpha_pr  ls
-  20  1.0125512e+00 8.28e-04 1.40e+00  -7.8 2.32e+01    -  9.94e-01 1.14e-01h  1
-  21  1.0125525e+00 2.28e-03 9.23e-01  -7.9 5.02e-02  -4.5 1.00e+00 2.83e-02h  1
-  22  1.0125516e+00 3.43e-04 1.64e-05  -7.9 1.01e+00    -  1.00e+00 1.00e+00f  1
-  23  1.0125506e+00 6.96e-04 5.30e-06  -7.9 2.72e+00    -  1.00e+00 9.81e-01h  1
-  24  1.0125627e+00 2.66e-04 4.80e-01  -9.4 2.82e-02  -5.0 1.00e+00 6.18e-01h  1
-  25  1.0125631e+00 2.46e-04 6.96e-02  -8.2 1.67e+01    -  1.00e+00 2.27e-02h  1
-  26  1.0125677e+00 1.19e-03 4.64e-06  -8.3 1.33e+00    -  1.00e+00 1.00e+00h  1
-  27  1.0125725e+00 2.68e-04 1.58e-07  -8.6 1.12e+00    -  1.00e+00 1.00e+00h  1
-  28  1.0125754e+00 2.31e-04 3.01e-03  -9.0 1.33e+00    -  8.53e-01 8.32e-01h  1
-  29  1.0125745e+00 7.28e-03 3.82e-08  -9.2 1.03e-02  -5.4 1.00e+00 1.00e+00h  1
+  20  1.0125618e+00 8.05e-05 1.28e-02  -8.2 6.15e-04  -4.0 1.00e+00 9.04e-01h  1
+  21  1.0125622e+00 4.78e-03 1.56e-07  -8.4 4.67e-03  -4.5 1.00e+00 1.00e+00h  1
+  22  1.0125572e+00 6.95e-03 6.25e-08  -8.4 5.54e-03  -5.0 1.00e+00 1.00e+00H  1
+  23  1.0125597e+00 6.73e-03 9.43e-08  -8.4 1.28e-02  -5.4 1.00e+00 1.00e+00H  1
+  24  1.0125657e+00 2.96e-03 3.21e-03  -8.5 2.24e+00    -  5.05e-01 5.41e-01h  1
+  25  1.0125708e+00 2.31e-04 1.63e-03  -8.5 1.85e+00    -  1.00e+00 9.77e-01f  1
+  26  1.0125723e+00 3.72e-02 5.18e-07  -8.7 5.25e-02  -5.0 1.00e+00 1.00e+00h  1
+  27  1.0125741e+00 8.96e-03 1.37e-02  -8.8 1.10e+00    -  1.00e+00 7.59e-01h  1
+  28  1.0125765e+00 1.83e-04 9.87e-04  -9.1 1.14e+00    -  9.88e-01 1.00e+00h  1
+  29  1.0125780e+00 2.13e-04 1.33e-07  -9.6 1.47e+00    -  1.00e+00 1.00e+00h  1
 iter    objective    inf_pr   inf_du lg(mu)  ||d||  lg(rg) alpha_du alpha_pr  ls
-  30  1.0125725e+00 7.16e-03 1.05e+00  -7.2 1.51e+02    -  1.89e-01 1.16e-02f  1
-  31  1.0125622e+00 2.06e-03 2.30e-01  -8.1 1.34e+00    -  4.91e-01 1.00e+00f  1
-  32  1.0125623e+00 9.44e-07 5.33e-08  -8.1 4.32e-02  -5.9 1.00e+00 1.00e+00h  1
-  33  1.0125693e+00 1.50e-05 2.37e-01  -9.0 4.51e-02  -6.4 9.54e-01 5.79e-01h  1
-  34  1.0125720e+00 4.44e-04 1.72e-01  -9.0 6.19e+00    -  3.67e-01 2.85e-01f  1
-  35  1.0125748e+00 8.71e-04 7.58e-02  -9.0 2.54e+00    -  6.40e-01 5.66e-01f  1
-  36  1.0125756e+00 4.07e-04 3.85e-02  -9.0 3.17e+00    -  1.00e+00 5.32e-01f  1
-  37  1.0125773e+00 1.76e-04 1.02e-07  -9.3 8.95e-01    -  1.00e+00 1.00e+00f  1
-  38  1.0125782e+00 1.68e-04 7.93e-08  -9.9 1.38e+00    -  1.00e+00 1.00e+00h  1
-  39  1.0125785e+00 2.19e-04 2.18e-04 -10.4 2.15e+00    -  1.00e+00 9.76e-01h  1
-iter    objective    inf_pr   inf_du lg(mu)  ||d||  lg(rg) alpha_du alpha_pr  ls
-  40  1.0125785e+00 1.50e-04 8.86e-05 -11.0 1.73e+00    -  1.00e+00 9.71e-01h  1
-  41  1.0125785e+00 3.55e-05 1.16e-09 -11.0 6.51e-01    -  1.00e+00 1.00e+00h  1
+  30  1.0125784e+00 2.61e-04 6.11e-08 -10.1 2.18e+00    -  1.00e+00 1.00e+00h  1
+  31  1.0125785e+00 1.79e-04 2.58e-04 -10.7 1.96e+00    -  1.00e+00 9.56e-01h  1
+  32  1.0125785e+00 9.12e-05 5.53e-09 -11.0 1.16e+00    -  1.00e+00 1.00e+00h  1
 
-Number of Iterations....: 41
+Number of Iterations....: 32
 
                                    (scaled)                 (unscaled)
-Objective...............:  -1.0125785437953778e+00    1.0125785437953778e+00
-Dual infeasibility......:   1.1623026750654656e-09    1.1623026750654656e-09
-Constraint violation....:   2.4519175578774366e-10    3.5472217165377629e-05
-Variable bound violation:   1.5575686190882180e-33    1.5575686190882180e-33
-Complementarity.........:   1.2787569079923440e-11    1.2787569079923440e-11
-Overall NLP error.......:   1.1623026750654656e-09    3.5472217165377629e-05
+Objective...............:  -1.0125785437912160e+00    1.0125785437912160e+00
+Dual infeasibility......:   5.5299001968538998e-09    5.5299001968538998e-09
+Constraint violation....:   5.1261295208604452e-10    9.1173242812825350e-05
+Variable bound violation:   8.1717232051227421e-31    8.1717232051227421e-31
+Complementarity.........:   1.6225332657065354e-11    1.6225332657065354e-11
+Overall NLP error.......:   5.5299001968538998e-09    9.1173242812825350e-05
 
 
-Number of objective function evaluations             = 42
-Number of objective gradient evaluations             = 42
-Number of equality constraint evaluations            = 42
+Number of objective function evaluations             = 36
+Number of objective gradient evaluations             = 33
+Number of equality constraint evaluations            = 36
 Number of inequality constraint evaluations          = 0
-Number of equality constraint Jacobian evaluations   = 42
+Number of equality constraint Jacobian evaluations   = 33
 Number of inequality constraint Jacobian evaluations = 0
-Number of Lagrangian Hessian evaluations             = 41
-Total seconds in IPOPT                               = 26.677
+Number of Lagrangian Hessian evaluations             = 32
+Total seconds in IPOPT                               = 26.220
 
 EXIT: Optimal Solution Found.</code></pre><p>This explicit approach with strategy instances is less high-level than the descriptive method used earlier. It provides more control over the solving process and is detailed in the <a href="https://control-toolbox.org/OptimalControl.jl/stable/manual-solve-explicit.html">explicit mode documentation</a>.</p><p>Let us now compare the performance of the two backends. We will use the <code>@btimed</code> macro from the <code>BenchmarkTools</code> package to measure the time taken for both the preparation of the NLP problem and the execution of the solver. Separating these measurements allows us to understand whether the bottleneck is in the discretization/modeling phase (which depends on the AD backend) or in the solver phase (which depends on the sparsity of the matrices). We use a lower-level approach with explicit strategy instances to separately measure the discretization/modeling time and the solver time.</p><pre><code class="language-julia hljs"># DataFrame to store the results
 data = DataFrame(
@@ -261,6 +251,6 @@ println(data)</code></pre><pre class="documenter-example-output"><code class="no
  Row │ Backend    NNZO   NNZJ    NNZH    PrepTime  ExecTime  Objective  Iterations
      │ Symbol     Int64  Int64   Int64   Float64   Float64   Float64    Int64
 ─────┼─────────────────────────────────────────────────────────────────────────────
-   1 │ optimized  15004   87004  105001  6.0053     58.9555    1.01258         129
-   2 │ manual     15004  192028  135025  0.249379   26.3614    1.01258          41</code></pre><h2 id="Explicit-time-grid"><a class="docs-heading-anchor" href="#Explicit-time-grid">Explicit time grid</a><a id="Explicit-time-grid-1"></a><a class="docs-heading-anchor-permalink" href="#Explicit-time-grid" title="Permalink"></a></h2><p>The option <code>time_grid=...</code> allows you to provide the full time grid vector <code>t0, t1, ..., tf</code>, which is especially useful if a non-uniform grid is desired. In the case of a free initial and/or final time, you should provide a normalized grid ranging from 0 to 1. Note that <code>time_grid</code> overrides <code>grid_size</code> if both options are specified.</p><pre><code class="language-julia hljs">sol = solve(ocp; time_grid=[0, 0.1, 0.5, 0.9, 1], display=false)
-println(time_grid(sol))</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">[0.0, 0.022086440107996666, 0.11043220053998332, 0.19877796097196998, 0.22086440107996663]</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="tutorial-continuation.html">« Discrete continuation</a><a class="docs-footer-nextpage" href="tutorial-free-times-final.html">Final time »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.17.0 on <span class="colophon-date" title="Friday 8 May 2026 20:39">Friday 8 May 2026</span>. Using Julia version 1.12.6.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+   1 │ optimized  15004   87004  105001  5.54898   104.227     1.01258         185
+   2 │ manual     15004  192028  135025  0.322769   25.7596    1.01258          32</code></pre><h2 id="Explicit-time-grid"><a class="docs-heading-anchor" href="#Explicit-time-grid">Explicit time grid</a><a id="Explicit-time-grid-1"></a><a class="docs-heading-anchor-permalink" href="#Explicit-time-grid" title="Permalink"></a></h2><p>The option <code>time_grid=...</code> allows you to provide the full time grid vector <code>t0, t1, ..., tf</code>, which is especially useful if a non-uniform grid is desired. In the case of a free initial and/or final time, you should provide a normalized grid ranging from 0 to 1. Note that <code>time_grid</code> overrides <code>grid_size</code> if both options are specified.</p><pre><code class="language-julia hljs">sol = solve(ocp; time_grid=[0, 0.1, 0.5, 0.9, 1], display=false)
+println(time_grid(sol))</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">[0.0, 0.022086440107996572, 0.11043220053998286, 0.19877796097196915, 0.22086440107996572]</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="tutorial-continuation.html">« Discrete continuation</a><a class="docs-footer-nextpage" href="tutorial-free-times-final.html">Final time »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.17.0 on <span class="colophon-date" title="Monday 11 May 2026 07:51">Monday 11 May 2026</span>. Using Julia version 1.12.6.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>

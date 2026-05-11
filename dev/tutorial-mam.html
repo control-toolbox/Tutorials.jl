@@ -25,20 +25,20 @@ end
 
 # Visualize the initial guess (solve without optimization, max_iter=0)
 sol_init = solve(ocp(T); init=init, grid_size=1000, max_iter=0)
-plot(sol_init)</code></pre><img src="tutorial-mam-ddcde268.svg" alt="Example block output"/><div class="admonition is-info" id="Initial-guess-strategy-270d45a9ed63b937"><header class="admonition-header">Initial guess strategy<a class="admonition-anchor" href="#Initial-guess-strategy-270d45a9ed63b937" title="Permalink"></a></header><div class="admonition-body"><p>The initial guess uses a simple geometric path: linear interpolation in <span>$x_1$</span> and a parabolic arc in <span>$x_2$</span>. This provides a reasonable starting point that avoids the unstable saddle point at the origin. The control is initialized to follow the deterministic flow along this path.</p></div></div><h2 id="Solving-the-Problem"><a class="docs-heading-anchor" href="#Solving-the-Problem">Solving the Problem</a><a id="Solving-the-Problem-1"></a><a class="docs-heading-anchor-permalink" href="#Solving-the-Problem" title="Permalink"></a></h2><p>We solve the problem in two steps for better accuracy:</p><div class="admonition is-info" id="Two-step-resolution-df8c8a7c48549344"><header class="admonition-header">Two-step resolution<a class="admonition-anchor" href="#Two-step-resolution-df8c8a7c48549344" title="Permalink"></a></header><div class="admonition-body"><p>Starting with a coarse grid (50 points) allows for faster initial convergence. Refining with a fine grid (1000 points) then improves accuracy of the solution.</p></div></div><pre><code class="language-julia hljs"># First solve with coarse grid
+plot(sol_init)</code></pre><img src="tutorial-mam-23dc1166.svg" alt="Example block output"/><div class="admonition is-info" id="Initial-guess-strategy-270d45a9ed63b937"><header class="admonition-header">Initial guess strategy<a class="admonition-anchor" href="#Initial-guess-strategy-270d45a9ed63b937" title="Permalink"></a></header><div class="admonition-body"><p>The initial guess uses a simple geometric path: linear interpolation in <span>$x_1$</span> and a parabolic arc in <span>$x_2$</span>. This provides a reasonable starting point that avoids the unstable saddle point at the origin. The control is initialized to follow the deterministic flow along this path.</p></div></div><h2 id="Solving-the-Problem"><a class="docs-heading-anchor" href="#Solving-the-Problem">Solving the Problem</a><a id="Solving-the-Problem-1"></a><a class="docs-heading-anchor-permalink" href="#Solving-the-Problem" title="Permalink"></a></h2><p>We solve the problem in two steps for better accuracy:</p><div class="admonition is-info" id="Two-step-resolution-df8c8a7c48549344"><header class="admonition-header">Two-step resolution<a class="admonition-anchor" href="#Two-step-resolution-df8c8a7c48549344" title="Permalink"></a></header><div class="admonition-body"><p>Starting with a coarse grid (50 points) allows for faster initial convergence. Refining with a fine grid (1000 points) then improves accuracy of the solution.</p></div></div><pre><code class="language-julia hljs"># First solve with coarse grid
 sol = solve(ocp(T); init=init, grid_size=50)
 
 # Refine solution with finer grid
 sol = solve(ocp(T); init=sol, grid_size=1000)
 
 # Objective value
-objective(sol)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">0.24942662080398545</code></pre><h2 id="Visualizing-Results"><a class="docs-heading-anchor" href="#Visualizing-Results">Visualizing Results</a><a id="Visualizing-Results-1"></a><a class="docs-heading-anchor-permalink" href="#Visualizing-Results" title="Permalink"></a></h2><p>Let&#39;s plot the solution trajectory and phase space:</p><pre><code class="language-julia hljs">plot(sol)</code></pre><img src="tutorial-mam-bd070e5a.svg" alt="Example block output"/><pre><code class="language-julia hljs"># Phase space plot
+objective(sol)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">0.24942662080398548</code></pre><h2 id="Visualizing-Results"><a class="docs-heading-anchor" href="#Visualizing-Results">Visualizing Results</a><a id="Visualizing-Results-1"></a><a class="docs-heading-anchor-permalink" href="#Visualizing-Results" title="Permalink"></a></h2><p>Let&#39;s plot the solution trajectory and phase space:</p><pre><code class="language-julia hljs">plot(sol)</code></pre><img src="tutorial-mam-480284aa.svg" alt="Example block output"/><pre><code class="language-julia hljs"># Phase space plot
 MLP = state(sol).(time_grid(sol))
 scatter(first.(MLP), last.(MLP),
         title=&quot;Minimal Action Path&quot;,
         xlabel=&quot;u&quot;,
         ylabel=&quot;v&quot;,
-        label=&quot;Transition path&quot;)</code></pre><img src="tutorial-mam-00cf239b.svg" alt="Example block output"/><p>The resulting path shows the most likely transition between the two stable states given a transient time <span>$T=50$</span>, minimizing the action functional while respecting the system&#39;s dynamics.</p><h2 id="Minimize-with-respect-to-T"><a class="docs-heading-anchor" href="#Minimize-with-respect-to-T">Minimize with respect to T</a><a id="Minimize-with-respect-to-T-1"></a><a class="docs-heading-anchor-permalink" href="#Minimize-with-respect-to-T" title="Permalink"></a></h2><p>To find the maximum likelihood path, we also need to minimize the transient time <code>T</code>. Hence, we perform a discrete continuation over the parameter <code>T</code> by solving the optimal control problem over a continuous range of final times <code>T</code>, using each solution to initialize the next problem.</p><pre><code class="language-julia hljs"># Continuation function to avoid global variables
+        label=&quot;Transition path&quot;)</code></pre><img src="tutorial-mam-5c19936b.svg" alt="Example block output"/><p>The resulting path shows the most likely transition between the two stable states given a transient time <span>$T=50$</span>, minimizing the action functional while respecting the system&#39;s dynamics.</p><h2 id="Minimize-with-respect-to-T"><a class="docs-heading-anchor" href="#Minimize-with-respect-to-T">Minimize with respect to T</a><a id="Minimize-with-respect-to-T-1"></a><a class="docs-heading-anchor-permalink" href="#Minimize-with-respect-to-T" title="Permalink"></a></h2><p>To find the maximum likelihood path, we also need to minimize the transient time <code>T</code>. Hence, we perform a discrete continuation over the parameter <code>T</code> by solving the optimal control problem over a continuous range of final times <code>T</code>, using each solution to initialize the next problem.</p><pre><code class="language-julia hljs"># Continuation function to avoid global variables
 function continuation_mam(Ts; init_guess=init)
     objectives = Float64[]
     iterations_list = Int[]
@@ -63,107 +63,107 @@ println(&quot; Time   Objective     Iterations&quot;)
 for i in eachindex(Ts)
     @printf(&quot;%6.2f  %9.6e  %d\n&quot;, Ts[i], objectives[i], iters[i])
 end</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi"> Time   Objective     Iterations
- 50.00  2.494266e-01  438
- 50.50  2.494244e-01  37
- 51.00  2.494223e-01  40
- 51.50  2.494203e-01  52
- 52.00  2.494184e-01  50
- 52.50  2.494167e-01  55
- 53.00  2.494150e-01  45
- 53.50  2.494134e-01  26
- 54.00  2.494119e-01  46
+ 50.00  2.494266e-01  434
+ 50.50  2.494244e-01  46
+ 51.00  2.494223e-01  55
+ 51.50  2.494203e-01  53
+ 52.00  2.494184e-01  49
+ 52.50  2.494169e-01  31
+ 53.00  2.494150e-01  74
+ 53.50  2.494134e-01  61
+ 54.00  2.494119e-01  62
  54.50  2.494104e-01  61
- 55.00  2.494091e-01  39
- 55.50  2.494078e-01  44
- 56.00  2.494066e-01  54
- 56.50  2.494055e-01  66
- 57.00  2.494044e-01  63
- 57.50  2.494034e-01  57
- 58.00  2.494025e-01  49
- 58.50  2.494016e-01  60
- 59.00  2.494008e-01  65
- 59.50  2.494000e-01  60
- 60.00  2.493993e-01  62
- 60.50  2.493987e-01  68
- 61.00  2.493981e-01  54
- 61.50  2.493975e-01  76
- 62.00  2.493970e-01  62
+ 55.00  2.494091e-01  61
+ 55.50  2.494078e-01  58
+ 56.00  2.494066e-01  64
+ 56.50  2.494055e-01  67
+ 57.00  2.494044e-01  34
+ 57.50  2.494034e-01  58
+ 58.00  2.494025e-01  52
+ 58.50  2.494016e-01  66
+ 59.00  2.494008e-01  52
+ 59.50  2.494000e-01  63
+ 60.00  2.493993e-01  54
+ 60.50  2.493992e-01  15
+ 61.00  2.493981e-01  92
+ 61.50  2.493975e-01  53
+ 62.00  2.493970e-01  36
  62.50  2.493966e-01  65
- 63.00  2.493962e-01  57
- 63.50  2.493958e-01  62
- 64.00  2.493955e-01  76
- 64.50  2.493958e-01  26
- 65.00  2.493949e-01  121
- 65.50  2.493947e-01  73
- 66.00  2.493945e-01  78
+ 63.00  2.493962e-01  71
+ 63.50  2.493958e-01  74
+ 64.00  2.493955e-01  70
+ 64.50  2.493952e-01  44
+ 65.00  2.493949e-01  62
+ 65.50  2.493947e-01  52
+ 66.00  2.493945e-01  57
  66.50  2.493944e-01  64
- 67.00  2.493943e-01  60
- 67.50  2.493942e-01  70
- 68.00  2.493942e-01  64
- 68.50  2.493942e-01  71
- 69.00  2.493942e-01  72
- 69.50  2.493942e-01  80
- 70.00  2.493943e-01  62
- 70.50  2.493944e-01  74
- 71.00  2.493945e-01  88
- 71.50  2.493947e-01  78
- 72.00  2.493949e-01  82
- 72.50  2.493951e-01  75
- 73.00  2.493954e-01  61
- 73.50  2.493956e-01  62
- 74.00  2.493959e-01  43
- 74.50  2.493962e-01  67
- 75.00  2.493966e-01  31
- 75.50  2.493969e-01  99
- 76.00  2.493976e-01  10
- 76.50  2.493977e-01  158
- 77.00  2.493981e-01  84
- 77.50  2.493985e-01  96
- 78.00  2.493990e-01  66
- 78.50  2.493995e-01  60
- 79.00  2.494000e-01  34
- 79.50  2.494005e-01  44
- 80.00  2.494010e-01  58
- 80.50  2.494016e-01  69
- 81.00  2.494022e-01  86
- 81.50  2.494028e-01  86
- 82.00  2.494034e-01  88
- 82.50  2.494040e-01  86
- 83.00  2.494046e-01  68
- 83.50  2.494053e-01  79
- 84.00  2.494060e-01  15
- 84.50  2.494067e-01  82
- 85.00  2.494074e-01  50
- 85.50  2.494081e-01  99
- 86.00  2.494088e-01  84
- 86.50  2.494096e-01  107
- 87.00  2.494104e-01  105
- 87.50  2.494111e-01  108
- 88.00  2.494119e-01  104
- 88.50  2.494127e-01  95
- 89.00  2.494136e-01  110
- 89.50  2.494144e-01  94
- 90.00  2.494152e-01  31
- 90.50  2.494161e-01  121
- 91.00  2.494170e-01  106
- 91.50  2.494179e-01  111
- 92.00  2.494188e-01  87
- 92.50  2.494197e-01  112
- 93.00  2.494206e-01  99
- 93.50  2.494216e-01  118
- 94.00  2.494226e-01  39
- 94.50  2.494235e-01  175
- 95.00  2.494245e-01  99
- 95.50  2.494254e-01  66
- 96.00  2.494264e-01  81
- 96.50  2.494275e-01  111
- 97.00  2.494285e-01  103
- 97.50  2.494295e-01  121
- 98.00  2.494306e-01  120
- 98.50  2.494316e-01  81
- 99.00  2.494327e-01  23
- 99.50  2.494339e-01  17
-100.00  2.494348e-01  213</code></pre><p>We can now analyze the results and identify the optimal transition time:</p><pre><code class="language-julia hljs"># Find optimal time
+ 67.00  2.493943e-01  64
+ 67.50  2.493942e-01  75
+ 68.00  2.493942e-01  63
+ 68.50  2.493942e-01  50
+ 69.00  2.493942e-01  67
+ 69.50  2.493942e-01  71
+ 70.00  2.493943e-01  86
+ 70.50  2.493944e-01  75
+ 71.00  2.493945e-01  90
+ 71.50  2.493947e-01  86
+ 72.00  2.493949e-01  44
+ 72.50  2.493951e-01  71
+ 73.00  2.493954e-01  92
+ 73.50  2.493956e-01  53
+ 74.00  2.493959e-01  65
+ 74.50  2.493962e-01  58
+ 75.00  2.493966e-01  43
+ 75.50  2.493969e-01  64
+ 76.00  2.493973e-01  70
+ 76.50  2.493977e-01  90
+ 77.00  2.493981e-01  63
+ 77.50  2.493985e-01  90
+ 78.00  2.493990e-01  57
+ 78.50  2.493995e-01  81
+ 79.00  2.494000e-01  53
+ 79.50  2.494005e-01  67
+ 80.00  2.494010e-01  77
+ 80.50  2.494016e-01  65
+ 81.00  2.494022e-01  93
+ 81.50  2.494031e-01  41
+ 82.00  2.494034e-01  111
+ 82.50  2.494040e-01  47
+ 83.00  2.494046e-01  14
+ 83.50  2.494053e-01  76
+ 84.00  2.494060e-01  48
+ 84.50  2.494067e-01  83
+ 85.00  2.494074e-01  79
+ 85.50  2.494081e-01  44
+ 86.00  2.494088e-01  80
+ 86.50  2.494096e-01  102
+ 87.00  2.494104e-01  80
+ 87.50  2.494111e-01  100
+ 88.00  2.494119e-01  91
+ 88.50  2.494127e-01  60
+ 89.00  2.494136e-01  53
+ 89.50  2.494144e-01  102
+ 90.00  2.494152e-01  51
+ 90.50  2.494161e-01  105
+ 91.00  2.494170e-01  105
+ 91.50  2.494179e-01  117
+ 92.00  2.494188e-01  121
+ 92.50  2.494197e-01  110
+ 93.00  2.494206e-01  108
+ 93.50  2.494216e-01  117
+ 94.00  2.494225e-01  48
+ 94.50  2.494235e-01  118
+ 95.00  2.494245e-01  107
+ 95.50  2.494254e-01  22
+ 96.00  2.494264e-01  111
+ 96.50  2.494275e-01  122
+ 97.00  2.494286e-01  33
+ 97.50  2.494296e-01  51
+ 98.00  2.494306e-01  183
+ 98.50  2.494316e-01  98
+ 99.00  2.494327e-01  114
+ 99.50  2.494338e-01  91
+100.00  2.494348e-01  127</code></pre><p>We can now analyze the results and identify the optimal transition time:</p><pre><code class="language-julia hljs"># Find optimal time
 idx_min = argmin(objectives)
 T_min = Ts[idx_min]
 obj_min = objectives[idx_min]
@@ -172,4 +172,4 @@ obj_min = objectives[idx_min]
 @printf(&quot;Minimal action: S* = %.6e\n&quot;, obj_min)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Optimal transition time: T* = 68.50
 Minimal action: S* = 2.493942e-01</code></pre><p>Let us visualize the evolution of the objective function with respect to the transition time:</p><pre><code class="language-julia hljs">plt1 = scatter(Ts, log10.(objectives), xlabel=&quot;Time&quot;, label=&quot;Objective (log10)&quot;)
 vline!(plt1, [T_min], label=&quot;Minimum at T=$(round(T_min, digits=1))&quot;, z_order=:back)
-plot(plt1, size=(800,400))</code></pre><img src="tutorial-mam-a716846a.svg" alt="Example block output"/><div class="admonition is-info" id="Interpretation-1292f07fc96d65c1"><header class="admonition-header">Interpretation<a class="admonition-anchor" href="#Interpretation-1292f07fc96d65c1" title="Permalink"></a></header><div class="admonition-body"><p>The optimal transition time <span>$T^*$</span> balances two competing effects: shorter times require larger deviations from the deterministic flow (higher action), while longer times allow the system to follow the flow more closely. The minimum represents the most probable transition time in the small noise limit.</p></div></div></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="tutorial-lqr.html">« Linear–quadratic regulator</a><a class="docs-footer-nextpage" href="tutorial-mpc.html">Model Predictive Control »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.17.0 on <span class="colophon-date" title="Friday 8 May 2026 20:39">Friday 8 May 2026</span>. Using Julia version 1.12.6.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+plot(plt1, size=(800,400))</code></pre><img src="tutorial-mam-7790783e.svg" alt="Example block output"/><div class="admonition is-info" id="Interpretation-1292f07fc96d65c1"><header class="admonition-header">Interpretation<a class="admonition-anchor" href="#Interpretation-1292f07fc96d65c1" title="Permalink"></a></header><div class="admonition-body"><p>The optimal transition time <span>$T^*$</span> balances two competing effects: shorter times require larger deviations from the deterministic flow (higher action), while longer times allow the system to follow the flow more closely. The minimum represents the most probable transition time in the small noise limit.</p></div></div></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="tutorial-lqr.html">« Linear–quadratic regulator</a><a class="docs-footer-nextpage" href="tutorial-mpc.html">Model Predictive Control »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.17.0 on <span class="colophon-date" title="Monday 11 May 2026 07:51">Monday 11 May 2026</span>. Using Julia version 1.12.6.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>

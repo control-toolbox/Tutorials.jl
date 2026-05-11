@@ -759,9 +759,9 @@ version = "0.3.2"
 
 [[deps.FastGaussQuadrature]]
 deps = ["LinearAlgebra", "SpecialFunctions", "StaticArrays"]
-git-tree-sha1 = "0044e9f5e49a57e88205e8f30ab73928b05fe5b6"
+git-tree-sha1 = "ad29c8cb0ea5fb1816926d2a49683f890a8daf64"
 uuid = "442a2c76-b920-505d-bb47-c5924d526838"
-version = "1.1.0"
+version = "1.2.0"
 
 [[deps.FastPower]]
 git-tree-sha1 = "862831f78c7a48681a074ecc9aac09f2de563f71"
@@ -1346,9 +1346,9 @@ version = "2.13.0"
 
 [[deps.LinearSolve]]
 deps = ["ArrayInterface", "ConcreteStructs", "DocStringExtensions", "EnumX", "GPUArraysCore", "InteractiveUtils", "Krylov", "Libdl", "LinearAlgebra", "MKL_jll", "Markdown", "OpenBLAS_jll", "PrecompileTools", "Preferences", "RecursiveArrayTools", "Reexport", "SciMLBase", "SciMLLogging", "SciMLOperators", "Setfield", "StaticArraysCore"]
-git-tree-sha1 = "42b5cb44317e89ef75dd841c9c8eba9045bf9ff0"
+git-tree-sha1 = "04940e970234c6ac650eec9adfc62677cca2328d"
 uuid = "7ed4a6bd-45f5-4d41-b270-4a48e9bafcae"
-version = "3.75.0"
+version = "3.76.0"
 
     [deps.LinearSolve.extensions]
     LinearSolveAMDGPUExt = "AMDGPU"
@@ -1373,12 +1373,12 @@ version = "3.75.0"
     LinearSolveKrylovKitExt = "KrylovKit"
     LinearSolveMetalExt = "Metal"
     LinearSolveMooncakeExt = "Mooncake"
-    LinearSolvePETScCSRExt = ["PETSc", "SparseArrays", "SparseMatricesCSR"]
-    LinearSolvePETScExt = ["PETSc", "SparseArrays"]
+    LinearSolvePETScExt = ["PETSc", "SparseArrays", "SparseMatricesCSR"]
     LinearSolvePETScMPIExt = ["PETSc", "PartitionedArrays", "SparseArrays", "SparseMatricesCSR"]
     LinearSolveParUExt = ["ParU_jll", "SparseArrays"]
     LinearSolvePardisoExt = ["Pardiso", "SparseArrays"]
     LinearSolveRecursiveFactorizationExt = "RecursiveFactorization"
+    LinearSolveSTRUMPACKExt = ["SparseArrays", "STRUMPACK_jll"]
     LinearSolveSparseArraysExt = "SparseArrays"
     LinearSolveSparspakExt = ["SparseArrays", "Sparspak"]
 
@@ -1410,6 +1410,7 @@ version = "3.75.0"
     Pardiso = "46dd5b70-b6fb-5a00-ae2d-e8fea33afaf2"
     PartitionedArrays = "5a9dfac6-5c52-46f7-8278-5e2210713be9"
     RecursiveFactorization = "f2c3362d-daeb-58d1-803e-2bc74f2840b4"
+    STRUMPACK_jll = "86fbd0b9-476f-557c-b766-62c724b42d8c"
     SparseArrays = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
     SparseMatricesCSR = "a0a7dd2c-ebf4-11e9-1f05-cf50bc540ca1"
     Sparspak = "e56a9233-b9d6-4f03-8d0f-1825330902ac"
@@ -2103,9 +2104,9 @@ version = "1.4.0"
 
 [[deps.Qt6Base_jll]]
 deps = ["Artifacts", "CompilerSupportLibraries_jll", "Fontconfig_jll", "Glib_jll", "JLLWrappers", "Libdl", "Libglvnd_jll", "OpenSSL_jll", "Vulkan_Loader_jll", "Xorg_libSM_jll", "Xorg_libXext_jll", "Xorg_libXrender_jll", "Xorg_libxcb_jll", "Xorg_xcb_util_cursor_jll", "Xorg_xcb_util_image_jll", "Xorg_xcb_util_keysyms_jll", "Xorg_xcb_util_renderutil_jll", "Xorg_xcb_util_wm_jll", "Zlib_jll", "libinput_jll", "xkbcommon_jll"]
-git-tree-sha1 = "d7a4bff94f42208ce3cf6bc8e4e7d1d663e7ee8b"
+git-tree-sha1 = "144895f6166994730ee7ff8113b981fc360638f1"
 uuid = "c0090381-4147-56d7-9ebc-da0b1113ec56"
-version = "6.10.2+1"
+version = "6.10.2+2"
 
 [[deps.Qt6Declarative_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Qt6Base_jll", "Qt6ShaderTools_jll", "Qt6Svg_jll"]
@@ -2606,9 +2607,9 @@ version = "1.1.0"
 
 [[deps.SymbolicUtils]]
 deps = ["AbstractTrees", "ArrayInterface", "Combinatorics", "ConstructionBase", "DataStructures", "Dictionaries", "DocStringExtensions", "DynamicPolynomials", "EnumX", "ExproniconLite", "Graphs", "LinearAlgebra", "MacroTools", "Moshi", "MultivariatePolynomials", "MutableArithmetics", "NaNMath", "PrecompileTools", "ReadOnlyArrays", "Setfield", "SparseArrays", "SpecialFunctions", "StaticArraysCore", "SymbolicIndexingInterface", "TaskLocalValues", "TermInterface", "WeakCacheSets"]
-git-tree-sha1 = "85d892b5d374ef817b7a7a16ac35d279441b528f"
+git-tree-sha1 = "a67a4753fbc38c743524514e1bdce5dd77fad85e"
 uuid = "d1185830-fcd6-423d-90d6-eec64667417b"
-version = "4.29.0"
+version = "4.29.1"
 
     [deps.SymbolicUtils.extensions]
     SymbolicUtilsChainRulesCoreExt = "ChainRulesCore"
@@ -3051,9 +3052,9 @@ version = "1.64.0+1"
 
 [[deps.oneTBB_jll]]
 deps = ["Artifacts", "JLLWrappers", "LazyArtifacts", "Libdl"]
-git-tree-sha1 = "1350188a69a6e46f799d3945beef36435ed7262f"
+git-tree-sha1 = "da8c1f6eee04831f14edcfa5dae611d309807e57"
 uuid = "1317d2d5-d96f-522e-a858-c73665f53c3e"
-version = "2022.0.0+1"
+version = "2022.3.0+0"
 
 [[deps.p7zip_jll]]
 deps = ["Artifacts", "CompilerSupportLibraries_jll", "Libdl"]
