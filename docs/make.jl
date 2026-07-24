@@ -1,8 +1,25 @@
-pushfirst!(LOAD_PATH, joinpath(@__DIR__))
+# to run the documentation generation:
+# julia --project=. docs/make.jl
 pushfirst!(LOAD_PATH, joinpath(@__DIR__, ".."))
+pushfirst!(LOAD_PATH, @__DIR__)
 
 using Documenter
+using DocumenterInterLinks
 using OptimalControl
+
+#
+links = InterLinks(
+    "CTDirect" => (
+        "https://control-toolbox.org/CTDirect.jl/stable/",
+        "https://control-toolbox.org/CTDirect.jl/stable/objects.inv",
+        joinpath(@__DIR__, "inventories", "CTDirect.toml"),
+    ),
+    "OptimalControl" => (
+        "https://control-toolbox.org/OptimalControl.jl/stable/",
+        "https://control-toolbox.org/OptimalControl.jl/stable/objects.inv",
+        joinpath(@__DIR__, "inventories", "OptimalControl.toml"),
+    ),
+)
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # Assets for reproducibility
@@ -34,16 +51,19 @@ repo_url = "github.com/control-toolbox/Tutorials.jl"
 Draft = false
 ```
 =#
-draft = true # Draft mode: if true, @example blocks in markdown are not executed
+draft = false  # Draft mode: if true, @example blocks in markdown are not executed
 
+# ═══════════════════════════════════════════════════════════════════════════════
+# Build documentation
+# ═══════════════════════════════════════════════════════════════════════════════
 makedocs(;
-    draft=draft, # if draft is true, then the julia code from .md is not executed
-    warnonly=[:cross_references, :autodocs_block],
+    draft=draft,
+    warnonly=true,
     sitename="Tutorials",
     format=Documenter.HTML(;
         repolink="https://" * repo_url,
         prettyurls=false,
-        size_threshold_ignore=[""],
+        # size_threshold_ignore=["tutorial-discretisation.md", "tutorial-nlp.md"],
         assets=[
             asset("https://control-toolbox.org/assets/css/documentation.css"),
             asset("https://control-toolbox.org/assets/js/documentation.js"),
@@ -54,6 +74,11 @@ makedocs(;
         "Tutorials and Advanced Features" => [
             "Discrete continuation" => "tutorial-continuation.md",
             "Discretisation methods" => "tutorial-discretisation.md",
+            "Free times" => [
+                "Final time" => "tutorial-free-times-final.md",
+                "Initial time" => "tutorial-free-times-initial.md",
+                "Final and initial times" => "tutorial-free-times-final-initial.md",
+            ],
             "NLP manipulations" => "tutorial-nlp.md",
             "Indirect simple shooting" => "tutorial-iss.md",
             "Goddard: direct, indirect" => "tutorial-goddard.md",
@@ -61,8 +86,10 @@ makedocs(;
             "Minimal action" => "tutorial-mam.md",
             "Constraints at intermediate times" => "tutorial-cit.md",
             "Model Predictive Control" => "tutorial-mpc.md",
+            "Symbolic Lagrangian Mechanics" => "tutorial-symbolics.md",
         ],
     ],
+    plugins=[links],
 )
 
-deploydocs(; repo=repo_url * ".git", devbranch="main")
+deploydocs(; repo=repo_url * ".git", devbranch="main", push_preview=true)
