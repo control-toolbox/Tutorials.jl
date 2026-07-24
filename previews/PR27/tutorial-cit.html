@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Constraints at intermediate times · Tutorials</title><meta name="title" content="Constraints at intermediate times · Tutorials"/><meta property="og:title" content="Constraints at intermediate times · Tutorials"/><meta property="twitter:title" content="Constraints at intermediate times · Tutorials"/><meta name="description" content="Documentation for Tutorials."/><meta property="og:description" content="Documentation for Tutorials."/><meta property="twitter:description" content="Documentation for Tutorials."/><script data-outdated-warner src="assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.050/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="assets/documenter.js"></script><script src="search_index.js"></script><script src="siteinfo.js"></script><script src="../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="assets/themes/catppuccin-mocha.css" data-theme-name="catppuccin-mocha"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="assets/themes/catppuccin-macchiato.css" data-theme-name="catppuccin-macchiato"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="assets/themes/catppuccin-frappe.css" data-theme-name="catppuccin-frappe"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="assets/themes/catppuccin-latte.css" data-theme-name="catppuccin-latte"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="assets/themeswap.js"></script><link href="https://control-toolbox.org/assets/css/documentation.css" rel="stylesheet" type="text/css"/><script src="https://control-toolbox.org/assets/js/documentation.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit"><a href="index.html">Tutorials</a></span></div><button class="docs-search-query input is-rounded is-small is-clickable my-2 mx-auto py-1 px-2" id="documenter-search-query">Search docs (Ctrl + /)</button><ul class="docs-menu"><li><a class="tocitem" href="index.html">Getting Started</a></li><li><span class="tocitem">Tutorials and Advanced Features</span><ul><li><a class="tocitem" href="tutorial-continuation.html">Discrete continuation</a></li><li><a class="tocitem" href="tutorial-discretisation.html">Discretisation methods</a></li><li><input class="collapse-toggle" id="menuitem-2-3" type="checkbox"/><label class="tocitem" for="menuitem-2-3"><span class="docs-label">Free times</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="tutorial-free-times-final.html">Final time</a></li><li><a class="tocitem" href="tutorial-free-times-initial.html">Initial time</a></li><li><a class="tocitem" href="tutorial-free-times-final-initial.html">Final and initial times</a></li></ul></li><li><a class="tocitem" href="tutorial-nlp.html">NLP manipulations</a></li><li><a class="tocitem" href="tutorial-iss.html">Indirect simple shooting</a></li><li><a class="tocitem" href="tutorial-goddard.html">Goddard: direct, indirect</a></li><li><a class="tocitem" href="tutorial-lqr.html">Linear–quadratic regulator</a></li><li><a class="tocitem" href="tutorial-mam.html">Minimal action</a></li><li class="is-active"><a class="tocitem" href="tutorial-cit.html">Constraints at intermediate times</a><ul class="internal"><li><a class="tocitem" href="#The-multi-arc-augmentation-technique"><span>The multi-arc augmentation technique</span></a></li><li><a class="tocitem" href="#Example-1:-a-tram-with-intermediate-stops"><span>Example 1: a tram with intermediate stops</span></a></li><li><a class="tocitem" href="#Example-2:-hovercraft-path-planning"><span>Example 2: hovercraft path planning</span></a></li><li><a class="tocitem" href="#Conclusion"><span>Conclusion</span></a></li></ul></li><li><a class="tocitem" href="tutorial-mpc.html">Model Predictive Control</a></li><li><a class="tocitem" href="tutorial-symbolics.html">Symbolic Lagrangian Mechanics</a></li></ul></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><a class="docs-sidebar-button docs-navbar-link fa-solid fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">Tutorials and Advanced Features</a></li><li class="is-active"><a href="tutorial-cit.html">Constraints at intermediate times</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href="tutorial-cit.html">Constraints at intermediate times</a></li></ul></nav><div class="docs-right"><a class="docs-navbar-link" href="https://github.com/control-toolbox/Tutorials.jl" title="View the repository on GitHub"><span class="docs-icon fa-brands"></span><span class="docs-label is-hidden-touch">GitHub</span></a><a class="docs-navbar-link" href="https://github.com/control-toolbox/Tutorials.jl/blob/main/docs/src/tutorial-cit.md" title="Edit source on GitHub"><span class="docs-icon fa-solid"></span></a><a class="docs-settings-button docs-navbar-link fa-solid fa-gear" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-article-toggle-button fa-solid fa-chevron-up" id="documenter-article-toggle-button" href="javascript:;" title="Collapse all docstrings"></a></div></header><article class="content" id="documenter-page"><h1 id="tutorial-for-constraints-at-intermediate-times"><a class="docs-heading-anchor" href="#tutorial-for-constraints-at-intermediate-times">Constraints at intermediate times</a><a id="tutorial-for-constraints-at-intermediate-times-1"></a><a class="docs-heading-anchor-permalink" href="#tutorial-for-constraints-at-intermediate-times" title="Permalink"></a></h1><p>In this tutorial, we address a class of optimal control problems where constraints must be enforced at <strong>intermediate times</strong> <span>$t_s \in (t_0, t_f)$</span>, such as passing through a waypoint or stopping at a station. Since OptimalControl.jl does not natively support such constraints, we use a <strong>multi-arc augmentation</strong> technique with time normalisation.</p><h2 id="The-multi-arc-augmentation-technique"><a class="docs-heading-anchor" href="#The-multi-arc-augmentation-technique">The multi-arc augmentation technique</a><a id="The-multi-arc-augmentation-technique-1"></a><a class="docs-heading-anchor-permalink" href="#The-multi-arc-augmentation-technique" title="Permalink"></a></h2><h3 id="Motivation"><a class="docs-heading-anchor" href="#Motivation">Motivation</a><a id="Motivation-1"></a><a class="docs-heading-anchor-permalink" href="#Motivation" title="Permalink"></a></h3><p>Consider an optimal control problem on <span>$[t_0, t_f]$</span> with dynamics <span>$\dot{x}(t) = f(x(t), u(t))$</span> and cost <span>$\int_{t_0}^{t_f} f^0(x(t), u(t))\, \mathrm{d}t$</span>. Suppose we have intermediate times</p><p class="math-container">\[t_0 &lt; t_1 &lt; \dots &lt; t_N = t_f\]</p><p>with constraints <span>$c_s(x(t_s)) = 0$</span> at each <span>$t_s$</span>. The idea is to split the problem into <span>$N$</span> <strong>arcs</strong>, one per interval <span>$[t_{k-1}, t_k]$</span>, and reformulate them as a single OCP on the normalised time <span>$s \in [0, 1]$</span>.</p><h3 id="Time-normalisation"><a class="docs-heading-anchor" href="#Time-normalisation">Time normalisation</a><a id="Time-normalisation-1"></a><a class="docs-heading-anchor-permalink" href="#Time-normalisation" title="Permalink"></a></h3><p>On each arc <span>$k$</span>, we introduce the affine change of time</p><p class="math-container">\[\varphi_k(s) = t_{k-1} + \Delta t_k\, s, \quad \Delta t_k = t_k - t_{k-1}, \quad s \in [0, 1].\]</p><p>The state on arc <span>$k$</span> is <span>$q_k(s) = x(\varphi_k(s))$</span>, and by the chain rule</p><p class="math-container">\[\dot{q}_k(s) = \Delta t_k\, f(q_k(s), v_k(s)),\]</p><p>where <span>$v_k(s) = u(\varphi_k(s))$</span> is the control on arc <span>$k$</span>.</p><h3 id="Augmented-problem"><a class="docs-heading-anchor" href="#Augmented-problem">Augmented problem</a><a id="Augmented-problem-1"></a><a class="docs-heading-anchor-permalink" href="#Augmented-problem" title="Permalink"></a></h3><p>The <span>$N$</span> arcs are combined into a single OCP on <span>$[0, 1]$</span> with:</p><ul><li><strong>Augmented state</strong>: <span>$y = (q_1, \dots, q_N) \in \mathbb{R}^{nN}$</span></li><li><strong>Augmented control</strong>: <span>$w = (v_1, \dots, v_N) \in \mathbb{R}^{mN}$</span></li><li><strong>Dynamics</strong>: <span>$\dot{q}_k(s) = \Delta t_k\, f(q_k(s), v_k(s))$</span> for each <span>$k$</span></li><li><strong>Cost</strong>: <span>$\sum_{k=1}^{N} \Delta t_k \int_0^1 f^0(q_k(s), v_k(s))\, \mathrm{d}s$</span></li><li><strong>Boundary conditions</strong>: <span>$c_s(q_k(0)) = 0$</span> and <span>$c_s(q_k(1)) = 0$</span> as needed</li><li><strong>Continuity</strong>: <span>$q_k(1) = q_{k+1}(0)$</span> for <span>$k = 1, \dots, N-1$</span></li></ul><p>This augmented problem can be solved directly by OptimalControl.jl as a standard OCP on <span>$[0, 1]$</span>.</p><h2 id="Example-1:-a-tram-with-intermediate-stops"><a class="docs-heading-anchor" href="#Example-1:-a-tram-with-intermediate-stops">Example 1: a tram with intermediate stops</a><a id="Example-1:-a-tram-with-intermediate-stops-1"></a><a class="docs-heading-anchor-permalink" href="#Example-1:-a-tram-with-intermediate-stops" title="Permalink"></a></h2><p>We consider a tram (point mass) travelling between four stations at positions <span>$0, 500, 1400, 2200$</span> m. The tram must stop at each intermediate station for passenger boarding. The control is the acceleration, and we minimise the total energy (sum of squared accelerations).</p><p>There are <strong>three arcs</strong> (one per travel segment) separated by <strong>stop phases</strong> at the two intermediate stations. The travel times are 50 s, 70 s and 55 s, with stop durations of 15 s and 20 s, giving a total schedule of <span>$50 + 15 + 70 + 20 + 55 = 210$</span> s. Note that the segment lengths and travel times are not proportional, making the problem asymmetric.</p><pre><code class="language-julia hljs">using OptimalControl
+using NLPModelsIpopt
+using Plots
+
+# Station positions along the track (in meters)
+station_0 = 0.0       # Starting station
+station_1 = 500.0     # First intermediate station
+station_2 = 1400.0    # Second intermediate station
+station_3 = 2200.0    # Final destination
+
+# Time schedule (in seconds)
+t0 = 0.0
+t1 = 50.0    # Arrival at station 1
+t2 = 135.0   # Arrival at station 2 (50 s travel + 15 s stop + 70 s travel)
+t3 = 210.0   # Arrival at station 3 (… + 20 s stop + 55 s travel)
+
+# Stop durations at intermediate stations
+stop_time_1 = 15.0  # seconds at station 1
+stop_time_2 = 20.0  # seconds at station 2
+
+# Travel time for each arc (excluding stops)
+Δt1 = t1 - t0                      # 50 s
+Δt2 = t2 - t1 - stop_time_1        # 70 s
+Δt3 = t3 - t2 - stop_time_2        # 55 s</code></pre><h3 id="Direct-method"><a class="docs-heading-anchor" href="#Direct-method">Direct method</a><a id="Direct-method-1"></a><a class="docs-heading-anchor-permalink" href="#Direct-method" title="Permalink"></a></h3><p>We define the augmented OCP on <span>$s \in [0, 1]$</span> with a 6-dimensional state (position and velocity for each arc) and a 3-dimensional control (acceleration for each arc).</p><pre><code class="language-julia hljs">@def ocp_3arc begin
+
+    s ∈ [0, 1], time
+    y = (pos1, vel1, pos2, vel2, pos3, vel3) ∈ R^6, state
+    w = (acc1, acc2, acc3) ∈ R^3, control
+
+    # Initial conditions (arc 1 starts from station 0 at rest)
+    pos1(0) == station_0
+    vel1(0) == 0.0
+
+    # Terminal conditions for arc 1 (arrive at station 1, stop)
+    pos1(1) == station_1
+    vel1(1) == 0.0
+
+    # Continuity between arc 1 and arc 2
+    pos2(0) - pos1(1) == 0
+    vel2(0) - vel1(1) == 0
+
+    # Terminal conditions for arc 2 (arrive at station 2, stop)
+    pos2(1) == station_2
+    vel2(1) == 0.0
+
+    # Continuity between arc 2 and arc 3
+    pos3(0) - pos2(1) == 0
+    vel3(0) - vel2(1) == 0
+
+    # Terminal conditions for arc 3 (arrive at station 3, stop)
+    pos3(1) == station_3
+    vel3(1) == 0.0
+
+    # Dynamics (time-normalised double integrator for each arc)
+    ẏ(s) == [
+        Δt1 * vel1(s), Δt1 * acc1(s),
+        Δt2 * vel2(s), Δt2 * acc2(s),
+        Δt3 * vel3(s), Δt3 * acc3(s)
+    ]
+
+    # Objective: minimise total energy
+    ∫(Δt1 * acc1(s)^2 + Δt2 * acc2(s)^2 + Δt3 * acc3(s)^2) → min
+
+end</code></pre><p>We now solve the augmented problem:</p><pre><code class="language-julia hljs">sol_direct = solve(ocp_3arc)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">▫ This is OptimalControl 2.0.4, solving with: <span class="sgr36"><span class="sgr1">collocation</span></span> → <span class="sgr36"><span class="sgr1">adnlp</span></span> → <span class="sgr36"><span class="sgr1">ipopt</span></span> (<span class="sgr35"><span class="sgr1">cpu</span></span>)
+
+  📦 Configuration:
+   ├─ <span class="sgr1">Discretizer</span>: <span class="sgr36"><span class="sgr1">collocation</span></span>
+   ├─ <span class="sgr1">Modeler</span>: <span class="sgr36"><span class="sgr1">adnlp</span></span>
+   └─ <span class="sgr1">Solver</span>: <span class="sgr36"><span class="sgr1">ipopt</span></span>
+
+▫ This is Ipopt version 3.14.19, running with linear solver MUMPS 5.8.2.
+
+Number of nonzeros in equality constraint Jacobian...:     5266
+Number of nonzeros in inequality constraint Jacobian.:        0
+Number of nonzeros in Lagrangian Hessian.............:      750
+
+Total number of variables............................:     2256
+                     variables with only lower bounds:        0
+                variables with lower and upper bounds:        0
+                     variables with only upper bounds:        0
+Total number of equality constraints.................:     1512
+Total number of inequality constraints...............:        0
+        inequality constraints with only lower bounds:        0
+   inequality constraints with lower and upper bounds:        0
+        inequality constraints with only upper bounds:        0
+
+iter    objective    inf_pr   inf_du lg(mu)  ||d||  lg(rg) alpha_du alpha_pr  ls
+   0  1.7500000e+00 2.20e+03 8.45e-16   0.0 0.00e+00    -  0.00e+00 0.00e+00   0
+   1  9.8500550e+01 4.55e-13 1.33e-15 -11.0 2.20e+03    -  1.00e+00 1.00e+00h  1
+
+Number of Iterations....: 1
+
+                                   (scaled)                 (unscaled)
+Objective...............:   9.8500549796014781e+01    9.8500549796014781e+01
+Dual infeasibility......:   1.3322676295501878e-15    1.3322676295501878e-15
+Constraint violation....:   4.5474735088646412e-13    4.5474735088646412e-13
+Variable bound violation:   0.0000000000000000e+00    0.0000000000000000e+00
+Complementarity.........:   0.0000000000000000e+00    0.0000000000000000e+00
+Overall NLP error.......:   4.5474735088646412e-13    4.5474735088646412e-13
+
+
+Number of objective function evaluations             = 2
+Number of objective gradient evaluations             = 2
+Number of equality constraint evaluations            = 2
+Number of inequality constraint evaluations          = 0
+Number of equality constraint Jacobian evaluations   = 2
+Number of inequality constraint Jacobian evaluations = 0
+Number of Lagrangian Hessian evaluations             = 1
+Total seconds in IPOPT                               = 6.448
+
+EXIT: Optimal Solution Found.</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">• Solver:
+  ✓ Successful  : true
+  │  Status     : first_order
+  │  Message    : Ipopt/generic
+  │  Iterations : 1
+  │  Objective  : 98.50054979601478
+  └─ Constraints violation : 4.547473508864641e-13
+
+• Boundary duals: [0.09600153602457652, 2.4000384006144104, -0.033026767495335375, 4.6041552991378545, 0.06297476852924115, 2.2041168985234405, 0.05242903135003915, 5.377721395203653, 0.1154037998792803, 3.17360449668021, -0.1154037998792803, 3.1736044966802117]
+</code></pre><h3 id="Plotting-the-multi-arc-solution"><a class="docs-heading-anchor" href="#Plotting-the-multi-arc-solution">Plotting the multi-arc solution</a><a id="Plotting-the-multi-arc-solution-1"></a><a class="docs-heading-anchor-permalink" href="#Plotting-the-multi-arc-solution" title="Permalink"></a></h3><p>Since the augmented problem is defined on the normalised time <span>$s \in [0, 1]$</span>, the solution from OptimalControl.jl is given in terms of <span>$s$</span>. To visualise the trajectory in real time, we need to <strong>reassemble the arcs</strong>: extract the state and control for each arc, map <span>$s$</span> back to physical time via <span>$\varphi_k(s)$</span>, and insert the stop phases between arcs.</p><details class="admonition is-details" id="Code-for-plotting-a0ea8b0225341e0e"><summary class="admonition-header">Code for plotting<a class="admonition-anchor" href="#Code-for-plotting-a0ea8b0225341e0e" title="Permalink"></a></summary><div class="admonition-body"><pre><code class="language-julia hljs">function plot_tram_solution(sol)
+    # Extract state, control, and costate from the augmented solution
+    t = time_grid(sol)
+    Y = state(sol).(t)
+    W = control(sol).(t)
+    P = costate(sol).(t)
+
+    # Real-time grids for each arc (excluding stops)
+    t_arc1 = t0 .+ Δt1 .* t
+    t_arc2 = (t1 + stop_time_1) .+ Δt2 .* t
+    t_arc3 = (t2 + stop_time_2) .+ Δt3 .* t
+
+    # Extract per-arc states, controls, and costates
+    pos1_vals = [y[1] for y in Y];  vel1_vals = [y[2] for y in Y];  acc1_vals = [w[1] for w in W]
+    pos2_vals = [y[3] for y in Y];  vel2_vals = [y[4] for y in Y];  acc2_vals = [w[2] for w in W]
+    pos3_vals = [y[5] for y in Y];  vel3_vals = [y[6] for y in Y];  acc3_vals = [w[3] for w in W]
+
+    ppos1_vals = [p[1] for p in P];  pvel1_vals = [p[2] for p in P]
+    ppos2_vals = [p[3] for p in P];  pvel2_vals = [p[4] for p in P]
+    ppos3_vals = [p[5] for p in P];  pvel3_vals = [p[6] for p in P]
+
+    # Build full real-time arrays including stop phases
+    # Arc 1
+    t_all = collect(t_arc1)
+    pos_all = copy(pos1_vals);  vel_all = copy(vel1_vals);  acc_all = copy(acc1_vals)
+    ppos_all = copy(ppos1_vals); pvel_all = copy(pvel1_vals)
+
+    # Stop at station 1 (hold terminal costate to visualise jumps)
+    append!(t_all, range(t_arc1[end], t1 + stop_time_1; length=10))
+    append!(pos_all, fill(station_1, 10));  append!(vel_all, zeros(10));  append!(acc_all, zeros(10))
+    append!(ppos_all, fill(ppos1_vals[end], 10)); append!(pvel_all, fill(pvel1_vals[end], 10))
+
+    # Arc 2
+    append!(t_all, collect(t_arc2))
+    append!(pos_all, pos2_vals);  append!(vel_all, vel2_vals);  append!(acc_all, acc2_vals)
+    append!(ppos_all, ppos2_vals); append!(pvel_all, pvel2_vals)
+
+    # Stop at station 2
+    append!(t_all, range(t_arc2[end], t2 + stop_time_2; length=10))
+    append!(pos_all, fill(station_2, 10));  append!(vel_all, zeros(10));  append!(acc_all, zeros(10))
+    append!(ppos_all, fill(ppos2_vals[end], 10)); append!(pvel_all, fill(pvel2_vals[end], 10))
+
+    # Arc 3
+    append!(t_all, collect(t_arc3))
+    append!(pos_all, pos3_vals);  append!(vel_all, vel3_vals);  append!(acc_all, acc3_vals)
+    append!(ppos_all, ppos3_vals); append!(pvel_all, pvel3_vals)
+
+    # Font settings (matching CTModels.jl defaults)
+    title_font = font(10, Plots.default(:fontfamily))
+    label_font_size = 10
+
+    # State (left column)
+    plt1 = plot(t_all, pos_all; title=&quot;state&quot;, xlabel=&quot;t (s)&quot;, ylabel=&quot;position (m)&quot;, label=false, linewidth=2, color=:blue, titlefont=title_font, xguidefontsize=label_font_size, yguidefontsize=label_font_size)
+    vline!(plt1, [t1, t1 + stop_time_1, t2, t2 + stop_time_2, t3]; linestyle=:dash, color=:gray, label=false)
+
+    plt3 = plot(t_all, vel_all; xlabel=&quot;t (s)&quot;, ylabel=&quot;velocity (m/s)&quot;, label=false, linewidth=2, color=:green, xguidefontsize=label_font_size, yguidefontsize=label_font_size)
+    vline!(plt3, [t1, t1 + stop_time_1, t2, t2 + stop_time_2, t3]; linestyle=:dash, color=:gray, label=false)
+
+    plt_state = plot(plt1, plt3; layout=(2, 1))
+
+    # Costate (right column)
+    plt2 = plot(t_all, ppos_all; title=&quot;costate&quot;, xlabel=&quot;t (s)&quot;, ylabel=&quot;p_pos&quot;, label=false, linewidth=2, color=:blue, titlefont=title_font, xguidefontsize=label_font_size, yguidefontsize=label_font_size)
+    vline!(plt2, [t1, t1 + stop_time_1, t2, t2 + stop_time_2, t3]; linestyle=:dash, color=:gray, label=false)
+
+    plt4 = plot(t_all, pvel_all; xlabel=&quot;t (s)&quot;, ylabel=&quot;p_vel&quot;, label=false, linewidth=2, color=:green, xguidefontsize=label_font_size, yguidefontsize=label_font_size)
+    vline!(plt4, [t1, t1 + stop_time_1, t2, t2 + stop_time_2, t3]; linestyle=:dash, color=:gray, label=false)
+
+    plt_costate = plot(plt2, plt4; layout=(2, 1))
+
+    # State | costate side by side
+    plt_sc = plot(plt_state, plt_costate; layout=(1, 2))
+
+    # Control (full width)
+    plt5 = plot(t_all, acc_all; title=&quot;control&quot;, xlabel=&quot;t (s)&quot;, ylabel=&quot;acceleration (m/s²)&quot;, label=false, linewidth=2, color=:orange, titlefont=title_font, xguidefontsize=label_font_size, yguidefontsize=label_font_size)
+    vline!(plt5, [t1, t1 + stop_time_1, t2, t2 + stop_time_2, t3]; linestyle=:dash, color=:gray, label=false)
+
+    l_final = @layout [a{0.67h}; b{0.33h}]
+    plot(plt_sc, plt5; layout=l_final, size=(800, 600), leftmargin=10px, bottommargin=10px)
+end</code></pre></div></details><p>We can now plot the solution:</p><pre><code class="language-julia hljs">plot_tram_solution(sol_direct)</code></pre><img src="tutorial-cit-2f61271d.svg" alt="Example block output"/><h3 id="Indirect-method"><a class="docs-heading-anchor" href="#Indirect-method">Indirect method</a><a id="Indirect-method-1"></a><a class="docs-heading-anchor-permalink" href="#Indirect-method" title="Permalink"></a></h3><p>We now solve the same problem using an <strong>indirect shooting method</strong> based on the Pontryagin Maximum Principle (PMP).</p><h4 id="PMP-for-the-augmented-problem"><a class="docs-heading-anchor" href="#PMP-for-the-augmented-problem">PMP for the augmented problem</a><a id="PMP-for-the-augmented-problem-1"></a><a class="docs-heading-anchor-permalink" href="#PMP-for-the-augmented-problem" title="Permalink"></a></h4><p>The pseudo-Hamiltonian (with <span>$p^0 = -1$</span>) for the augmented OCP is</p><p class="math-container">\[H(y, p, w) = \sum_{k=1}^{3} \Delta t_k \bigl( p_{2k-1}\, v_k + p_{2k}\, a_k - a_k^2 \bigr),\]</p><p>where <span>$p = (p_1, p_2, p_3, p_4, p_5, p_6)$</span> is the costate of the augmented state <span>$y = (pos_1, v_1, pos_2, v_2, pos_3, v_3)$</span>. Maximising over <span>$w = (a_1, a_2, a_3)$</span> gives</p><p class="math-container">\[a_k^*(s) = \frac{1}{2}\, p_{2k}(s), \qquad k = 1, 2, 3.\]</p><p>The costate equations are <span>$\dot p_{2k-1} = 0$</span> and <span>$\dot p_{2k} = -\Delta t_k\, p_{2k-1}$</span>, so each arc&#39;s costate evolves <strong>independently</strong>.</p><h4 id="Transversality-conditions-and-shooting-function"><a class="docs-heading-anchor" href="#Transversality-conditions-and-shooting-function">Transversality conditions and shooting function</a><a id="Transversality-conditions-and-shooting-function-1"></a><a class="docs-heading-anchor-permalink" href="#Transversality-conditions-and-shooting-function" title="Permalink"></a></h4><p>The boundary conditions of the augmented OCP can be written as <span>$c(y_0, y_f) = 0$</span> with <span>$y_0 = y(0)$</span>, <span>$y_f = y(1)$</span>. Setting <span>$\xi(y_0, y_f) \coloneqq \lambda \cdot c(y_0, y_f)$</span>, the general two-point boundary value problem involves <span>$2n + l$</span> unknowns <span>$(y_0, p_0, \lambda)$</span> and the same number of equations:</p><p class="math-container">\[c(y_0, y_f) = 0, \qquad
+p_0 = -\frac{\partial \xi}{\partial y_0}(y_0, y_f), \qquad
+p_f = \frac{\partial \xi}{\partial y_f}(y_0, y_f).\]</p><p>The last two equations are the <strong>transversality conditions</strong> of the PMP.</p><p><strong>In our problem</strong> we write the boundary conditions in the equivalent form where all components of <span>$y_0$</span> and <span>$y_f$</span> are fixed directly:</p><p class="math-container">\[c(y_0, y_f) = \begin{pmatrix} y_0 - y_0^* \\ y_f - y_f^* \end{pmatrix} = 0,\]</p><p class="math-container">\[y_0^* = (q_0,\, 0,\, q_1,\, 0,\, q_2,\, 0), \qquad
+y_f^* = (q_1,\, 0,\, q_2,\, 0,\, q_3,\, 0),\]</p><p>where <span>$q_0, q_1, q_2, q_3$</span> are the station positions.</p><p>With multipliers <span>$\lambda = (\lambda_0, \lambda_f) \in \mathbb{R}^6 \times \mathbb{R}^6$</span>, the transversality conditions give immediately <span>$\lambda_0 = -p_0$</span> and <span>$\lambda_f = p_f$</span>: the multipliers are absorbed into the costate, leaving <span>$p_0$</span> and <span>$p_f$</span> <strong>free</strong>. Eliminating <span>$\lambda$</span> and substituting into <span>$c = 0$</span> yields the sole conditions <span>$y_0 = y_0^*$</span> and <span>$y_f = y_f^*$</span> — no constraint on <span>$p_0$</span> or <span>$p_f$</span>.</p><p><strong>Reduction.</strong> Since <span>$y_0 = y_0^*$</span> is fully determined, it is hardcoded as the initial state of the Hamiltonian flow. The only free quantities at <span>$s = 0$</span> are the costate components <span>$p_0 \in \mathbb{R}^6$</span>. The shooting equations are the <span>$n = 6$</span> terminal state conditions <span>$y_f = y_f^*$</span>:</p><p class="math-container">\[S(p_0) \coloneqq \pi_x\!\bigl(\Phi^H(0,\, y_0^*,\, p_0,\, 1)\bigr) - y_f^* = 0 \in \mathbb{R}^6,\]</p><p>where <span>$\Phi^H$</span> is the Hamiltonian flow and <span>$\pi_x$</span> the state projection (the state part of the phase point).</p><div class="admonition is-info" id="Costate-jumps-at-intermediate-times-c85ab5ae81fe559b"><header class="admonition-header">Costate jumps at intermediate times<a class="admonition-anchor" href="#Costate-jumps-at-intermediate-times-c85ab5ae81fe559b" title="Permalink"></a></header><div class="admonition-body"><p>In the original multi-arc formulation (continuity written as <span>$pos_2(0) - pos_1(1) = 0$</span>, etc.), the same elimination shows that the coupling multipliers are absorbed into <span>$p_0$</span> and <span>$p_f$</span>, yielding the same shooting function. The costates of different arcs are <strong>independent</strong>: the terminal costate of arc <span>$k$</span> need not equal the initial costate of arc <span>$k+1$</span>, reflecting the classical costate jump condition of the multi-arc PMP.</p><p>Be careful with the word <em>jump</em>: the augmented costate <span>$p \in \mathbb{R}^6$</span> is <strong>continuous in <span>$s$</span></strong> (the Hamiltonian flow is smooth). The &quot;jump&quot; appears only when we reassemble in physical time and place the terminal costate of arc <span>$k$</span> next to the initial costate of arc <span>$k+1$</span> — these are <em>different components</em> of <span>$p$</span>, so their values differ. It is the augmented-formulation image of the discontinuity of the single costate in the classical interior-point BVP, not a discontinuity of the ODE.</p></div></div><h4 id="Implementation"><a class="docs-heading-anchor" href="#Implementation">Implementation</a><a id="Implementation-1"></a><a class="docs-heading-anchor-permalink" href="#Implementation" title="Permalink"></a></h4><pre><code class="language-julia hljs">using OrdinaryDiffEq
+using NonlinearSolve
+using LinearAlgebra
+
+# Maximising control in feedback form: a_k* = p_{2k} / 2
+u_opt(x, p) = [p[2]/2, p[4]/2, p[6]/2]
+
+# Hamiltonian flow
+f_flow = Flow(ocp_3arc, u_opt)
+
+# Initial and target states (fully determined by BCs)
+y0        = [station_0, 0.0, station_1, 0.0, station_2, 0.0]
+yf_target = [station_1, 0.0, station_2, 0.0, station_3, 0.0]
+
+# State projection from the flow output
+π_x((x, p)) = x
+
+# Shooting function: S(p0) = 0 iff terminal state conditions are met
+S(p0) = π_x(f_flow(0.0, y0, p0, 1.0)) - yf_target
+
+# Initial guess for the costate from the direct solution
+p0_guess = costate(sol_direct)(0.0)
+
+# Solve the shooting equations
+nle!(s, p0, _) = s[:] = S(p0)
+prob = NonlinearProblem(nle!, p0_guess)
+shooting_sol = solve(prob, NewtonRaphson())
+p0_sol = shooting_sol.u
+println(&quot;Shooting residual: &quot;, norm(S(p0_sol)))</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Shooting residual: 5.857562241215484e-13</code></pre><h4 id="Solution-and-comparison"><a class="docs-heading-anchor" href="#Solution-and-comparison">Solution and comparison</a><a id="Solution-and-comparison-1"></a><a class="docs-heading-anchor-permalink" href="#Solution-and-comparison" title="Permalink"></a></h4><p>We reconstruct the full trajectory from the shooting solution and plot it:</p><pre><code class="language-julia hljs">sol_indirect = f_flow((0.0, 1.0), y0, p0_sol; saveat=range(0.0, 1.0, 200))
+plot_tram_solution(sol_indirect)</code></pre><img src="tutorial-cit-f3daf7db.svg" alt="Example block output"/><h2 id="Example-2:-hovercraft-path-planning"><a class="docs-heading-anchor" href="#Example-2:-hovercraft-path-planning">Example 2: hovercraft path planning</a><a id="Example-2:-hovercraft-path-planning-1"></a><a class="docs-heading-anchor-permalink" href="#Example-2:-hovercraft-path-planning" title="Permalink"></a></h2><p>We consider a hovercraft (point mass in the plane) that must pass through a sequence of <strong>waypoints</strong> at fixed times while minimising thrust energy. Unlike the tram, the hovercraft is not required to stop at the waypoints: its <strong>velocity is free</strong> at each intermediate time. This changes the structure of the indirect method.</p><p>This example is inspired by the <a href="https://infiniteopt.github.io/InfiniteOpt.jl/stable/examples/Optimal%20Control/hovercraft/">hovercraft problem from InfiniteOpt.jl</a>.</p><p>The problem is the 2D version of a double integrator:</p><p class="math-container">\[\min \int_0^{T} \|u(t)\|^2 \, \mathrm{d}t, \quad
+\dot{x} = v, \quad \dot{v} = u, \quad
+x(t_i) = x_i, \; i \in \{0,1,2,3\},\]</p><p>where <span>$x(t), v(t), u(t) \in \mathbb{R}^2$</span> are the position, velocity and thrust, <span>$x_i$</span> are the waypoint positions, and the waypoint times <span>$t_i$</span> are <strong>fixed</strong>.</p><pre><code class="language-julia hljs"># Waypoint positions (2D, in meters)
+xw = [1.0 4.0 6.0 1.0;
+      1.0 3.0 0.0 1.0]   # columns: waypoint 0, 1, 2, 3
+
+# Waypoint times (fixed, in seconds)
+tw = [0.0, 25.0, 50.0, 60.0]
+
+# Arc durations
+Δτ1 = tw[2] - tw[1]   # 25 s
+Δτ2 = tw[3] - tw[2]   # 25 s
+Δτ3 = tw[4] - tw[3]   # 10 s</code></pre><h3 id="Direct-method-2"><a class="docs-heading-anchor" href="#Direct-method-2">Direct method</a><a class="docs-heading-anchor-permalink" href="#Direct-method-2" title="Permalink"></a></h3><p>The augmented state is <span>$y = (x_1, v_1, x_2, v_2, x_3, v_3) \in \mathbb{R}^{12}$</span> (2D position + velocity per arc). Positions at arc endpoints are fixed to the waypoints; <strong>velocities at arc junctions are free</strong> but must be continuous (<span>$v_k(1) = v_{k+1}(0)$</span>).</p><pre><code class="language-julia hljs">@def ocp_hover begin
+
+    s ∈ [0, 1], time
+    y = (x1, y1, vx1, vy1, x2, y2, vx2, vy2, x3, y3, vx3, vy3) ∈ R^12, state
+    w = (ux1, uy1, ux2, uy2, ux3, uy3) ∈ R^6, control
+
+    # Initial conditions: arc 1 starts at waypoint 0, initial velocity fixed to zero
+    x1(0)  == xw[1, 1]
+    y1(0)  == xw[2, 1]
+    vx1(0) == 0.0
+    vy1(0) == 0.0
+
+    # Arc 1 terminal position: waypoint 1 (velocity free)
+    x1(1)  == xw[1, 2]
+    y1(1)  == xw[2, 2]
+
+    # Continuity arc 1 → arc 2 (position and velocity)
+    x2(0)  - x1(1)  == 0
+    y2(0)  - y1(1)  == 0
+    vx2(0) - vx1(1) == 0
+    vy2(0) - vy1(1) == 0
+
+    # Arc 2 terminal position: waypoint 2 (velocity free)
+    x2(1)  == xw[1, 3]
+    y2(1)  == xw[2, 3]
+
+    # Continuity arc 2 → arc 3 (position and velocity)
+    x3(0)  - x2(1)  == 0
+    y3(0)  - y2(1)  == 0
+    vx3(0) - vx2(1) == 0
+    vy3(0) - vy2(1) == 0
+
+    # Arc 3 terminal position: waypoint 3, final velocity fixed to zero
+    x3(1)  == xw[1, 4]
+    y3(1)  == xw[2, 4]
+    vx3(1) == 0.0
+    vy3(1) == 0.0
+
+    # Dynamics: time-normalised 2D double integrator for each arc
+    ẏ(s) == [
+        Δτ1 * vx1(s), Δτ1 * vy1(s), Δτ1 * ux1(s), Δτ1 * uy1(s),
+        Δτ2 * vx2(s), Δτ2 * vy2(s), Δτ2 * ux2(s), Δτ2 * uy2(s),
+        Δτ3 * vx3(s), Δτ3 * vy3(s), Δτ3 * ux3(s), Δτ3 * uy3(s)
+    ]
+
+    # Objective: minimise total thrust energy
+    ∫(
+        Δτ1 * (ux1(s)^2 + uy1(s)^2) +
+        Δτ2 * (ux2(s)^2 + uy2(s)^2) +
+        Δτ3 * (ux3(s)^2 + uy3(s)^2)
+    ) → min
+
+end</code></pre><pre><code class="language-julia hljs">sol_hover_direct = solve(ocp_hover)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">▫ This is OptimalControl 2.0.4, solving with: <span class="sgr36"><span class="sgr1">collocation</span></span> → <span class="sgr36"><span class="sgr1">adnlp</span></span> → <span class="sgr36"><span class="sgr1">ipopt</span></span> (<span class="sgr35"><span class="sgr1">cpu</span></span>)
+
+  📦 Configuration:
+   ├─ <span class="sgr1">Discretizer</span>: <span class="sgr36"><span class="sgr1">collocation</span></span>
+   ├─ <span class="sgr1">Modeler</span>: <span class="sgr36"><span class="sgr1">adnlp</span></span>
+   └─ <span class="sgr1">Solver</span>: <span class="sgr36"><span class="sgr1">ipopt</span></span>
+
+▫ This is Ipopt version 3.14.19, running with linear solver MUMPS 5.8.2.
+
+Number of nonzeros in equality constraint Jacobian...:    10528
+Number of nonzeros in inequality constraint Jacobian.:        0
+Number of nonzeros in Lagrangian Hessian.............:     1500
+
+Total number of variables............................:     4512
+                     variables with only lower bounds:        0
+                variables with lower and upper bounds:        0
+                     variables with only upper bounds:        0
+Total number of equality constraints.................:     3020
+Total number of inequality constraints...............:        0
+        inequality constraints with only lower bounds:        0
+   inequality constraints with lower and upper bounds:        0
+        inequality constraints with only upper bounds:        0
+
+iter    objective    inf_pr   inf_du lg(mu)  ||d||  lg(rg) alpha_du alpha_pr  ls
+   0  1.2000000e+00 5.90e+00 6.38e-15   0.0 0.00e+00    -  0.00e+00 0.00e+00   0
+   1  1.6362831e-01 1.78e-15 1.11e-16 -11.0 7.92e+00    -  1.00e+00 1.00e+00h  1
+
+Number of Iterations....: 1
+
+                                   (scaled)                 (unscaled)
+Objective...............:   1.6362830862324826e-01    1.6362830862324826e-01
+Dual infeasibility......:   1.1102230246251565e-16    1.1102230246251565e-16
+Constraint violation....:   1.7763568394002505e-15    1.7763568394002505e-15
+Variable bound violation:   0.0000000000000000e+00    0.0000000000000000e+00
+Complementarity.........:   0.0000000000000000e+00    0.0000000000000000e+00
+Overall NLP error.......:   1.7763568394002505e-15    1.7763568394002505e-15
+
+
+Number of objective function evaluations             = 2
+Number of objective gradient evaluations             = 2
+Number of equality constraint evaluations            = 2
+Number of inequality constraint evaluations          = 0
+Number of equality constraint Jacobian evaluations   = 2
+Number of inequality constraint Jacobian evaluations = 0
+Number of Lagrangian Hessian evaluations             = 1
+Total seconds in IPOPT                               = 5.087
+
+EXIT: Optimal Solution Found.</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">• Solver:
+  ✓ Successful  : true
+  │  Status     : first_order
+  │  Message    : Ipopt/generic
+  │  Iterations : 1
+  │  Objective  : 0.16362830862324826
+  └─ Constraints violation : 1.7763568394002505e-15
+
+• Boundary duals: [-0.0008747374190401179, 0.003946737418668674, 0.011910463192171483, 0.0456897416047336, 0.008874864681444123, -0.008874815528351754, 0.008000127262404004, -0.00492807810968308, 0.03377889866817299, -0.052978693861982756, -0.06293398943164163, 0.021461633075917107, -0.05493386216923763, 0.016533554966234026, -0.16622428289192687, 0.07022325888009362, 0.05493386216923763, -0.01653355496623403, -0.3831143388004503, 0.0951122907822452]
+</code></pre><h3 id="Plotting-the-hovercraft-solution"><a class="docs-heading-anchor" href="#Plotting-the-hovercraft-solution">Plotting the hovercraft solution</a><a id="Plotting-the-hovercraft-solution-1"></a><a class="docs-heading-anchor-permalink" href="#Plotting-the-hovercraft-solution" title="Permalink"></a></h3><p>We visualise the hovercraft solution in three complementary views: <strong>state and costate</strong> (to reveal the PMP structure), <strong>control</strong> (the thrust components), and <strong>trajectory</strong> (the 2D path through waypoints).</p><details class="admonition is-details" id="Code-for-plotting-47e3dfffa7cc1254"><summary class="admonition-header">Code for plotting<a class="admonition-anchor" href="#Code-for-plotting-47e3dfffa7cc1254" title="Permalink"></a></summary><div class="admonition-body"><pre><code class="language-julia hljs"># Common extraction of real-time arrays from a hovercraft solution
+function hover_extract(sol)
+    s_grid = time_grid(sol)
+    Y = state(sol).(s_grid)
+    W = control(sol).(s_grid)
+    P = costate(sol).(s_grid)
+
+    t_all = vcat(tw[1] .+ Δτ1 .* s_grid, tw[2] .+ Δτ2 .* s_grid, tw[3] .+ Δτ3 .* s_grid)
+
+    x_all   = vcat([y[1]  for y in Y], [y[5]  for y in Y], [y[9]  for y in Y])
+    y_all   = vcat([y[2]  for y in Y], [y[6]  for y in Y], [y[10] for y in Y])
+    vx_all  = vcat([y[3]  for y in Y], [y[7]  for y in Y], [y[11] for y in Y])
+    vy_all  = vcat([y[4]  for y in Y], [y[8]  for y in Y], [y[12] for y in Y])
+    ux_all  = vcat([w[1]  for w in W], [w[3]  for w in W], [w[5]  for w in W])
+    uy_all  = vcat([w[2]  for w in W], [w[4]  for w in W], [w[6]  for w in W])
+
+    px_all  = vcat([p[1]  for p in P], [p[5]  for p in P], [p[9]  for p in P])
+    py_all  = vcat([p[2]  for p in P], [p[6]  for p in P], [p[10] for p in P])
+    pvx_all = vcat([p[3]  for p in P], [p[7]  for p in P], [p[11] for p in P])
+    pvy_all = vcat([p[4]  for p in P], [p[8]  for p in P], [p[12] for p in P])
+
+    return (t_all, x_all, y_all, vx_all, vy_all, ux_all, uy_all,
+            px_all, py_all, pvx_all, pvy_all)
+end
+
+# Font settings (matching CTModels.jl defaults)
+title_font = font(10, Plots.default(:fontfamily))
+label_font_size = 10
+vlines = collect(tw[2:end-1])
+vlines_end = vcat(vlines, [tw[end]])
+
+# 1. State | Costate (4 rows x 2 columns)
+function plot_hover_state_costate(sol)
+    # NB: name the position costates pxx/pxy (not px/py): a local `px` would
+    # shadow the `px` pixel unit from Plots.PlotMeasures, turning `10px` in the
+    # margins below into a vector and breaking the layout.
+    (t, x, y, vx, vy, _, _, pxx, pxy, pvx, pvy) = hover_extract(sol)
+
+    plt_x = plot(t, x; title=&quot;state&quot;, ylabel=&quot;x (m)&quot;, label=false, linewidth=2, color=:blue, titlefont=title_font, xguidefontsize=label_font_size, yguidefontsize=label_font_size)
+    vline!(plt_x, vlines_end; linestyle=:dash, color=:gray, label=false)
+
+    plt_px = plot(t, pxx; title=&quot;costate&quot;, label=false, linewidth=2, color=:blue, titlefont=title_font, xguidefontsize=label_font_size, yguidefontsize=label_font_size)
+    vline!(plt_px, vlines_end; linestyle=:dash, color=:gray, label=false)
+
+    plt_y = plot(t, y; ylabel=&quot;y (m)&quot;, label=false, linewidth=2, color=:blue, xguidefontsize=label_font_size, yguidefontsize=label_font_size)
+    vline!(plt_y, vlines_end; linestyle=:dash, color=:gray, label=false)
+
+    plt_py = plot(t, pxy; label=false, linewidth=2, color=:blue, xguidefontsize=label_font_size, yguidefontsize=label_font_size)
+    vline!(plt_py, vlines_end; linestyle=:dash, color=:gray, label=false)
+
+    plt_vx = plot(t, vx; ylabel=&quot;vx (m/s)&quot;, label=false, linewidth=2, color=:green, xguidefontsize=label_font_size, yguidefontsize=label_font_size)
+    vline!(plt_vx, vlines_end; linestyle=:dash, color=:gray, label=false)
+
+    plt_pvx = plot(t, pvx; label=false, linewidth=2, color=:green, xguidefontsize=label_font_size, yguidefontsize=label_font_size)
+    vline!(plt_pvx, vlines_end; linestyle=:dash, color=:gray, label=false)
+
+    plt_vy = plot(t, vy; xlabel=&quot;t (s)&quot;, ylabel=&quot;vy (m/s)&quot;, label=false, linewidth=2, color=:green, xguidefontsize=label_font_size, yguidefontsize=label_font_size)
+    vline!(plt_vy, vlines_end; linestyle=:dash, color=:gray, label=false)
+
+    plt_pvy = plot(t, pvy; xlabel=&quot;t (s)&quot;, label=false, linewidth=2, color=:green, xguidefontsize=label_font_size, yguidefontsize=label_font_size)
+    vline!(plt_pvy, vlines_end; linestyle=:dash, color=:gray, label=false)
+
+    plot(plt_x, plt_px, plt_y, plt_py, plt_vx, plt_pvx, plt_vy, plt_pvy;
+         layout=(4, 2), size=(800, 600), leftmargin=10px, bottommargin=10px)
+end
+
+# 2. Control (1 row x 2 columns)
+function plot_hover_control(sol)
+    (t, _, _, _, _, ux, uy, _, _, _, _) = hover_extract(sol)
+
+    plt_ux = plot(t, ux; title=&quot;control&quot;, ylabel=&quot;ux (m/s²)&quot;, label=false, linewidth=2, color=:orange, titlefont=title_font, xguidefontsize=label_font_size, yguidefontsize=label_font_size)
+    vline!(plt_ux, vlines_end; linestyle=:dash, color=:gray, label=false)
+
+    plt_uy = plot(t, uy; xlabel=&quot;t (s)&quot;, ylabel=&quot;uy (m/s²)&quot;, label=false, linewidth=2, color=:orange, xguidefontsize=label_font_size, yguidefontsize=label_font_size)
+    vline!(plt_uy, vlines_end; linestyle=:dash, color=:gray, label=false)
+
+    plot(plt_ux, plt_uy; layout=(2, 1), size=(800, 400), leftmargin=10px, bottommargin=10px)
+end
+
+# 3. 2D trajectory
+function plot_hover_trajectory(sol)
+    s_grid = time_grid(sol)
+    Y = state(sol).(s_grid)
+
+    x1v = [y[1] for y in Y];  y1v = [y[2] for y in Y]
+    x2v = [y[5] for y in Y];  y2v = [y[6] for y in Y]
+    x3v = [y[9] for y in Y];  y3v = [y[10] for y in Y]
+
+    plt = plot(x1v, y1v; title=&quot;position&quot;, label=&quot;arc 1&quot;, linewidth=2, color=:blue, titlefont=title_font, xguidefontsize=label_font_size, yguidefontsize=label_font_size)
+    plot!(plt, x2v, y2v; label=&quot;arc 2&quot;, linewidth=2, color=:green)
+    plot!(plt, x3v, y3v; label=&quot;arc 3&quot;, linewidth=2, color=:red)
+    scatter!(plt, xw[1,:], xw[2,:]; label=&quot;waypoints&quot;, markersize=7, color=:black, markershape=:star5)
+    plot!(plt; xlabel=&quot;x (m)&quot;, ylabel=&quot;y (m)&quot;, aspect_ratio=:equal, size=(800, 400), leftmargin=10px, bottommargin=10px)
+end</code></pre></div></details><h4 id="Direct-solution:-state-and-costate"><a class="docs-heading-anchor" href="#Direct-solution:-state-and-costate">Direct solution: state and costate</a><a id="Direct-solution:-state-and-costate-1"></a><a class="docs-heading-anchor-permalink" href="#Direct-solution:-state-and-costate" title="Permalink"></a></h4><p>The left column shows the state components (position <span>$x, y$</span> and velocity <span>$v_x, v_y$</span>); the right column shows the corresponding costates. The vertical dashed lines mark the waypoint times. Note how the <strong>velocity costates</strong> <span>$p^v_x$</span> and <span>$p^v_y$</span> are <strong>continuous</strong> across junctions, while the <strong>position costates</strong> <span>$p^x_x$</span> and <span>$p^x_y$</span> may <strong>jump</strong> — this is the key structural difference from the tram problem.</p><pre><code class="language-julia hljs">plot_hover_state_costate(sol_hover_direct)</code></pre><img src="tutorial-cit-f5655337.svg" alt="Example block output"/><h4 id="Direct-solution:-control"><a class="docs-heading-anchor" href="#Direct-solution:-control">Direct solution: control</a><a id="Direct-solution:-control-1"></a><a class="docs-heading-anchor-permalink" href="#Direct-solution:-control" title="Permalink"></a></h4><p>The thrust components <span>$u_x$</span> and <span>$u_y$</span> are shown below. By the PMP, <span>$u_k^* = \frac{1}{2} p^v_k$</span>, so the control is proportional to the velocity costate.</p><pre><code class="language-julia hljs">plot_hover_control(sol_hover_direct)</code></pre><img src="tutorial-cit-ed785b5a.svg" alt="Example block output"/><h4 id="Direct-solution:-trajectory"><a class="docs-heading-anchor" href="#Direct-solution:-trajectory">Direct solution: trajectory</a><a id="Direct-solution:-trajectory-1"></a><a class="docs-heading-anchor-permalink" href="#Direct-solution:-trajectory" title="Permalink"></a></h4><p>The 2D trajectory passes through the four waypoints (star markers). The hovercraft does not stop at intermediate waypoints — only the final velocity is zero.</p><pre><code class="language-julia hljs">plot_hover_trajectory(sol_hover_direct)</code></pre><img src="tutorial-cit-7659b669.svg" alt="Example block output"/><h3 id="Indirect-method-2"><a class="docs-heading-anchor" href="#Indirect-method-2">Indirect method</a><a class="docs-heading-anchor-permalink" href="#Indirect-method-2" title="Permalink"></a></h3><p>We now solve the hovercraft problem with an indirect shooting method. The richer structure of this problem — free velocity at waypoints — produces a more complex shooting function than the tram.</p><h4 id="PMP-for-the-augmented-problem-2"><a class="docs-heading-anchor" href="#PMP-for-the-augmented-problem-2">PMP for the augmented problem</a><a class="docs-heading-anchor-permalink" href="#PMP-for-the-augmented-problem-2" title="Permalink"></a></h4><p>The pseudo-Hamiltonian for the augmented hovercraft OCP is</p><p class="math-container">\[H(y, p, w) = \sum_{k=1}^{3} \Delta\tau_k \bigl( p^x_k \cdot v_k + p^v_k \cdot u_k - \|u_k\|^2 \bigr),\]</p><p>where the costate per arc is <span>$p_k = (p^x_k,\, p^v_k) \in \mathbb{R}^2 \times \mathbb{R}^2$</span>. Maximising over <span>$u_k \in \mathbb{R}^2$</span> gives</p><p class="math-container">\[u_k^*(s) = \frac{1}{2}\, p^v_k(s).\]</p><p>The costate equations are <span>$\dot p^x_k = 0$</span> and <span>$\dot p^v_k = -\Delta\tau_k\, p^x_k$</span>.</p><h4 id="Transversality-conditions-and-shooting-function-2"><a class="docs-heading-anchor" href="#Transversality-conditions-and-shooting-function-2">Transversality conditions and shooting function</a><a class="docs-heading-anchor-permalink" href="#Transversality-conditions-and-shooting-function-2" title="Permalink"></a></h4><p>The boundary conditions split as:</p><ul><li><strong>Positions at arc endpoints</strong>: <span>$x_k(0)$</span> and <span>$x_k(1)$</span> are <strong>fixed</strong> (waypoints) — the corresponding costates <span>$p^x_k$</span> can jump at junctions.</li><li><strong>Velocities at arc junctions</strong>: <span>$v_k(1) = v_{k+1}(0)$</span> are <strong>free</strong> (only continuity imposed) — the transversality conditions require the velocity costates to be <strong>continuous</strong>:</li></ul><p class="math-container">\[p^v_k(1) = p^v_{k+1}(0), \qquad k = 1, 2.\]</p><p>These continuity conditions replace costate jumps and add equations to the shooting function.</p><p><strong>Shooting unknowns</strong>: the 12 costate components <span>$p_k(0) \in \mathbb{R}^4$</span> for <span>$k = 1,2,3$</span>, plus the 4 junction velocity components <span>$v_{j,1}, v_{j,2} \in \mathbb{R}^2$</span>, giving <span>$z = (p_0, v_{j,1}, v_{j,2}) \in \mathbb{R}^{16}$</span>.</p><p><strong>Shooting equations</strong> (16 total):</p><ul><li>6 terminal position conditions: <span>$x_k(1) = x_{k+1}$</span> for <span>$k = 1,2,3$</span> (componentwise in <span>$\mathbb{R}^2$</span>)</li><li>2 final velocity conditions: <span>$v_3(1) = 0$</span> (componentwise in <span>$\mathbb{R}^2$</span>)</li><li>4 velocity costate continuity conditions: <span>$p^v_k(1) = p^v_{k+1}(0)$</span> for <span>$k = 1, 2$</span> (componentwise in <span>$\mathbb{R}^2$</span>)</li><li>4 state velocity continuity conditions: <span>$v_k(1) = v_{j,k}$</span> for <span>$k = 1, 2$</span> (componentwise in <span>$\mathbb{R}^2$</span>)</li></ul><p class="math-container">\[S(z) \coloneqq \begin{pmatrix}
+  \pi_x\bigl(\Phi^H(0, y_0, p_0, 1)\bigr) - x_f^* \\
+  v_3(1) \\
+  p^v_k(1) - p^v_{k+1}(0) \\
+  v_k(1) - v_{j,k}
+\end{pmatrix} = 0 \in \mathbb{R}^{16},\]</p><p>where <span>$z = (p_0, v_{j,1}, v_{j,2}) \in \mathbb{R}^{16}$</span> and <span>$y_0 = (x_0, 0,\, x_1, v_{j,1},\, x_2, v_{j,2})$</span>.</p><div class="admonition is-info" id="Comparison-with-the-tram-a82378695e9ab6da"><header class="admonition-header">Comparison with the tram<a class="admonition-anchor" href="#Comparison-with-the-tram-a82378695e9ab6da" title="Permalink"></a></header><div class="admonition-body"><p>In the tram, all velocities at junctions were fixed to zero, leaving only <span>$p_0 \in \mathbb{R}^6$</span> as unknowns (no velocity costate continuity equations needed). Here, free junction velocities add both unknowns and continuity equations, keeping the system <span>$16 \times 16$</span>.</p></div></div><div class="admonition is-success" id="General-principle:-fixed-state-free-costate-44fb38be0153a2f2"><header class="admonition-header">General principle: fixed state ⇔ free costate<a class="admonition-anchor" href="#General-principle:-fixed-state-free-costate-44fb38be0153a2f2" title="Permalink"></a></header><div class="admonition-body"><p>Both examples obey a single rule. At a junction, read each state component separately:</p><ul><li>a <strong>fixed</strong> component (a station/waypoint position) ⇒ its costate is <strong>free</strong>, unconstrained across the junction — it may <em>jump</em>;</li><li>a component required only <strong>continuous</strong> (a waypoint velocity) ⇒ its costate is <strong>continuous</strong> across the junction.</li></ul><p>This is the classical duality <em>fixed state ⇔ free costate / free state ⇒ costate set by transversality</em>, transported to an interior point. The continuity of the costate for a continuous state holds <strong>because the cost has no Mayer term evaluated at the junction</strong>: such a term would add its gradient to the transversality condition and make the costate jump even when the state is continuous.</p></div></div><h4 id="Implementation-2"><a class="docs-heading-anchor" href="#Implementation-2">Implementation</a><a class="docs-heading-anchor-permalink" href="#Implementation-2" title="Permalink"></a></h4><pre><code class="language-julia hljs"># Maximising control in feedback form: u_k* = p^v_k / 2
+function u_opt_hover(x, p)
+    [p[3]/2, p[4]/2,     # arc 1: u_1 = p^v_1 / 2
+     p[7]/2, p[8]/2,     # arc 2: u_2 = p^v_2 / 2
+     p[11]/2, p[12]/2]   # arc 3: u_3 = p^v_3 / 2
+end
+
+# Hamiltonian flow
+f_hover = Flow(ocp_hover, u_opt_hover)
+
+# Fixed components of y0 (positions at waypoints 0, 1, 2; initial velocity = 0)
+# Junction velocities (vx1(0), vy1(0), vx2(0), vy2(0) of arcs 2 and 3)
+# are determined by direct solution as initial guess
+y0_hover_fixed = [xw[1,1], xw[2,1], 0.0, 0.0,    # arc 1: x0, y0, vx0=0, vy0=0
+                  xw[1,2], xw[2,2], 0.0, 0.0,    # arc 2: x0=xw1, y0=yw1, vx0 free, vy0 free
+                  xw[1,3], xw[2,3], 0.0, 0.0]    # arc 3: x0=xw2, y0=yw2, vx0 free, vy0 free
+
+# Build y0 with junction velocities included in shooting unknowns z = (p0, vjunc)
+# z[1:12]  = p0 (costate at s=0)
+# z[13:16] = (vx1_junc, vy1_junc, vx2_junc, vy2_junc) junction velocities
+
+function S_hover(z)
+    p0      = z[1:12]
+    vj1 = z[13:14]   # junction velocity between arc 1 and 2
+    vj2 = z[15:16]   # junction velocity between arc 2 and 3
+
+    # Build full initial state (patch junction velocities)
+    # Use eltype(z) to support ForwardDiff Duals during Jacobian computation
+    y0 = Vector{eltype(z)}(y0_hover_fixed)
+    y0[7:8]  = vj1   # arc 2 initial velocity
+    y0[11:12] = vj2  # arc 3 initial velocity
+
+    # Integrate Hamiltonian flow
+    xf, pf = f_hover(0.0, y0, p0, 1.0)
+
+    # Extract terminal positions (conditions: reach target positions)
+    pos_cond = [xf[1] - xw[1,2], xf[2] - xw[2,2],   # arc 1 terminal pos
+                xf[5] - xw[1,3], xf[6] - xw[2,3],   # arc 2 terminal pos
+                xf[9] - xw[1,4], xf[10] - xw[2,4]]  # arc 3 terminal pos
+
+    # Final velocity condition (arc 3 must stop)
+    vel_final_cond = [xf[11], xf[12]]
+
+    # Velocity costate continuity: pvy_k(1) = pvy_{k+1}(0)
+    # arc 1 final vel costate vs arc 2 initial vel costate
+    pvcont1 = [pf[3] - p0[7], pf[4] - p0[8]]    # pvx1(1)==pvx2(0), pvy1(1)==pvy2(0)
+    # arc 2 final vel costate vs arc 3 initial vel costate
+    pvcont2 = [pf[7] - p0[11], pf[8] - p0[12]]  # pvx2(1)==pvx3(0), pvy2(1)==pvy3(0)
+
+    # Velocity continuity (state): v1(1) == v2(0) and v2(1) == v3(0)
+    vcont1 = [xf[3] - vj1[1], xf[4] - vj1[2]]
+    vcont2 = [xf[7] - vj2[1], xf[8] - vj2[2]]
+
+    return vcat(pos_cond, vel_final_cond, pvcont1, pvcont2, vcont1, vcont2)
+end
+
+# Initial guess from the direct solution
+p0_hover_guess = costate(sol_hover_direct)(0.0)
+y0d = state(sol_hover_direct)(0.0)
+vj1_guess = [y0d[7], y0d[8]]    # vx2(0), vy2(0) from direct solution (≈ vx1(1), vy1(1))
+vj2_guess = [y0d[11], y0d[12]]  # vx3(0), vy3(0) from direct solution (≈ vx2(1), vy2(1))
+z_guess = vcat(p0_hover_guess, vj1_guess, vj2_guess)
+
+nle_hover!(res, z, _) = res[:] = S_hover(z)
+prob_hover = NonlinearProblem(nle_hover!, z_guess)
+shooting_hover_sol = solve(prob_hover, NewtonRaphson())
+z_sol = shooting_hover_sol.u
+println(&quot;Hovercraft shooting residual: &quot;, norm(S_hover(z_sol)))</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Hovercraft shooting residual: 1.3210521364051308e-14</code></pre><h4 id="Indirect-solution:-state-and-costate"><a class="docs-heading-anchor" href="#Indirect-solution:-state-and-costate">Indirect solution: state and costate</a><a id="Indirect-solution:-state-and-costate-1"></a><a class="docs-heading-anchor-permalink" href="#Indirect-solution:-state-and-costate" title="Permalink"></a></h4><p>The indirect solution reproduces the same state and costate trajectories. The velocity costates <span>$p^v_x$</span> and <span>$p^v_y$</span> are <strong>continuous</strong> at waypoint times (as required by the transversality conditions), while the position costates <span>$p^x_x$</span> and <span>$p^x_y$</span> exhibit <strong>jumps</strong> — these are the costate jumps predicted by the multi-arc PMP.</p><pre><code class="language-julia hljs">p0_hover_sol = z_sol[1:12]
+vj1_sol      = z_sol[13:14]
+vj2_sol      = z_sol[15:16]
+
+y0_hover_sol = copy(y0_hover_fixed)
+y0_hover_sol[7:8]  = vj1_sol
+y0_hover_sol[11:12] = vj2_sol
+
+sol_hover_indirect = f_hover((0.0, 1.0), y0_hover_sol, p0_hover_sol; saveat=range(0.0, 1.0, 200))
+plot_hover_state_costate(sol_hover_indirect)</code></pre><img src="tutorial-cit-776bd866.svg" alt="Example block output"/><h4 id="Indirect-solution:-control"><a class="docs-heading-anchor" href="#Indirect-solution:-control">Indirect solution: control</a><a id="Indirect-solution:-control-1"></a><a class="docs-heading-anchor-permalink" href="#Indirect-solution:-control" title="Permalink"></a></h4><pre><code class="language-julia hljs">plot_hover_control(sol_hover_indirect)</code></pre><img src="tutorial-cit-f5bf2e22.svg" alt="Example block output"/><h4 id="Indirect-solution:-trajectory"><a class="docs-heading-anchor" href="#Indirect-solution:-trajectory">Indirect solution: trajectory</a><a id="Indirect-solution:-trajectory-1"></a><a class="docs-heading-anchor-permalink" href="#Indirect-solution:-trajectory" title="Permalink"></a></h4><pre><code class="language-julia hljs">plot_hover_trajectory(sol_hover_indirect)</code></pre><img src="tutorial-cit-f84a7d70.svg" alt="Example block output"/><h2 id="Conclusion"><a class="docs-heading-anchor" href="#Conclusion">Conclusion</a><a id="Conclusion-1"></a><a class="docs-heading-anchor-permalink" href="#Conclusion" title="Permalink"></a></h2><p>The <strong>multi-arc augmentation</strong> with time normalisation turns constraints at intermediate times into a single standard OCP on <span>$[0, 1]$</span>, solvable both by a direct method and by an indirect shooting method — here in close agreement (shooting residuals <span>$\sim 10^{-13}$</span>). The costate structure at the junctions follows the fixed-state ⇔ free-costate duality: full stops (tram) leave each arc&#39;s costate independent, whereas continuous velocities (hovercraft) force the velocity costates to be continuous.</p><div class="admonition is-info" id="Going-further:-free-intermediate-times-7e4b78a2f2042940"><header class="admonition-header">Going further: free intermediate times<a class="admonition-anchor" href="#Going-further:-free-intermediate-times-7e4b78a2f2042940" title="Permalink"></a></header><div class="admonition-body"><p>Here the schedule is <strong>fixed</strong> (<span>$\Delta t_k$</span>, <span>$\Delta\tau_k$</span> are data), so the PMP conditions on the Hamiltonian at the endpoints are never used. If instead an intermediate time <span>$t_s$</span> is <strong>free</strong> (the schedule is optimised), <span>$\Delta t_k$</span> becomes a parameter and stationarity with respect to it yields — back in physical time — the <strong>continuity of the Hamiltonian</strong> at the junction, <span>$H_k(t_s^-) = H_{k+1}(t_s^+)$</span> (absent a junction cost). This is the temporal analogue of the duality above: a free junction <em>time</em> produces continuity of the <em>Hamiltonian</em>, just as a continuous state component produces continuity of its costate.</p></div></div></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="tutorial-mam.html">« Minimal action</a><a class="docs-footer-nextpage" href="tutorial-mpc.html">Model Predictive Control »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.17.0 on <span class="colophon-date" title="Friday 24 July 2026 21:54">Friday 24 July 2026</span>. Using Julia version 1.12.6.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
