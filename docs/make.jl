@@ -1,14 +1,43 @@
+pushfirst!(LOAD_PATH, joinpath(@__DIR__))
+pushfirst!(LOAD_PATH, joinpath(@__DIR__, ".."))
+
 using Documenter
 using OptimalControl
 
-mkpath("./docs/src/assets")
-cp("./docs/Manifest.toml", "./docs/src/assets/Manifest.toml"; force=true)
-cp("./docs/Project.toml", "./docs/src/assets/Project.toml"; force=true)
+# ═══════════════════════════════════════════════════════════════════════════════
+# Assets for reproducibility
+# ═══════════════════════════════════════════════════════════════════════════════
+mkpath(joinpath(@__DIR__, "src", "assets"))
+cp(
+    joinpath(@__DIR__, "Manifest.toml"),
+    joinpath(@__DIR__, "src", "assets", "Manifest.toml");
+    force=true,
+)
+cp(
+    joinpath(@__DIR__, "Project.toml"),
+    joinpath(@__DIR__, "src", "assets", "Project.toml");
+    force=true,
+)
 
+# ═══════════════════════════════════════════════════════════════════════════════
+# Paths
+# ═══════════════════════════════════════════════════════════════════════════════
 repo_url = "github.com/control-toolbox/Tutorials.jl"
 
+# ═══════════════════════════════════════════════════════════════════════════════
+# Configuration
+# ═══════════════════════════════════════════════════════════════════════════════
+# if draft is true, then the julia code from .md is not executed
+# to disable the draft mode in a specific markdown file, use the following:
+#=
+```@meta
+Draft = false
+```
+=#
+draft = true # Draft mode: if true, @example blocks in markdown are not executed
+
 makedocs(;
-    draft=false, # if draft is true, then the julia code from .md is not executed
+    draft=draft, # if draft is true, then the julia code from .md is not executed
     warnonly=[:cross_references, :autodocs_block],
     sitename="Tutorials",
     format=Documenter.HTML(;
@@ -30,6 +59,7 @@ makedocs(;
             "Goddard: direct, indirect" => "tutorial-goddard.md",
             "Linear–quadratic regulator" => "tutorial-lqr.md",
             "Minimal action" => "tutorial-mam.md",
+            "Constraints at intermediate times" => "tutorial-cit.md",
             "Model Predictive Control" => "tutorial-mpc.md",
         ],
     ],
