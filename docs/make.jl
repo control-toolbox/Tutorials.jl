@@ -36,6 +36,9 @@ cp(
     force=true,
 )
 
+# ═══════════════════════════════════════════════════════════════════════════════
+# Paths
+# ═══════════════════════════════════════════════════════════════════════════════
 repo_url = "github.com/control-toolbox/Tutorials.jl"
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -69,20 +72,31 @@ makedocs(;
     pages=[
         "Getting Started" => "index.md",
         "Tutorials and Advanced Features" => [
-            "Discrete continuation" => "tutorial-continuation.md",
-            "Discretisation methods" => "tutorial-discretisation.md",
-            "Free times" => [
-                "Final time" => "tutorial-free-times-final.md",
-                "Initial time" => "tutorial-free-times-initial.md",
-                "Final and initial times" => "tutorial-free-times-final-initial.md",
+            "Fundamentals" => [
+                "Linear–quadratic regulator" => "tutorial-lqr.md",
+                "Free times" => [
+                    "Final time"              => "tutorial-free-times-final.md",
+                    "Initial time"            => "tutorial-free-times-initial.md",
+                    "Final and initial times" => "tutorial-free-times-final-initial.md",
+                ],
             ],
-            "NLP manipulations" => "tutorial-nlp.md",
-            "Indirect simple shooting" => "tutorial-iss.md",
-            "Goddard: direct, indirect" => "tutorial-goddard.md",
-            "Linear–quadratic regulator" => "tutorial-lqr.md",
-            "Minimal action" => "tutorial-mam.md",
-            "Model Predictive Control" => "tutorial-mpc.md",
-            "Symbolic Lagrangian Mechanics" => "tutorial-symbolics.md",
+            "Direct methods" => [
+                "Discretisation methods" => "tutorial-discretisation.md",
+                "NLP manipulations"      => "tutorial-nlp.md",
+                "Discrete continuation"  => "tutorial-continuation.md",
+            ],
+            "Indirect methods" => [
+                "Indirect simple shooting" => "tutorial-iss.md",
+            ],
+            "Combined approaches" => [
+                "Goddard: direct, indirect"         => "tutorial-goddard.md",
+                "Constraints at intermediate times" => "tutorial-cit.md",
+            ],
+            "Applications" => [
+                "Minimal action"                => "tutorial-mam.md",
+                "Model Predictive Control"      => "tutorial-mpc.md",
+                "Symbolic Lagrangian Mechanics" => "tutorial-symbolics.md",
+            ],
         ],
     ],
     plugins=[links],
