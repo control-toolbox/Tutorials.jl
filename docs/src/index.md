@@ -6,20 +6,45 @@ From this page, you can find a list of tutorials to solve optimal control proble
 
 ## Available tutorials
 
+### Fundamentals
+
 | Tutorial | Description |
 | :------- | :---------- |
-| **[Discrete continuation](@ref tutorial-continuation)** | Uses warm start to implement a discrete continuation method, solving a sequence of OCPs where each solution initializes the next. |
-| **[Discretisation methods](@ref tutorial-discretisation-methods)** | Compares discretisation schemes (trapeze, midpoint, Gauss-Legendre…) and automatic differentiation backends on the Goddard problem. |
+| **[Linear–quadratic regulator](@ref tutorial-lqr)** | A simple LQR example illustrating how to solve a linear-quadratic OCP. |
 | **[Free final time](@ref tutorial-free-times-final)** | OCP with a free final time `tf`, solved by direct transcription and indirect shooting on a double integrator. |
 | **[Free initial time](@ref tutorial-free-times-initial)** | OCP with a free initial time `t0`, solved by direct transcription and indirect shooting on a double integrator. |
 | **[Free initial and final times](@ref tutorial-free-times-final-initial)** | OCP with both initial and final times as free optimization variables. |
+
+### Direct methods
+
+| Tutorial | Description |
+| :------- | :---------- |
+| **[Discretisation methods](@ref tutorial-discretisation-methods)** | Compares discretisation schemes (trapeze, midpoint, Gauss-Legendre…) and automatic differentiation backends on the Goddard problem. |
 | **[NLP manipulations](@ref tutorial-nlp)** | Low-level decomposition of `solve`: discretize the OCP, build an NLP model, solve it with an NLP solver, and rebuild the OCP solution. |
+| **[Discrete continuation](@ref tutorial-continuation)** | Uses warm start to implement a discrete continuation method, solving a sequence of OCPs where each solution initializes the next. |
+
+### Indirect methods
+
+| Tutorial | Description |
+| :------- | :---------- |
 | **[Indirect simple shooting](@ref tutorial-indirect-simple-shooting)** | Implements the indirect simple shooting method on a simple example. |
+
+### Combined approaches
+
+| Tutorial | Description |
+| :------- | :---------- |
 | **[Goddard: direct, indirect](@ref tutorial-goddard)** | Solves the Goddard rocket problem (maximize altitude) with both direct and indirect methods, including singular and boundary arcs. |
-| **[Linear–quadratic regulator](@ref tutorial-lqr)** | A simple LQR example illustrating how to solve a linear-quadratic OCP. |
+| **[Constraints at intermediate times](@ref tutorial-for-constraints-at-intermediate-times)** | Enforces waypoint or station constraints at intermediate times via a multi-arc augmentation with time normalisation. |
+
+### Applications
+
+| Tutorial | Description |
+| :------- | :---------- |
 | **[Minimal action](@ref tutorial-mam)** | Applies the Minimal Action Method (MAM) to find the most probable transition pathway between stable states in a stochastic system. |
 | **[Model Predictive Control](@ref tutorial-mpc)** | Implements MPC for ship navigation in a sea current, with a real-time replanning loop. |
 | **[Symbolic dynamics derivation](@ref tutorial-symbolics)** | Derives the equation of motion for the cart-pole symbolically and determines a periodic orbit. |
+
+To go further with concrete applications built with the control-toolbox ecosystem (MRI, orbital mechanics, epidemiology, calculus of variations, …), visit [control-toolbox.org/applications](https://control-toolbox.org/applications/).
 
 ## Reproducibility
 
