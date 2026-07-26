@@ -75,26 +75,24 @@ makedocs(;
             "Fundamentals" => [
                 "Linear–quadratic regulator" => "tutorial-lqr.md",
                 "Free times" => [
-                    "Final time"              => "tutorial-free-times-final.md",
-                    "Initial time"            => "tutorial-free-times-initial.md",
+                    "Final time" => "tutorial-free-times-final.md",
+                    "Initial time" => "tutorial-free-times-initial.md",
                     "Final and initial times" => "tutorial-free-times-final-initial.md",
                 ],
             ],
             "Direct methods" => [
                 "Discretisation methods" => "tutorial-discretisation.md",
-                "NLP manipulations"      => "tutorial-nlp.md",
-                "Discrete continuation"  => "tutorial-continuation.md",
+                "NLP manipulations" => "tutorial-nlp.md",
+                "Discrete continuation" => "tutorial-continuation.md",
             ],
-            "Indirect methods" => [
-                "Indirect simple shooting" => "tutorial-iss.md",
-            ],
+            "Indirect methods" => ["Indirect simple shooting" => "tutorial-iss.md"],
             "Combined approaches" => [
-                "Goddard: direct, indirect"         => "tutorial-goddard.md",
+                "Goddard: direct, indirect" => "tutorial-goddard.md",
                 "Constraints at intermediate times" => "tutorial-cit.md",
             ],
             "Applications" => [
-                "Minimal action"                => "tutorial-mam.md",
-                "Model Predictive Control"      => "tutorial-mpc.md",
+                "Minimal action" => "tutorial-mam.md",
+                "Model Predictive Control" => "tutorial-mpc.md",
                 "Symbolic Lagrangian Mechanics" => "tutorial-symbolics.md",
             ],
         ],
